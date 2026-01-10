@@ -8,8 +8,11 @@ const getTextContent = (children: React.ReactNode): string => {
   if (typeof children === 'string') return children;
   if (typeof children === 'number') return String(children);
   if (Array.isArray(children)) return children.map(getTextContent).join('');
-  if (React.isValidElement(children) && children.props.children) {
-    return getTextContent(children.props.children);
+  if (React.isValidElement(children)) {
+    const props = children.props as { children?: React.ReactNode };
+    if (props.children) {
+      return getTextContent(props.children);
+    }
   }
   return '';
 };

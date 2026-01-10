@@ -63,7 +63,7 @@ export function TableOfContents() {
         });
 
         // Find the active heading: prefer intersecting ones near the threshold
-        let activeHeading = null;
+        let activeHeading: Element | null = null;
         let minDistance = Infinity;
 
         // First, try to find intersecting headings near the scroll threshold
@@ -87,7 +87,7 @@ export function TableOfContents() {
         }
 
         if (activeHeading) {
-          setActiveId(activeHeading.id);
+          setActiveId((activeHeading as HTMLElement).id);
         }
       },
       {
