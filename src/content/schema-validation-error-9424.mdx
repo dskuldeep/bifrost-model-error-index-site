@@ -1,0 +1,32 @@
+---
+title: "Invalid schema for function \"get_current_weather\": In context=(), object schema missing properties"
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "schema-validation-error-9424"
+---
+
+## Reason
+
+The `400 - Bad Request` error in the OpenAI API is a client-side error indicating that the server cannot process the request due to invalid syntax or configuration. In the context of the error message `Invalid schema for function "get_current_weather": In context=(), object schema missing properties`, the failure is specifically related to the tool/function definition schema.
+
+Key reasons for this error include:
+
+- **Missing 'properties' Field**: When defining a function's parameters as `type: "object"`, the JSON Schema specification requires a `properties` key to define the fields within that object. If this key is omitted or empty, the schema is considered invalid.
+- **Invalid or Missing Parameters**: The request may be missing required parameters or failing to conform to the expected JSON Schema structure required by the OpenAI API.
+- **Incorrect API Request Structure**: The API expects a specific hierarchy for the `tools` or `functions` array. Misplaced keys or incorrectly formatted headers can lead to validation failures.
+- **Model-Specific Constraints**: Different models (such as GPT-4o or GPT-4 Turbo) may enforce stricter validation. For instance, when using Structured Outputs with `strict: true`, the schema must include `additionalProperties: false` and all fields must be marked as `required`.
+
+## Solution
+To resolve the `400 - Bad Request` error and fix the invalid schema for your function, follow these steps:
+1. **Verify the API Request Structure**: Ensure your function definition is wrapped correctly within the `tools` array (for the Chat Completions API) and follows the standard format: `type`, `function`, `name`, and `parameters`.
+2. **Check for Missing Properties**: Open your function's `parameters` block. If the type is set to `"object"`, ensure you have a `properties` dictionary defined. Even if the function takes no arguments, the schema must be a valid object definition.
+3. **Validate JSON Payload**: Use a JSON linter to ensure the request body is syntactically correct. Check for trailing commas, unquoted keys, or mismatched brackets that might break the schema structure.
+4. **Review Model-Specific Constraints**: If you are using Structured Outputs, verify that your schema complies with OpenAI's specific subset of JSON Schema, including the requirement for `additionalProperties: false` in object definitions.
+5. **Refer to API Documentation**: Compare your function schema against the examples in the OpenAI Function Calling guide to ensure all mandatory fields are present and correctly typed.
+
+## Suggested Links
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-tools](https://platform.openai.com/docs/api-reference/chat/create#chat-create-tools)
+- [https://platform.openai.com/docs/guides/structured-outputs](https://platform.openai.com/docs/guides/structured-outputs)
+- [https://json-schema.org/understanding-json-schema/reference/object](https://json-schema.org/understanding-json-schema/reference/object)

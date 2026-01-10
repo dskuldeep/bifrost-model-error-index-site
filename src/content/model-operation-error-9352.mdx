@@ -1,0 +1,38 @@
+---
+title: "The specified model is incompatible with the chosen operation. Please select a different model and try again. Learn more about compatible models with operations here: https://go.microsoft.com/fwlink/?linkid=2197993."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "model-operation-error-9352"
+---
+
+## Raw Error Text
+
+```text
+The chatCompletion operation does not work with the specified model, text-embedding-ada-002. Please choose different model and try again. You can learn more about which models can be used with each operation here: https://go.microsoft.com/fwlink/?linkid=2197993.
+```
+
+## Reason
+
+The HTTP 400 status error occurs because the Azure OpenAI service identifies a mismatch between the requested API operation and the model's architectural capabilities. 
+
+Key reasons include:
+
+* **Model Incompatibility**: The `text-embedding-ada-002` model is a specialized representation model designed solely to convert text into numerical vectors (embeddings). It does not support generative text tasks or the `chatCompletion` operation.
+* **Endpoint Mismatch**: The `chatCompletion` operation (specifically the `/chat/completions` endpoint) requires Chat-optimized models like `gpt-4o` or `gpt-3.5-turbo`. Attempting to use an embedding model with this endpoint results in a "Bad Request" because the server cannot map the embedding weights to a text generation request.
+* **Invalid Request Configuration**: The error indicates that the API request is pointing to a deployment whose model type does not support the requested functionality. In Azure OpenAI, model deployments are strictly bound to their intended purpose (Chat, Completions, or Embeddings).
+
+## Solution
+To resolve this error, you must align your model selection with the specific API operation you are performing.
+
+Follow these steps:
+1. **Switch to a Compatible Chat Model**: If your goal is to generate a conversational response, replace `text-embedding-ada-002` with a supported chat model such as `gpt-4o`, `gpt-4`, or `gpt-3.5-turbo`.
+2. **Correct the API Operation**: If you actually intended to generate embeddings (vectors) for text, ensure your code is calling the `embeddings` endpoint (`/openai/deployments/{deployment-id}/embeddings`) instead of the `chatCompletion` operation.
+3. **Verify Deployment in Azure AI Foundry**: Log into the Azure AI Foundry (formerly Azure AI Studio) and navigate to the **Deployments** section. Ensure the `deployment_id` referenced in your code matches a deployment of a Chat model when using the Chat Completion API.
+4. **Update SDK Methods**: If using the OpenAI Python or Node.js SDK, ensure you are using `client.chat.completions.create` for chat models and `client.embeddings.create` for embedding models like `text-embedding-ada-002`.
+5. **Consult the Model Capability Matrix**: Review the official Azure OpenAI documentation to verify which models support specific operations to ensure future requests are properly configured.
+
+## Suggested Links
+- [https://go.microsoft.com/fwlink/?linkid=2197993](https://go.microsoft.com/fwlink/?linkid=2197993)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#embeddings](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#embeddings)

@@ -1,0 +1,30 @@
+---
+title: "\"messages\" is a required property"
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "validation-error-9528"
+---
+
+## Reason
+
+The `"messages" is a required property` error is a validation failure (HTTP 400) indicating that the OpenAI Chat Completions API did not receive the expected input structure. This occurs for several specific reasons:
+
+- **Incorrect Request Structure**: The API request payload may be missing the top-level `messages` key entirely, or the key may be misspelled (e.g., using `message` instead of `messages`).
+- **Missing or Empty Content**: The `messages` property must be an array of objects. If the array is empty, or if any object within that array is missing the `content` field, the API will trigger a validation error.
+- **Missing Role Field**: Every message object within the array must have a valid `role` (such as `system`, `user`, `assistant`, or `tool`). If the `role` key is missing, the request is considered malformed.
+- **Endpoint Mismatch**: This error frequently happens when a user attempts to use parameters meant for the Chat Completions endpoint (`/v1/chat/completions`) on the legacy Completions endpoint (`/v1/completions`), or vice versa.
+- **Payload Parsing Issues**: If the application logic fails to properly extract a previous assistant message from a response object before passing it back into a new request, the resulting `messages` array may contain undefined or null entries.
+
+## Solution
+To resolve the 400 Validation Error, ensure your request payload adheres to the following structural requirements:
+1. **Verify the Messages Key**: Ensure the root of your JSON body contains a key named exactly `messages`.
+2. **Validate the Array Structure**: Confirm that the value of `messages` is a JSON array and that it contains at least one message object.
+3. **Include Mandatory Keys in Every Object**: Every object inside the `messages` array must contain both the `role` and `content` keys.
+4. **Check Content Values**: Ensure the `content` field is a string (or the appropriate array format for multimodal models) and is not null. If you are sending a tool response, ensure the `tool_call_id` is also present if required.
+5. **Review JSON Serialization**: Ensure your client-side code is correctly serializing the object to JSON. In some languages, passing an object that hasn't been properly mapped to the `messages` field can result in an empty payload.
+6. **Match Model and Endpoint**: Ensure you are using a chat-compatible model (like `gpt-4o` or `gpt-3.5-turbo`) and sending the request to the `v1/chat/completions` endpoint.
+
+## Suggested Links
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)
+- [https://platform.openai.com/docs/guides/text-generation](https://platform.openai.com/docs/guides/text-generation)

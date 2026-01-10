@@ -1,0 +1,40 @@
+---
+title: "Missing required parameter: 'response_format.json_schema'."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "missing-parameter-error-9318"
+---
+
+## Reason
+
+The "Missing required parameter: 'response_format.json_schema'" error in the Azure OpenAI API occurs because the API request specifies a response type that requires a schema definition, but fails to provide it. 
+
+Key reasons for this error include:
+
+- **Mandatory Parameter for Structured Outputs**: When utilizing the Structured Outputs feature, the API requires the `response_format.json_schema` parameter to understand the intended structure of the model's response. Without this parameter, the API cannot validate the output against a specific schema.
+- **Incorrect Request Configuration**: The request body is incomplete. If the `type` field within `response_format` is set to `json_schema`, the `json_schema` object must be explicitly defined.
+- **API Requirements**: The Azure OpenAI and OpenAI APIs enforce strict validation on these parameters to ensure that responses conform to the requested `JsonSchema` type. This error is a direct result of the API rejecting a request that lacks the schema definition required for that mode.
+
+## Solution
+To resolve the "Missing required parameter: 'response_format.json_schema'" error, you must ensure that the `response_format` object is correctly populated in your API request. 
+
+Follow these steps to remediate the issue:
+1. **Include the Missing Parameter**: Add the `json_schema` object inside the `response_format` block of your request payload.
+2. **Verify Schema Formatting**: Ensure the `json_schema` object includes the mandatory fields required by the API:
+   - `name`: A name for the schema (alphanumeric with underscores or hyphens).
+   - `schema`: The actual JSON Schema definition describing the desired output format.
+   - `strict`: Typically required to be set to `true` for Structured Outputs.
+3. **Check Response Type**: If you intended to use standard JSON Mode without a strict schema, ensure the type is set to `{ "type": "json_object" }`. However, if you are using the newer Structured Outputs feature, the type must be `json_schema` and the schema object must be present.
+4. **Consult Documentation**: Verify the exact structure and allowed properties for the JSON schema version you are using (e.g., ensuring `additionalProperties: false` is set for compatibility with `strict: true`).
+5. **Ensure Model Compatibility**: Confirm that the model deployment being used (e.g., `gpt-4o-2024-08-06` or later) supports the `json_schema` response format.
+
+## Suggested Links
+- [https://community.openai.com/t/unable-to-use-json-struct-output/1026023](https://community.openai.com/t/unable-to-use-json-struct-output/1026023)
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://github.com/openai/openai-dotnet/issues/205](https://github.com/openai/openai-dotnet/issues/205)
+- [https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue](https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue)
+- [https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md](https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md)
+- [https://community.openai.com/t/how-do-i-use-the-new-json-mode/475890](https://community.openai.com/t/how-do-i-use-the-new-json-mode/475890)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/structured-outputs](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/structured-outputs)
+- [https://platform.openai.com/docs/guides/structured-outputs](https://platform.openai.com/docs/guides/structured-outputs)

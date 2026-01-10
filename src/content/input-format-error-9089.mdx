@@ -1,0 +1,38 @@
+---
+title: "Invalid image (base64) data."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "input-format-error-9089"
+---
+
+## Reason
+
+The "Invalid image (base64) data" error in Azure OpenAI usually occurs when the API fails to parse the provided image input. This is typically caused by one of the following factors:
+1. **Incorrect Payload Structure**: Multimodal models like `gpt-4o` and `gpt-4-vision-preview` require the `content` field to be an array of objects. If the image is not properly nested within an `image_url` object with a defined `type` property, the request will fail.
+2. **Missing or Malformed Data URI Prefix**: The API requires base64 data to be provided as a Data URL. If the required prefix (e.g., `data:image/jpeg;base64,`) is missing or formatted incorrectly, the base64 string is considered invalid.
+3. **Base64 Encoding Issues**: The provided string may be corrupted, contain invalid characters, or lack the necessary padding. The encoding must conform to standard base64 specifications and cannot be an empty string.
+4. **Model and Endpoint Incompatibility**: Not all Azure OpenAI models support vision data. Attempting to send images to a non-vision model deployment (such as standard GPT-3.5) or using an outdated API version that does not recognize multimodal inputs will trigger a 400 error.
+5. **Invalid or Missing Headers**: Requests must include correctly configured `api-key` (or `Authorization`) and `Content-Type: application/json` headers to be recognized by the service.
+6. **Rate Limiting or Throttling**: Although less frequent for this specific error message, hitting service-level constraints or quotas can occasionally result in 400 errors indicating that the request was not processed due to usage limitations.
+
+## Solution
+To resolve the 400 status error when sending base64 image data to the Azure OpenAI API, ensure the following requirements are met:
+1. **Format the Data URI Correctly**: Always prefix your base64 encoded image content with the appropriate MIME type and the base64 flag. For example: `data:image/png;base64,[base64_encoded_content]`.
+2. **Structure the Content Array**: Verify that the `messages` content field is an array of objects. The image must be specified within an `image_url` object as shown below:
+   `"content": [ { "type": "image_url", "image_url": { "url": "data:image/jpeg;base64,..." } } ]`.
+3. **Use a Vision-Enabled Model**: Confirm that your deployment uses a compatible model, such as `gpt-4o` or `gpt-4-vision-preview`. Ensure you are calling a supported API version (e.g., `2024-02-15-preview` or later).
+4. **Validate Encoding**: Check that the image data is not corrupted and is correctly base64 encoded without spaces or line breaks.
+5. **Configure Headers**: Ensure that your request includes the mandatory `api-key` (or Bearer token) and that the `Content-Type` is set to `application/json`.
+6. **Check Image Size and Format**: Verify that the image file is below the 20 MB size limit and is in a supported format (PNG, JPEG, WEBP, or non-animated GIF). If the image is too large, resize or compress it before encoding.
+
+## Suggested Links
+- [https://community.openai.com/t/error-sending-base64-image-data-in-api-request-to-gpt-4-vision-model/495864](https://community.openai.com/t/error-sending-base64-image-data-in-api-request-to-gpt-4-vision-model/495864)
+- [https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue](https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue)
+- [https://community.openai.com/t/gpt-4-vision-preview-400-invalid-base64-image-url/679812](https://community.openai.com/t/gpt-4-vision-preview-400-invalid-base64-image-url/679812)
+- [https://learn.microsoft.com/en-us/answers/questions/1462206/why-resp-api-returns-error-400-the-request-has-an](https://learn.microsoft.com/en-us/answers/questions/1462206/why-resp-api-returns-error-400-the-request-has-an)
+- [https://community.openai.com/t/how-can-i-write-a-post-request-for-azure-openai-that-uses-structured-output/898569](https://community.openai.com/t/how-can-i-write-a-post-request-for-azure-openai-that-uses-structured-output/898569)
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/structured-outputs?tabs=rest](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/structured-outputs?tabs=rest)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/gpt-with-vision](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/gpt-with-vision)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#chat-completions](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#chat-completions)

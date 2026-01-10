@@ -1,0 +1,29 @@
+---
+title: "Invalid response recieved from google: [{\"error\":{\"code\":400,\"message\":\"Please ensure that multiturn requests ends with a user role or a function response.\",\"status\":\"INVALID_ARGUMENT\"}}]"
+provider: "google"
+provider_icon: "/logos/google.png"
+solved: true
+slug: "invalid-argument-error-9248"
+---
+
+## Reason
+
+The 400 Bad Request error with the `INVALID_ARGUMENT` status occurs because the Google Gemini API (or Vertex AI) enforces a specific structure for multiturn (chat) interactions. The error message "Please ensure that multiturn requests ends with a user role or a function response" indicates that the request does not conform to the expected conversation pattern.
+
+Key reasons for this failure include:
+1. **Incorrect Final Role**: The API expects the last message in the conversation history to be from the `user` role. This message serves as the active prompt that the model needs to respond to.
+2. **Unresolved Function Calls**: If the model previously generated a `function_call`, the API expects the next turn to be a `function_response`. Sending a new user prompt or another model message before providing the tool output will trigger this error.
+3. **Structural Non-Compliance**: The `contents` array in the request must follow a strict alternating pattern (typically user-model-user). If the request ends with a `model` role message, the server cannot process it as a valid completion request.
+
+## Solution
+To resolve the 400 Bad Request error, you must ensure your multiturn request is properly structured and ends with the correct role. Follow these steps:
+1. **Verify the Final Message Role**: Inspect the `contents` array in your API payload. Ensure the very last object in the list has the `role` set to `user` or contains a `function_response`.
+2. **Handle Tool Outputs**: If you are using Function Calling, verify that every `call` from the model has a corresponding `response`. The conversation cannot proceed to a new generation turn until the pending function result is provided.
+3. **Check for Alternating Roles**: Ensure that the message history strictly alternates between `user` and `model`. Do not send two consecutive messages from the same role.
+4. **Audit Required Parameters**: Verify that all message objects include the mandatory `role` and `parts` fields as defined in the Google Generative AI documentation.
+5. **Align with API Schema**: Ensure the overall request structure matches the specific requirements for the model version you are using (e.g., Gemini 1.5 Pro or Flash).
+
+## Suggested Links
+- [https://ai.google.dev/gemini-api/docs/text-generation#chat](https://ai.google.dev/gemini-api/docs/text-generation#chat)
+- [https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini)
+- [https://ai.google.dev/gemini-api/docs/function-calling](https://ai.google.dev/gemini-api/docs/function-calling)

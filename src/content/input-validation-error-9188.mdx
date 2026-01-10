@@ -1,0 +1,36 @@
+---
+title: "messages: text content blocks must be non-empty"
+provider: "anthropic"
+provider_icon: "/logos/anthropic.png"
+solved: true
+slug: "input-validation-error-9188"
+---
+
+## Reason
+
+The Anthropic API returns an HTTP 400 Bad Request error with the message "messages: text content blocks must be non-empty" when a request is submitted containing message blocks that lack actual text content. This validation is strictly enforced because the Claude models require at least some non-empty text input within the `messages` array to process and generate a response.
+
+Key reasons for this error include:
+1. Submitting a message object where the `content` field is an empty string (`""`).
+2. Passing an empty array `[]` to the `content` field.
+3. Using the structured content block format where a block of `type: "text"` has an empty `text` property.
+4. Application logic errors that allow `null`, `undefined`, or whitespace-only strings to be passed to the API client during the request construction.
+
+## Solution
+To resolve this error, ensure that every message sent in the `messages` array contains valid, non-empty text content. Follow these remediation steps:
+1. Verify that each message object in your payload includes a `content` field and that it is not set to `null`.
+2. Ensure the `content` string has a length greater than zero. The API will reject requests if the text is entirely empty.
+3. If you are using structured content blocks, confirm that every block of type `text` contains a populated `text` field.
+4. Remove any empty or null text content blocks from the `messages` array before sending the request to the API.
+5. Implement client-side validation or a filtering function to strip out empty messages from the conversation history.
+6. Double-check your request payload for formatting errors, such as trailing commas or incorrectly nested objects, that might result in empty content blocks being generated.
+
+## Suggested Links
+- [https://github.com/continuedev/continue/issues/2006](https://github.com/continuedev/continue/issues/2006)
+- [https://community.openai.com/t/content-is-required-property-error-400/486260](https://community.openai.com/t/content-is-required-property-error-400/486260)
+- [https://www.restack.io/p/anthropic-answer-http-400-bad-request-cat-ai](https://www.restack.io/p/anthropic-answer-http-400-bad-request-cat-ai)
+- [https://docs.anthropic.com/en/api/errors](https://docs.anthropic.com/en/api/errors)
+- [https://forum.cursor.com/t/unable-to-reach-anthropic/22766](https://forum.cursor.com/t/unable-to-reach-anthropic/22766)
+- [https://github.com/langchain-ai/langchain/issues/18646](https://github.com/langchain-ai/langchain/issues/18646)
+- [https://www.googlecloudcommunity.com/gc/AI-ML/Not-able-to-use-anthropic-claude-3-5-model-API/m-p/830352](https://www.googlecloudcommunity.com/gc/AI-ML/Not-able-to-use-anthropic-claude-3-5-model-API/m-p/830352)
+- [https://docs.anthropic.com/en/api/messages](https://docs.anthropic.com/en/api/messages)

@@ -1,0 +1,39 @@
+---
+title: "Timeout while downloading https://tutormundi.s3-sa-east-1.amazonaws.com/images/fdbqhtQBuxXMHq9aw/1734726153378.jpg."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "download-timeout-error-9054"
+---
+
+## Reason
+
+The **400 status error** with the message "Timeout while downloading" occurs when the OpenAI API (typically GPT-4 Vision models) fails to retrieve an external image within its internal timeout window. This is common when hosting images on AWS S3, particularly in regions like `sa-east-1` which may face higher latency relative to OpenAI's ingestion servers.
+
+Key causes include:
+1.  **Network and Latency Issues**: The OpenAI ingestion service has a strict internal timeout. If the host server (e.g., Amazon S3) is slow to respond or if the geographic distance causes a high round-trip time, the request will fail even if the URL is technically accessible.
+2.  **AWS S3 Configuration**: The image might be behind a private bucket or requires a pre-signed URL. If the pre-signed URL is expired, improperly encoded, or restricted by IP/User-Agent, OpenAI will be unable to fetch the file.
+3.  **Invalid or Unaccessible URL**: The URL might be incorrectly formatted or require headers that the OpenAI crawler does not send. OpenAI also respects `robots.txt` instructions; if the bucket's configuration or a front-end proxy blocks crawlers, the download will timeout.
+4.  **Image Constraint Violations**: While usually resulting in specific errors, images exceeding 20MB or using unsupported formats (OpenAI supports PNG, JPEG, WEBP, and non-animated GIF) can occasionally trigger processing timeouts.
+5.  **Intermittent API Instability**: High demand on OpenAI's infrastructure can lead to intermittent download failures for externally hosted resources.
+
+## Solution
+To resolve the "Timeout while downloading" error, follow these technical remediation steps:
+1.  **Verify Image URL and Accessibility**: Ensure the image URL is public and not expired. Test the URL in a fresh browser session or via a tool like `curl` from a different network to confirm it is not restricted by local IP whitelisting.
+2.  **Optimize Hosting for Latency**: If your S3 bucket is in a distant region like `sa-east-1`, consider using a CDN (like Amazon CloudFront) to serve images from a location closer to OpenAI's US-based infrastructure.
+3.  **Implement Base64 Encoding**: As a more reliable alternative to URLs, encode your image in Base64 and pass it directly in the data payload. This bypasses the need for OpenAI to perform a remote fetch and eliminates download timeouts.
+4.  **Check Image Specifications**: Confirm the image is under the **20MB** limit and matches a supported file type (JPEG, PNG, WEBP, or GIF). High-resolution images should be resized if they are causing processing delays.
+5.  **Audit S3 Pre-signed URLs**: If using signed URLs, ensure the signature includes all necessary parameters and has a sufficient expiration window (e.g., at least 5-10 minutes) to account for queueing time in the API.
+6.  **Review robots.txt**: Ensure that the hosting server does not have a `robots.txt` policy that blocks OpenAI's crawler (User-Agent: `gptbot` or similar).
+7.  **Implement Retry Logic**: For intermittent failures, implement exponential backoff in your application code. Frequent 400 errors may also be mitigated by rotating API keys if the current key is hitting specific infrastructure bottlenecks.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/gpt-4-vision-timeout-while-downloading-image-url/982439](https://community.openai.com/t/gpt-4-vision-timeout-while-downloading-image-url/982439)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://community.openai.com/t/frequently-getting-api-timeout-error-what-am-i-doing-wrong/611941](https://community.openai.com/t/frequently-getting-api-timeout-error-what-am-i-doing-wrong/611941)
+- [https://community.openai.com/t/request-failed-with-status-code-400/39242](https://community.openai.com/t/request-failed-with-status-code-400/39242)
+- [https://www.restack.io/p/openai-python-answer-request-failed-400-error-cat-ai](https://www.restack.io/p/openai-python-answer-request-failed-400-error-cat-ai)
+- [https://community.openai.com/t/timeout-error-while-accessing-image-url-hosted-on-aws-s3-via-signed-url/997762](https://community.openai.com/t/timeout-error-while-accessing-image-url-hosted-on-aws-s3-via-signed-url/997762)
+- [https://platform.openai.com/docs/guides/vision](https://platform.openai.com/docs/guides/vision)
+- [https://community.openai.com/t/openai-badrequesterror-error-code-400-timeout-while-downloading/1148729](https://community.openai.com/t/openai-badrequesterror-error-code-400-timeout-while-downloading/1148729)

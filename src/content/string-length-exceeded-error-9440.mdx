@@ -1,0 +1,35 @@
+---
+title: "Invalid 'messages[0].content[0].text': string too long. Expected a string with maximum length 1048576, but got a string with length 3235717 instead."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "string-length-exceeded-error-9440"
+---
+
+## Reason
+
+The error occurs because a single text string within the `messages` array exceeds the maximum character limit allowed by the OpenAI API. This is a structural constraint on the API's JSON payload rather than a model-specific token limit.
+
+Key reasons for this failure include:
+1. **Character Limit Violation**: The OpenAI API enforces a strict limit of **1,048,576 characters** (approximately 1MB of text) for the `messages.content.text` field.
+2. **Payload Size**: In this specific instance, the request sent a string with a length of 3,235,717 characters, which is more than triple the allowed threshold.
+3. **Status Code 400**: When this limit is exceeded, the server rejects the request immediately with a `400 Bad Request` error before any model processing occurs.
+
+## Solution
+To resolve the "Invalid 'messages.content.text': string too long" error, you must ensure your request string stays within the 1,048,576 character limit. Implement the following remediation steps:
+1. **Trim or Truncate the Text**: Measure the character length of your input before sending the API call. If it exceeds the limit, programmatically truncate the string to 1,048,576 characters or fewer.
+2. **Split the Text**: Break down large documents or long strings into multiple messages. You can send these in chunks or as a sequence of user messages within the same thread to maintain context without hitting single-string limits.
+3. **Use a Summarization Approach**: If the full text is not required for the specific prompt, use a preprocessing step to summarize the content, extracting only the most relevant information to fit within the allowed length.
+4. **Optimize the Request Payload**: Review the request construction to ensure no unnecessary metadata or redundant text is being passed in the `content` field.
+5. **Use File-Based Processing**: For massive datasets that consistently exceed payload limits, consider using the OpenAI Files API or the Assistants API with file attachments. This allows the model to retrieve information from a file rather than requiring the entire text to be passed as a raw string in the JSON body.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/error-400-related-to-size-of-string/840368](https://community.openai.com/t/error-400-related-to-size-of-string/840368)
+- [https://community.openai.com/t/error-with-gpt-api-incoming-streaming/880719](https://community.openai.com/t/error-with-gpt-api-incoming-streaming/880719)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://community.openai.com/t/issue-with-an-error-400-string-too-long/878992](https://community.openai.com/t/issue-with-an-error-400-string-too-long/878992)
+- [https://github.com/langchain-ai/langchain/issues/24531](https://github.com/langchain-ai/langchain/issues/24531)
+- [https://community.openai.com/t/assisants-api-message-content-maximum-length/829483](https://community.openai.com/t/assisants-api-message-content-maximum-length/829483)
+- [https://community.openai.com/t/maximum-token-length-allowed/137151](https://community.openai.com/t/maximum-token-length-allowed/137151)
+- [https://platform.openai.com/docs/api-reference/messages/object](https://platform.openai.com/docs/api-reference/messages/object)

@@ -1,0 +1,42 @@
+---
+title: "\"null\" is not of type \"array\" - \"messages\""
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "type-mismatch-error-9477"
+---
+
+## Reason
+
+The **400 - Bad Request** error, specifically the message `"null" is not of type "array" - "messages"`, occurs when the OpenAI API receives a request where the mandatory `messages` parameter is set to `null` or is otherwise not provided as a JSON array. 
+
+Key causes include:
+1. **Incorrect Request Structure**: The OpenAI Chat Completions API expects the `messages` parameter to be a structured array of objects. Providing a literal `null` value or a different data type (like a string) violates the JSON schema validation.
+2. **Invalid Syntax or Configuration**: This error often stems from programmatic errors where the variable intended for the `messages` field is uninitialized, empty, or incorrectly mapped during the request serialization process.
+3. **Schema Violation**: The API gateway validates the request body before processing. If the `messages` field does not conform to the expected array format, the request is rejected immediately as a malformed request.
+
+## Solution
+To resolve the `"null" is not of type "array"` error, ensure that your API request body strictly follows the OpenAI specification. Follow these remediation steps:
+1. **Define the Messages Parameter as an Array**: Ensure the `messages` field is explicitly initialized as a JSON array (e.g., `[]`) even if it only contains one message object.
+2. **Verify Message Object Structure**: Each element within the `messages` array must be an object containing at least a `role` (e.g., "system", "user", or "assistant") and `content` (the text of the message).
+3. **Validate Request Logic**: Check your code for logic that might result in the `messages` variable being null at the time the API call is executed. This is common when dynamically building conversation history.
+4. **Remove Malformed Values**: Audit the request body to ensure no other required fields are missing and that no unnecessary `null` values are being passed to parameters that expect specific data types.
+5. **Consult Official Documentation**: Compare your request payload against the schema defined in the OpenAI API Reference to ensure all data types match expectations.
+
+**Example of a correctly formatted request body:**
+
+```json
+{
+  "model": "gpt-4",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello!"
+    }
+  ]
+}
+```
+
+## Suggested Links
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)
+- [https://platform.openai.com/docs/guides/error-codes](https://platform.openai.com/docs/guides/error-codes)

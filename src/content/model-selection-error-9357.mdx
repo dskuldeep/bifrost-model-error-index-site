@@ -1,0 +1,38 @@
+---
+title: "Invalid model: mistralai/Mixtral-8x7B-Instruct-v0.1"
+provider: "mistral-ai"
+provider_icon: "/file.svg"
+solved: true
+slug: "model-selection-error-9357"
+---
+
+## Reason
+
+The "Invalid model" error (specifically for `mistralai/Mixtral-8x7B-Instruct-v0.1`) in the Mistral AI API typically indicates a mismatch between the requested identifier and the recognized model slugs on the server. The primary reasons include:
+1. **Incorrect Model Naming Convention**: The identifier `mistralai/Mixtral-8x7B-Instruct-v0.1` is a common format used on the Hugging Face hub or by other providers like Together AI. However, the official Mistral AI API (La Plateforme) requires specific internal slugs, such as `open-mixtral-8x7b`.
+2. **Model Availability**: The requested model may not be loaded or available on the server at the time of the request due to maintenance, updates, or a transition to a newer version (e.g., `mistral-large-latest`).
+3. **Model Permissions**: Access to certain high-performance or newer models may be restricted based on your account's subscription tier or organization-specific authorization settings.
+4. **Configuration or Syntax Issues**: The API request may contain malformed syntax, incorrect headers, or parameters that do not align with the expected request format for the specified endpoint.
+5. **Rate Limiting or Throttling**: While less common for this specific error message, extreme rate limiting or quota exhaustion can occasionally cause the API to reject model requests, though this usually returns a 429 status code.
+
+## Solution
+To resolve the "Invalid model" error and successfully call the Mistral AI API, follow these remediation steps:
+1. **Verify Official Model Slugs**: Ensure you are using the correct identifier as defined in the Mistral AI documentation. For the Mixtral-8x7B model, replace `mistralai/Mixtral-8x7B-Instruct-v0.1` with the official slug `open-mixtral-8x7b`.
+2. **Check Model Availability and Status**: Visit the official Mistral AI Status Page to confirm if the model or API service is undergoing maintenance or experiencing downtime.
+3. **Review Account Permissions and Billing**: Log into the Mistral AI Console to ensure your API key has the necessary permissions for the model you are trying to use. Verify that your account has an active billing plan and sufficient credits.
+4. **Inspect Request Syntax**: Double-check your API call configuration. Ensure that the model parameter is correctly nested in the JSON payload and that all headers (such as the Authorization Bearer token) are properly formatted.
+5. **Monitor Rate Limits**: Review your usage dashboard to ensure you are operating within the allowed rate limits for your current tier.
+6. **Contact Support**: If the model name is correct and permissions are verified but the issue persists, reach out to Mistral AI support for further technical assistance.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.make.com/t/400-invalid-model-llama-3-8b-instruct-how-is-that-possible-if-it-is-actually-permitted/53562](https://community.make.com/t/400-invalid-model-llama-3-8b-instruct-how-is-that-possible-if-it-is-actually-permitted/53562)
+- [https://learn.microsoft.com/en-us/answers/questions/2117664/my-mistral-large-2407-serverless-deployment-api-is](https://learn.microsoft.com/en-us/answers/questions/2117664/my-mistral-large-2407-serverless-deployment-api-is)
+- [https://discuss.huggingface.co/t/tried-to-download-mistral-7b-but-got-an-error-message/57196](https://discuss.huggingface.co/t/tried-to-download-mistral-7b-but-got-an-error-message/57196)
+- [https://github.com/langchain-ai/langchain/issues/16869](https://github.com/langchain-ai/langchain/issues/16869)
+- [https://www.datacamp.com/tutorial/codestral-api-tutorial](https://www.datacamp.com/tutorial/codestral-api-tutorial)
+- [https://community.make.com/t/400-invalid-model/59048](https://community.make.com/t/400-invalid-model/59048)
+- [https://forum.cloudron.io/topic/11826/using-mistral-api-seems-broken-on-cloudron](https://forum.cloudron.io/topic/11826/using-mistral-api-seems-broken-on-cloudron)
+- [https://www.merge.dev/blog/mistral-ai-api-key](https://www.merge.dev/blog/mistral-ai-api-key)
+- [https://docs.mistral.ai/platform/endpoints/](https://docs.mistral.ai/platform/endpoints/)
+- [https://status.mistral.ai/](https://status.mistral.ai/)

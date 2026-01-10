@@ -1,0 +1,70 @@
+---
+title: "The model `test_for_fallback` does not exist or you do not have access to it."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "model-access-error-9332"
+---
+
+## Reason
+
+The 404 error indicating that a model does not exist or access is denied typically stems from a mismatch between the API request and the account's authorized resources. In this specific case, the model name `test_for_fallback` is not a standard OpenAI production model (such as `gpt-4o` or `gpt-3.5-turbo`), suggesting it is likely a placeholder or variable name that was not correctly resolved in the application code.
+
+Key reasons for this error include:
+
+**Model Non-Existence**
+The identifier provided does not match any valid OpenAI model. This often occurs due to typos, using internal project placeholders (like `test_for_fallback`) in production calls, or requesting a model that has been deprecated.
+
+**Usage Tier and Access Restrictions**
+OpenAI restricts access to certain models (such as `o1-preview` or `gpt-4`) based on your account's **Usage Tier** (Tiers 1 through 5). If your account has not reached the required cumulative spend or hasn't completed organization verification, requests to higher-tier models will return a 404 error.
+
+**Organization and Project Scoping**
+API keys are now often scoped to specific **Projects** within an OpenAI **Organization**. If a model is restricted to a specific project or if the API key used belongs to a project where that model is not enabled, the request will fail.
+
+**Endpoint and Parameter Mismatches**
+Using the wrong API endpoint can trigger this error. For instance, attempting to call a chat-based model (like `gpt-4o`) using the legacy `/v1/completions` endpoint instead of `/v1/chat/completions` will result in a resource-not-found error.
+
+**Regional or Rollout Delays**
+Newly released models are often rolled out in phases. A model might be announced but not yet available to your specific region or account tier, leading to temporary access issues.
+
+## Solution
+To resolve the 404 error for the `test_for_fallback` model, follow these troubleshooting and remediation steps:
+
+**1. Validate the Model Identifier**
+Ensure that the model name in your code is a valid OpenAI string. If you are using a fallback mechanism, verify that the variable `test_for_fallback` is being correctly replaced by a real model ID (e.g., `gpt-4o`) before the API call is made.
+
+**2. Check OpenAI Usage Tiers**
+Navigate to the **Limits** section in your OpenAI Dashboard to confirm your current Usage Tier. High-performance models often require Tier 1 or higher, which is achieved by adding a minimum of $5 to your account balance.
+
+**3. Verify Project-Level Permissions**
+If you are using the newer Project system:
+1. Go to **Settings > Projects**.
+2. Select the project associated with your API key.
+3. Ensure the specific model you want to use is added to the "Allowed Models" list for that project.
+
+**4. Confirm Endpoint Compatibility**
+Ensure your code uses the correct SDK method for the model type:
+1. For `gpt-4` and `gpt-3.5` models, use the `chat.completions` endpoint.
+2. For legacy models like `gpt-3.5-turbo-instruct`, use the `completions` endpoint.
+
+**5. Correct Azure OpenAI Configuration (If Applicable)**
+If you are accessing OpenAI via Azure, the model name in your request must match the **Deployment Name** you created in the Azure AI Studio, which may differ from the base model name.
+
+**Key Actions Summary:**
+1. **Check Model Name**: Replace placeholders with accurate model identifiers.
+2. **Verify Tier Access**: Confirm your account tier supports the requested model.
+3. **Audit Project Settings**: Check the "Allowed Models" configuration in the OpenAI dashboard.
+4. **Verify Endpoint**: Use `/v1/chat/completions` for modern chat models.
+
+## Suggested Links
+- [https://community.openai.com/t/gpt-3-5-turbo-model-gives-me-a-404-error/83297](https://community.openai.com/t/gpt-3-5-turbo-model-gives-me-a-404-error/83297)
+- [https://community.openai.com/t/tier-5-access-but-no-o1-models-api-problem-or-bug-lets-figure-this-out/949204](https://community.openai.com/t/tier-5-access-but-no-o1-models-api-problem-or-bug-lets-figure-this-out/949204)
+- [https://community.openai.com/t/error-that-model-does-not-exist-http-status-code-404-but-it-does-exist/25866](https://community.openai.com/t/error-that-model-does-not-exist-http-status-code-404-but-it-does-exist/25866)
+- [https://github.com/langchain-ai/langchain/issues/13284](https://github.com/langchain-ai/langchain/issues/13284)
+- [https://community.openai.com/t/why-cant-i-access-model-o1-with-my-api-key/1092861](https://community.openai.com/t/why-cant-i-access-model-o1-with-my-api-key/1092861)
+- [https://community.openai.com/t/how-to-set-billing-limits-and-restrict-model-usage-for-a-project-via-openai-api/1087771](https://community.openai.com/t/how-to-set-billing-limits-and-restrict-model-usage-for-a-project-via-openai-api/1087771)
+- [https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096](https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096)
+- [https://community.openai.com/t/api-returning-404-model-not-found-all-of-a-sudden-why-and-how-to-fix/679777](https://community.openai.com/t/api-returning-404-model-not-found-all-of-a-sudden-why-and-how-to-fix/679777)
+- [https://community.openai.com/t/chat-completions-api-giving-me-a-404-error/788279](https://community.openai.com/t/chat-completions-api-giving-me-a-404-error/788279)
+- [https://platform.openai.com/docs/guides/rate-limits/usage-tiers](https://platform.openai.com/docs/guides/rate-limits/usage-tiers)
+- [https://platform.openai.com/docs/models](https://platform.openai.com/docs/models)

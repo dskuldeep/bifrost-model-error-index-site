@@ -1,0 +1,56 @@
+---
+title: "This model's maximum context length is 128000 tokens. However, your messages resulted in 411525 tokens (411032 in the messages, 493 in the functions). Please reduce the length of the messages or functions."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "context-length-exceeded-error-9033"
+---
+
+## Reason
+
+The OpenAI API returns a 400 Bad Request error when a request exceeds the maximum context length (token limit) allowed by the specific model being used. 
+
+Key points regarding this error include:
+1. The model in use has a hard limit of 128,000 tokens. This limit applies to the combined total of the prompt, the conversation history, and any function/tool definitions.
+2. In this instance, the request totaled 411,525 tokens, which is significantly beyond the model's capacity. This was comprised of 411,032 tokens in the messages and 493 tokens in the functions.
+3. The API performs this check during the request validation phase; if the token count is too high, it rejects the request immediately without generating a response.
+
+## Solution
+To resolve the 400 status error due to exceeding the context length, you must reduce the total token count of your request. Follow these remediation steps:
+
+**1. Break down the input into chunks**
+
+* Divide large texts or long documents into smaller, manageable sections that fit within the 128,000-token limit.
+* Process these chunks sequentially. If the task requires context from previous chunks, use a summary of the previous output as a prefix for the next request.
+
+**2. Optimize the context**
+
+* Remove unnecessary instructions, redundant context, or boilerplate text from the prompt.
+* Utilize text preprocessing or summarization techniques to condense the input size while preserving the core meaning.
+* Implement a "sliding window" approach for conversation history, keeping only the most recent N messages and discarding or summarizing older ones.
+
+**3. Use the `messages` array efficiently**
+
+* Ensure each message in the `messages` array is necessary for the current task.
+* Use the `tiktoken` library (or equivalent for your programming language) to calculate token counts locally before sending the request. This allows you to programmatically truncate text if it exceeds a threshold.
+* If you have static instructions used across many requests, consider using fine-tuning or moving them to the system message in a more concise format.
+
+**4. Implement Retrieval-Augmented Generation (RAG)**
+
+* Instead of sending an entire document library in the prompt, store your data in a vector database. Use semantic search to retrieve and include only the most relevant excerpts (top-k results) in the prompt.
+
+**5. Control the response length**
+
+* Use the `max_tokens` parameter to limit the length of the model's output. Note that the total context window must accommodate both your input (prompt) and the requested output length.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/gpt-4-1106-preview-400-this-models-maximum-context-length-is-4097-tokens/578172](https://community.openai.com/t/gpt-4-1106-preview-400-this-models-maximum-context-length-is-4097-tokens/578172)
+- [https://community.openai.com/t/error-code-400-max-token-length/716391](https://community.openai.com/t/error-code-400-max-token-length/716391)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://community.openai.com/t/4096-response-limit-vs-128-000-context-window/656864](https://community.openai.com/t/4096-response-limit-vs-128-000-context-window/656864)
+- [https://community.openai.com/t/you-can-specify-the-length-of-the-response/129859](https://community.openai.com/t/you-can-specify-the-length-of-the-response/129859)
+- [https://help.openai.com/en/articles/5072518-controlling-the-length-of-openai-model-responses](https://help.openai.com/en/articles/5072518-controlling-the-length-of-openai-model-responses)
+- [https://victoria.dev/posts/how-to-send-long-text-input-to-chatgpt-using-the-openai-api/](https://victoria.dev/posts/how-to-send-long-text-input-to-chatgpt-using-the-openai-api/)
+- [https://platform.openai.com/docs/guides/text-generation/managing-tokens](https://platform.openai.com/docs/guides/text-generation/managing-tokens)
+- [https://github.com/openai/tiktoken](https://github.com/openai/tiktoken)

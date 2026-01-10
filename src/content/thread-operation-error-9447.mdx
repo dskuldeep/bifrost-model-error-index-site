@@ -1,0 +1,39 @@
+---
+title: "Can't add messages to thread_JS11XQsRG0YCGFpW7ylpG2yM while a run run_yQrPxI86HgmUs0Q9b1XFx23L is active."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "thread-operation-error-9447"
+---
+
+## Reason
+
+The error **"Can't add messages to thread while a run is active"** (HTTP 400) occurs within the OpenAI Assistants API when a request is made to append a new message to a conversation thread that is currently being processed by an Assistant.
+
+Key reasons for this behavior include:
+1.  **Thread Locking**: When a **Run** is created, the associated **Thread** enters a locked state. To maintain the integrity and sequential logic of the conversation, the API prevents any modifications to the thread—including adding new messages or creating additional runs—until the current execution completes.
+2.  **State Management**: The API requires a Run to reach a terminal state before the Thread becomes available for new inputs. If a Run is in a non-terminal state such as `queued`, `in_progress`, or `requires_action`, any attempt to add messages will be rejected.
+3.  **Concurrency Constraints**: The Assistants API is designed for stateful, asynchronous execution. It does not support concurrent message additions to a single thread while an active process is generating a response.
+
+## Solution
+To resolve this error, you must ensure that the previous Run has finished before attempting to modify the Thread. Follow these steps:
+1.  **Monitor Run Status**: Implement a polling mechanism to check the status of the Run periodically using the `Retrieve Run` endpoint.
+2.  **Wait for Terminal States**: Only proceed with adding new messages once the Run status reaches one of the following terminal states:
+    *   `completed`
+    *   `failed` 
+    *   `cancelled` 
+    *   `expired`
+3.  **Handle 'Requires Action'**: Be aware that if a Run status is `requires_action` (often due to Tool Outputs or Function Calling), the Run is still technically active. You must either submit the required tool outputs or cancel the Run before you can add new messages to the thread.
+4.  **Implement a Message Queue**: If your application receives user input while a Run is still active, implement a client-side or server-side queue. Store these messages temporarily and process them sequentially once the active Run is confirmed as finished.
+5.  **Refine Asynchronous Logic**: Ensure your code utilizes `await` correctly (in Node.js/Python) or uses appropriate callbacks to prevent race conditions where a second message request is triggered before the first Run has transitioned out of an active state.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/cant-add-messages-to-thread-while-a-run-is-active/491669](https://community.openai.com/t/cant-add-messages-to-thread-while-a-run-is-active/491669)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://community.openai.com/t/is-api-not-working-i-get-the-error-run-is-active-right-from-the-second-request-to-the-specified-thread-id/508821](https://community.openai.com/t/is-api-not-working-i-get-the-error-run-is-active-right-from-the-second-request-to-the-specified-thread-id/508821)
+- [https://forum.bubble.io/t/open-ai-api-http-400-error-payload/268017](https://forum.bubble.io/t/open-ai-api-http-400-error-payload/268017)
+- [https://community.openai.com/t/i-am-receiving-an-error-status-code-400/351121](https://community.openai.com/t/i-am-receiving-an-error-status-code-400/351121)
+- [https://community.openai.com/t/error-400-can-t-add-messages-to-thread-while-a-run-is-active/1048887](https://community.openai.com/t/error-400-can-t-add-messages-to-thread-while-a-run-is-active/1048887)
+- [https://platform.openai.com/docs/assistants/how-it-works/run-lifecycle](https://platform.openai.com/docs/assistants/how-it-works/run-lifecycle)
+- [https://platform.openai.com/docs/api-reference/runs/getRun](https://platform.openai.com/docs/api-reference/runs/getRun)

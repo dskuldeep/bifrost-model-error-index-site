@@ -1,0 +1,37 @@
+---
+title: "The input for \"tools\" or \"functions\" is expected to be an array, but a different data type was provided. Please ensure the input adheres to the required schema."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "type-mismatch-error-9470"
+---
+
+## Raw Error Text
+
+```text
+{"name": "information_extraction", "description": "Extracts the relevant information from the passage.", "parameters": {"type": "object", "properties": {"Tech Sector Concerns": {"title": "Tech Sector Concerns", "type": "integer", "enum": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "description": "Describes how much the message is related to the following topic: "Tech Sector Concerns" - There appears to be some anxiety about the current state of the tech and gaming sectors with references to job cuts, financial downturn and a potential anticipation for government intervention. The higher the number the more related"}, "Bot Development Work": {"title": "Bot Development Work", "type": "integer", "enum": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "description": "Describes how much the message is related to the following topic: "Bot Development Work" - The team is actively working on a bot, requiring improvements and internal testing. There"s mention of considerable changes that will impact bug reporting, feedback/suggestions and Hasura implementations. The higher the number the more related"}, "Expense Question": {"title": "Expense Question", "type": "integer", "enum": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "description": "Describes how much the message is related to the following topic: "Expense Question" - There"s a humorous exchange around the proposal of expensing a purchase, implying some light-hearted camaraderie within the team. The higher the number the more related"}, "API Configuration Progress": {"title": "API Configuration Progress", "type": "integer", "enum": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "description": "Describes how much the message is related to the following topic: "API Configuration Progress" - One of the team members managed to create Linear App ID/secret, Titan ID/secret and got OAuth2 user approval. Difficulties were encountered, but it"s seen as overall good progress. The higher the number the more related"}}, "required": ["Tech Sector Concerns", "Bot Development Work", "Expense Question", "API Configuration Progress"]}} is not of type "array" - "tools"
+```
+
+## Reason
+
+The 400 Bad Request error encountered with the Azure OpenAI API is primarily caused by a schema validation failure. The error message specifically indicates that the `tools` parameter received a single object instead of the required array type.
+
+Key reasons for this failure include:
+1. **Invalid Request Format**: The `tools` (and deprecated `functions`) parameter must be provided as an array of objects. In the provided log, the API received a single tool definition object directly, which violates the expected data structure.
+2. **Malformed Resource ID or Endpoint**: If the API endpoint URL or the specific Resource ID is incorrectly formatted, the server will reject the request as a bad request.
+3. **Incorrect API Version or Configuration**: Using an older API version that does not support the `tools` parameter, or misconfiguring model-specific parameters that do not match the expected schema, can trigger this error.
+4. **Schema Discrepancies**: Discrepancies between the request payload and the specific requirements of the Azure OpenAI version being called.
+
+## Solution
+To resolve the 400 status error and ensure your request conforms to the Azure OpenAI API schema, follow these steps:
+1. **Verify the Request Format**: Ensure that the `tools` parameter is formatted as an array, even if you are only defining a single tool. Wrap the tool object in square brackets. The structure should follow this pattern:
+   `"tools": [ { "type": "function", "function": { ... } } ]`.
+2. **Check the Endpoint and Resource ID**: Confirm that the API endpoint URL and Resource ID are correctly formatted and correspond to your active Azure OpenAI instance.
+3. **Update API Version and Configuration**: Use a supported API version (such as `2023-12-01-preview` or later) that explicitly supports tool calling. Review the latest documentation to ensure all model parameters and message structures are current.
+4. **Inspect Network Traffic and Logs**: Use network debugging tools or internal logging to capture the raw JSON payload. Compare the sent payload against the official schema to identify exactly where the type mismatch occurs.
+5. **Validate Tool Definitions**: Ensure that each object within the `tools` array contains the required `type` field (e.g., `"type": "function"`) and a valid `function` object containing the name, description, and parameters.
+
+## Suggested Links
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-tools](https://platform.openai.com/docs/api-reference/chat/create#chat-create-tools)

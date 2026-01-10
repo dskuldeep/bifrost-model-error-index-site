@@ -1,0 +1,52 @@
+---
+title: "Invalid chat format. Expected \"url\" field in image_url dict."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-format-error-9098"
+---
+
+## Reason
+
+The error message "Invalid chat format. Expected 'url' field in image_url dict" occurs when a request to OpenAI's vision-capable models (such as `gpt-4o`, `gpt-4-turbo`, or `gpt-4-vision-preview`) uses an incorrect JSON payload structure. 
+
+Key reasons for this error include:
+
+- **Incorrect Payload Nesting**: The API expects the `image_url` field to be a dictionary containing a `url` key. A common mistake is providing the URL directly as a string or placing the `url` key at the same level as the `type` field.
+- **Unexpected Keys in Content Blocks**: The request may include keys or parameters that do not match the expected schema. For instance, placing parameters like `detail` outside of the nested `image_url` dictionary will trigger a validation failure.
+- **Model-Specific Formatting Requirements**: Vision models require the `content` field to be an array of objects rather than a simple string. Each object in this array must specify a `type` (e.g., `text` or `image_url`) and follow the precise hierarchical structure required for that type.
+
+## Solution
+To resolve the "Invalid chat format" error, you must ensure your request payload strictly adheres to the OpenAI vision schema requirements.
+
+Follow these remediation steps:
+1. **Verify the image_url Nesting**: Ensure the `image_url` key points to a nested dictionary. Inside that dictionary, you must include the required `url` field.
+2. **Correctly Place Optional Parameters**: If you are using the `detail` parameter (to specify `low`, `high`, or `auto` resolution), it must be placed inside the `image_url` dictionary, not at the top level of the content object.
+3. **Use a Content Array**: Format the `content` field of your message as an array of content objects. Every object in the array must contain a `type` field set to either `text` or `image_url`.
+4. **Format Base64 Data URLs**: If you are providing images via base64 encoding, ensure the string includes the correct data URL prefix (e.g., `data:image/jpeg;base64,{base64_string}`).
+5. **Remove Unsupported Keys**: Strip any unexpected keys or parameters from the payload that do not conform to the chat completion structure for vision models.
+
+**Example of a valid structure:**
+
+```json
+{
+  "role": "user",
+  "content": [
+    {
+      "type": "text",
+      "text": "Describe this image."
+    },
+    {
+      "type": "image_url",
+      "image_url": {
+        "url": "https://example.com/sample.jpg",
+        "detail": "auto"
+      }
+    }
+  ]
+}
+```
+
+## Suggested Links
+- [https://platform.openai.com/docs/guides/vision](https://platform.openai.com/docs/guides/vision)
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)

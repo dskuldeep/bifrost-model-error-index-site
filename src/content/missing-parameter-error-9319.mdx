@@ -1,0 +1,58 @@
+---
+title: "Missing required parameter: 'tools[0].type'."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "missing-parameter-error-9319"
+---
+
+## Reason
+
+The OpenAI API error `Missing required parameter: 'tools[0].type'` occurs because the `tools` parameter in Chat Completions requires a specific object structure for each item in the array. This error specifically highlights that the first element (`index 0`) in your tools list is missing the mandatory `type` property.
+
+Key reasons for this failure include:
+
+* **Missing Type Property**: Every object within the `tools` array must have a `type` field. For function calling, the required value is currently `"function"`.
+* **Incorrect Schema Nesting**: A common mistake is placing the `type` parameter inside the `function` definition block rather than at the top level of the tool object.
+* **Legacy Format Conflicts**: You might be passing a list of raw function definitions (used in the deprecated `functions` parameter) into the newer `tools` parameter, which expects an extra layer of wrapping.
+* **Malformed JSON**: Syntax errors, such as missing quotes around keys or improper braces, can cause the API validator to overlook the parameter even if it is present in the code.
+* **Documentation Discrepancies**: Using outdated SDK examples or documentation where parameters like `role` or `function` were used interchangeably might result in a request that fails modern schema validation.
+
+## Solution
+To resolve the `400 Bad Request` error, ensure that each tool in your request payload is correctly wrapped and includes the mandatory `type` field. Follow these steps:
+1. **Add the Type Field**: Explicitly define `"type": "function"` for every tool object in the array.
+2. **Structure the Tool Correctly**: Verify that the tool object contains a top-level `type` and a separate `function` object. The correct structure should look like this:
+
+```json
+{
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "get_weather",
+        "description": "Get the current weather",
+        "parameters": {
+          "type": "object",
+          "properties": { ... }
+        }
+      }
+    }
+  ]
+}
+```
+3. **Validate the JSON Payload**: Ensure your JSON is well-formed and that environment variables or dynamic objects are being correctly stringified/mapped to the API's expected data types.
+4. **Update SDKs and Models**: Ensure you are using a model that supports the `tools` parameter (e.g., `gpt-4o` or `gpt-3.5-turbo`) and that your client library version is up to date with the current API specification.
+5. **Check Documentation**: Review the official OpenAI API reference for the most recent requirements regarding tool definitions.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/content-is-required-property-error-400/486260](https://community.openai.com/t/content-is-required-property-error-400/486260)
+- [https://community.openai.com/t/request-failed-with-status-code-400/39242](https://community.openai.com/t/request-failed-with-status-code-400/39242)
+- [https://github.com/Nutlope/aicommits/issues/137](https://github.com/Nutlope/aicommits/issues/137)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://mirascope.com/blog/openai-function-calling/](https://mirascope.com/blog/openai-function-calling/)
+- [https://community.openai.com/t/error-400-related-to-size-of-string/840368](https://community.openai.com/t/error-400-related-to-size-of-string/840368)
+- [https://community.openai.com/t/function-calling-parameter-types/268564](https://community.openai.com/t/function-calling-parameter-types/268564)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-tools](https://platform.openai.com/docs/api-reference/chat/create#chat-create-tools)

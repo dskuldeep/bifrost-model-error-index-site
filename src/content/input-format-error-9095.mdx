@@ -1,0 +1,40 @@
+---
+title: "Invalid chat format. Unexpected keys in a message content image dict."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-format-error-9095"
+---
+
+## Reason
+
+The `400 Bad Request` error with the message "Invalid chat format. Unexpected keys in a message content image dict" occurs when the OpenAI API receives a request payload that does not conform to the strict schema required for multimodal messages. This is common when using models like `gpt-4o`, `gpt-4o-mini`, or `gpt-4-vision-preview`.
+
+Key reasons for this error include:
+1. **Incorrect Request Format**: The request payload does not match the expected structure for the specified API endpoint. For vision models, the `content` field must be an array of objects rather than a simple string.
+2. **Flat vs. Nested Dictionaries**: A frequent cause is placing parameters like `detail` at the same hierarchical level as the `type` key. The API expects `detail` and `url` to be nested inside a secondary `image_url` dictionary.
+3. **Unsupported Keys**: The `image_url` dictionary is strictly limited to specific keys. Including unexpected keys such as `name`, `data`, `id`, or `filename` will trigger a validation failure.
+4. **Model Alignment Issues**: The request may not adhere to the specific requirements of the model being used. For example, the `gpt-4-vision-preview` model has particular expectations for how text and image data are interleaved within the `content` array.
+
+## Solution
+To fix the "Invalid chat format" error, ensure your message structure complies with the official OpenAI schema for vision-capable models:
+1. **Validate the Message Structure**: Ensure the message includes a `role` (e.g., "user") and that the `content` field is formatted as an array of objects for multimodal requests.
+2. **Properly Nest Image Parameters**: Ensure that `url` and `detail` are nested within an `image_url` object. The structure should look like this:
+   `{"type": "image_url", "image_url": {"url": "...", "detail": "low"}}`.
+3. **Remove Unexpected Parameters**: Audit the request payload to ensure no extra or unsupported keys are present in the `content` or `image_url` dictionaries.
+4. **Correctly Format Image Data**: If you are sending base64-encoded image data, it must be provided as a valid data URL (e.g., `data:image/jpeg;base64,{base64_string}`) within the `url` field.
+5. **Check Model Requirements**: Refer to the OpenAI documentation for the specific model you are using to ensure that the interleaving of text and image blocks matches the model's expectations.
+6. **Verify Library Versions**: If using a wrapper or SDK, ensure it is updated to a version that supports the nested dictionary format required for vision features.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://github.com/langgenius/dify/issues/3165](https://github.com/langgenius/dify/issues/3165)
+- [https://community.openai.com/t/content-is-required-property-error-400/486260](https://community.openai.com/t/content-is-required-property-error-400/486260)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://community.openai.com/t/error-sending-base64-image-data-in-api-request-to-gpt-4-vision-model/495864](https://community.openai.com/t/error-sending-base64-image-data-in-api-request-to-gpt-4-vision-model/495864)
+- [https://platform.openai.com/docs/guides/text-generation](https://platform.openai.com/docs/guides/text-generation)
+- [https://cdn.openai.com/spec/model-spec-2024-05-08.html](https://cdn.openai.com/spec/model-spec-2024-05-08.html)
+- [https://community.openai.com/t/gpt-4-vision-api-detail-param-and-token-cost/476448](https://community.openai.com/t/gpt-4-vision-api-detail-param-and-token-cost/476448)
+- [https://platform.openai.com/docs/guides/vision](https://platform.openai.com/docs/guides/vision)
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)
+- [https://community.openai.com/t/gpt-4-vision-api-detail-param-and-token-cost/476615/6](https://community.openai.com/t/gpt-4-vision-api-detail-param-and-token-cost/476615/6)

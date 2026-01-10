@@ -1,0 +1,33 @@
+---
+title: "Invalid image."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "image-validation-error-9075"
+---
+
+## Reason
+
+The OpenAI API returns a 400 "Invalid image" error when the request cannot be processed due to issues with the provided image payload or request structure. Key reasons include:
+
+*   **Invalid or Disallowed Content**: The image may contain content that violates OpenAI's safety policies or automated moderation filters.
+*   **Incorrect API Request Parameters**: The request may be malformed, containing unsupported or misspelled parameters (e.g., an invalid `response_format` or `size` for the specific model).
+*   **Model and Dimension Limitations**: The model used may not support the specific request. For example, DALL-E 3 and GPT-4o have specific supported aspect ratios and dimensions; providing an unsupported resolution will trigger this error.
+*   **Network and Configuration Issues**: Improper network configuration or traffic anomalies can occasionally result in a 400 error, although this is less common for image-specific validation failures.
+*   **Encoding Errors**: If the image is provided via Base64, any corruption in the encoding or missing headers can prevent the server from interpreting the file.
+
+## Solution
+To resolve the 400 status error and validate your image request, follow these steps:
+1.  **Verify Image Requirements**: Ensure the image is under the 20 MB size limit and is in one of the supported formats: PNG, JPEG, GIF, or WEBP.
+2.  **Check API Parameters**: Review the API request to ensure all parameters are correctly formatted and supported by the endpoint you are calling.
+3.  **Review Content Policies**: Confirm that the image does not contain any content that violates OpenAI's Usage Policies or Moderation guidelines.
+4.  **Validate Model Support**: Check that the model specified (e.g., `dall-e-3` or `gpt-4o`) supports the requested dimensions and image processing features.
+5.  **Format Base64 Correctly**: If using Base64 representation, ensure the string is correctly encoded, contains no invalid characters, and is formatted according to the API requirements.
+6.  **Check API Key and Service Status**: Ensure your API key is valid, has not expired, and that there are no ongoing service disruptions on the OpenAI Status page.
+7.  **Inspect and Retry**: Use a network inspection tool to verify the payload being sent. If the error persists despite correct formatting, try a brief cool-off period before retrying the request.
+
+## Suggested Links
+- [https://platform.openai.com/docs/guides/images](https://platform.openai.com/docs/guides/images)
+- [https://platform.openai.com/docs/guides/vision](https://platform.openai.com/docs/guides/vision)
+- [https://openai.com/policies/usage-policies](https://openai.com/policies/usage-policies)
+- [https://status.openai.com/](https://status.openai.com/)

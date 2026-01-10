@@ -1,0 +1,66 @@
+---
+title: "Invalid model name"
+provider: "mistral-ai"
+provider_icon: "/file.svg"
+solved: true
+slug: "model-selection-error-9363"
+---
+
+## Reason
+
+The "Invalid model name" error (typically accompanied by an HTTP 400 Bad Request status) occurs when the Mistral AI API or similar providers cannot recognize the model identifier provided in the request payload. 
+
+**Incorrect Model Name**
+The model name specified does not match the provider's permitted or available models. This is frequently caused by typos, using outdated model names that have been deprecated, or requesting a model that is not supported by the specific endpoint being called (e.g., calling a chat completion endpoint with a non-chat model).
+
+**Invalid Configuration**
+The request may contain malformed syntax or missing required properties. Common issues include missing `Content-Type: application/json` headers, incorrectly formatted `Authorization` bearer tokens, or providing parameters in the wrong data type.
+
+**Rate Limiting or Throttling**
+While rate limits usually return a 429 status code, certain middleware configurations or API gateways may manifest throttling issues as a 400 error if the request is rejected before reaching the core model processing logic.
+
+**Environmental or Variable Issues**
+The error can arise if environment variables used to store the model name are incorrectly defined. For example, the variable might include accidental whitespace, hidden characters, or extra quotation marks that invalidate the string when passed to the API client.
+
+**Network or Middleware Issues**
+General network problems or misconfigured middleware (such as Axios, LangChain, or proxy wrappers) can lead to malformed requests where the model name is stripped or altered before it reaches the API server.
+
+## Solution
+To resolve the "Invalid model name" error, follow these structured remediation steps:
+
+**1. Verify the Model Name**
+Cross-reference the model string in your code with the official Mistral AI documentation. Ensure you are using the correct identifier for the desired model, such as:
+
+*   `open-mistral-7b`
+*   `open-mixtral-8x7b`
+*   `mistral-small-latest`
+*   `mistral-medium-latest`
+*   `mistral-large-latest`
+
+**2. Check API Keys and Headers**
+Confirm that your API keys are active and that your headers are correctly configured. The `Authorization` header must follow the `Bearer <API_KEY>` format, and the `Content-Type` must be set to `application/json`.
+
+**3. Review Request Syntax**
+Inspect the JSON payload for syntax errors. Ensure that the `model` field is a valid string and that all other mandatory fields (e.g., the `messages` array) are properly structured according to the API specification.
+
+**4. Inspect Network Traffic**
+Use network inspection tools or logging to view the raw HTTP request being sent. This will help identify if the model name or other parameters are being modified by a library or proxy before transmission.
+
+**5. Check Environment Variables**
+If you are loading the model name from an environment variable, log the variable's value immediately before the API call to ensure it contains only the intended string without leading/trailing spaces or incorrect casing.
+
+**6. Monitor Rate Limits**
+Check your provider dashboard to ensure you have not exceeded your usage limits or tier quotas. If you are being throttled, reduce the frequency of your requests or upgrade your plan.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.make.com/t/400-invalid-model-llama-3-8b-instruct-how-is-that-possible-if-it-is-actually-permitted/53562](https://community.make.com/t/400-invalid-model-llama-3-8b-instruct-how-is-that-possible-if-it-is-actually-permitted/53562)
+- [https://community.openai.com/t/request-failed-with-status-code-400/39242](https://community.openai.com/t/request-failed-with-status-code-400/39242)
+- [https://community.openai.com/t/content-is-required-property-error-400/486260](https://community.openai.com/t/content-is-required-property-error-400/486260)
+- [https://discuss.huggingface.co/t/400-client-error-in-inference-api-for-sentence-similarity-task/34784](https://discuss.huggingface.co/t/400-client-error-in-inference-api-for-sentence-similarity-task/34784)
+- [https://learn.microsoft.com/en-us/answers/questions/2117664/my-mistral-large-2407-serverless-deployment-api-is](https://learn.microsoft.com/en-us/answers/questions/2117664/my-mistral-large-2407-serverless-deployment-api-is)
+- [https://community.crewai.com/t/crewai-on-mistral-api-error/1559](https://community.crewai.com/t/crewai-on-mistral-api-error/1559)
+- [https://github.com/langchain-ai/langchain/issues/16869](https://github.com/langchain-ai/langchain/issues/16869)
+- [https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/discussions/98](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/discussions/98)
+- [https://docs.mistral.ai/getting-started/models/](https://docs.mistral.ai/getting-started/models/)
+- [https://docs.mistral.ai/api/](https://docs.mistral.ai/api/)

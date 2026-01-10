@@ -1,0 +1,48 @@
+---
+title: "Invalid image URL: 'messages[5].content[1].image_url.url'. Expected a base64-encoded data URL with an image MIME type (e.g. 'data:image/png;base64,aW1nIGJ5dGVzIGhlcmU='), but got a value without the 'data:' prefix."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "invalid-image-url-error-9254"
+---
+
+## Reason
+
+The "Invalid image URL" error (HTTP 400) occurs when the OpenAI API expects a base64-encoded data URL but receives a string that is either a standard URL or a malformed data URI. 
+
+Key points regarding this error include:
+1. **Missing Schema Prefix**: The API requires base64-encoded images to start with the `data:` prefix. If this prefix is missing, the API cannot identify the string as image data.
+2. **MIME Type Requirement**: The data URL must include a valid image MIME type (e.g., `image/png`, `image/jpeg`) immediately following the `data:` prefix.
+3. **Incorrect Field Value**: The error specifically targets the `messages[5].content[1].image_url.url` path in your request, indicating that the value provided there does not meet the expected format for a data URI.
+4. **Base64 Encoding**: If you are sending raw image bytes, they must be converted to a base64-encoded string and wrapped in the data URI format to be accepted.
+
+## Solution
+To resolve the "Invalid image URL" error, you must ensure that your image data is correctly formatted as a base64 data URL. Follow these steps:
+
+**1. Fetch and Encode the Image**
+1. Fetch the image data from your source (e.g., a local file or a private URL) using a library like `axios`, `fetch`, or the `https` module.
+2. Convert the raw binary image data into a base64-encoded string.
+
+**2. Construct the Data URL**
+1. Identify the correct MIME type for your image (e.g., `image/png`, `image/jpeg`, `image/webp`, or `image/gif`).
+2. Format the final string using the following structure: `data:<MIME_TYPE>;base64,<BASE64_STRING>`.
+3. Example: `data:image/png;base64,iVBORw0KGgoAAAANSUh...`.
+
+**3. Update Your API Request**
+1. Place the complete data URL string into the `url` property of the `image_url` object within your message content.
+2. Ensure there are no leading or trailing spaces in the string that might break the URI schema.
+
+**4. Verify External URLs (Alternative)**
+
+If you intended to use a standard URL instead of base64, ensure the URL is publicly accessible. OpenAI cannot access images stored behind authentication or local firewalls unless they are passed as base64 data strings.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/invalid-image-error-in-gpt-4o-when-using-s3-presigned-url/794549](https://community.openai.com/t/invalid-image-error-in-gpt-4o-when-using-s3-presigned-url/794549)
+- [https://community.openai.com/t/gpt-4-turbo-vision-api-recognizes-image-url-as-base64-encoded-image-data/734243](https://community.openai.com/t/gpt-4-turbo-vision-api-recognizes-image-url-as-base64-encoded-image-data/734243)
+- [https://community.openai.com/t/invalid-image-error-in-gpt-4-vision/505843](https://community.openai.com/t/invalid-image-error-in-gpt-4-vision/505843)
+- [https://github.com/openai/openai-python/issues/1483](https://github.com/openai/openai-python/issues/1483)
+- [https://pqina.nl/blog/convert-a-file-to-a-base64-string-with-javascript/](https://pqina.nl/blog/convert-a-file-to-a-base64-string-with-javascript/)
+- [https://community.openai.com/t/gpt-4-vision-preview-400-invalid-base64-image-url/679812](https://community.openai.com/t/gpt-4-vision-preview-400-invalid-base64-image-url/679812)
+- [https://formspree.io/blog/image-to-base64/](https://formspree.io/blog/image-to-base64/)
+- [https://platform.openai.com/docs/guides/vision#uploading-base-64-encoded-images](https://platform.openai.com/docs/guides/vision#uploading-base-64-encoded-images)

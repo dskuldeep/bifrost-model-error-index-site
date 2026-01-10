@@ -1,0 +1,50 @@
+---
+title: "The response was filtered due to the prompt triggering content management policy. Please modify your prompt and retry. See our documentation for more information on content filtering policies."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "content-policy-violation-error-9022"
+---
+
+## Raw Error Text
+
+```text
+The response was filtered due to the prompt triggering Azure OpenAI's content management policy. Please modify your prompt and retry. To learn more about our content filtering policies please read our documentation: https://go.microsoft.com/fwlink/?linkid=2198766
+```
+
+## Reason
+
+The **400 status error** in the Azure OpenAI API occurs when a prompt or a model's completion is flagged by the built-in Content Safety system. This system is designed to identify and filter content that violates safety standards.
+
+Key reasons for this error include:
+1. **Content Category Violation**: The prompt or the predicted response contains content falling into one of four harm categories: Hate, Sexual, Violence, or Self-harm.
+2. **Severity Thresholds**: By default, Azure OpenAI blocks content classified at **Medium** or **High** severity levels. Even content at a **Low** severity level may be filtered if custom, stricter filters are applied.
+3. **Prompt Shields and Jailbreak Detection**: The system includes binary classifiers to detect jailbreak attempts or 'Prompt Injection' attacks. If a prompt appears to be designed to bypass safety guardrails, it will be blocked.
+4. **Protected Material Detection**: Optional filters may block the generation of protected text (such as song lyrics) or public repository code to ensure copyright compliance.
+5. **False Positives and Contextual Triggers**: Harmless prompts can sometimes trigger filters due to ambiguous phrasing or the presence of specific keywords that resemble restricted topics, especially when summarizing transcripts or processing sensitive datasets.
+6. **API Key Issues**: While less common for this specific message, broader 400 errors can also be caused by incorrect or expired API keys.
+
+## Solution
+To resolve this error and prevent future occurrences, follow these remediation steps:
+1. **Analyze the Error Response**: Inspect the JSON response body. Azure OpenAI typically provides an `innererror` object containing `content_filter_results`. This will show you exactly which category (e.g., `violence`) and severity level triggered the filter.
+2. **Refine and Neutralize the Prompt**: 
+   - Rephrase the prompt to remove keywords or context that might be misinterpreted by the safety models.
+   - Use specific, neutral instructions rather than vague commands (e.g., instead of "summarize this fight," use "provide a professional summary of the conflict resolution points").
+3. **Configure Custom Content Filters**: 
+   - Navigate to **Azure OpenAI Studio** and select the **Content Filters** tab.
+   - Create a new customized configuration and adjust the severity sliders for Hate, Sexual, Violence, and Self-harm categories to better suit your use case.
+   - Associate the custom filter with your model deployment under the **Deployments** tab.
+4. **Apply for Modified Access**: 
+   - Managed customers with specific enterprise requirements can apply for **Modified Content Filtering** or a waiver for **Abuse Monitoring**.
+   - This requires submitting a formal request to Microsoft via the "Limited Access Review: Modified Content Filters" form.
+5. **Update API Versions**: Ensure you are using a recent API version (e.g., `2024-02-15-preview` or later), as newer versions may have improved classification accuracy and fewer false positives.
+6. **Validate API Configuration**: Confirm that your API keys are valid and that the request payload (including headers and parameters) conforms to the expected schema.
+
+## Suggested Links
+- [https://community.openai.com/t/facing-issue-with-many-prompts-where-open-api-is-blocking-prompts-due-to-content-management-policy-which-was-working-day-before/982882](https://community.openai.com/t/facing-issue-with-many-prompts-where-open-api-is-blocking-prompts-due-to-content-management-policy-which-was-working-day-before/982882)
+- [https://github.com/openai/openai-python/issues/331](https://github.com/openai/openai-python/issues/331)
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/openai-s-content-management-policy-triggered-wrongly/300869](https://community.openai.com/t/openai-s-content-management-policy-triggered-wrongly/300869)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/content-filtering](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/content-filtering)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/content-filters](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/content-filters)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/limited-access](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/limited-access)

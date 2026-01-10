@@ -1,0 +1,27 @@
+---
+title: "too many tokens: total number of tokens in the prompt cannot exceed 4081 - received 4588. Try using a shorter prompt, or enabling prompt truncating. See https://docs.cohere.com/reference/generate for more details."
+provider: "cohere"
+provider_icon: "/logos/cohere.png"
+solved: true
+slug: "input-limit-exceeded-error-9114"
+---
+
+## Reason
+
+The HTTP 400 error occurs because the total number of tokens in the request exceeds the maximum capacity allowed for the model. In this specific case, the Cohere API reported that the prompt contained 4588 tokens, which surpassed the hard limit of 4081 tokens.
+
+This token limit represents the context window for the model being used via the `generate` endpoint. When the sum of the input tokens (and in some configurations, the requested response tokens) exceeds this threshold, the API rejects the request to prevent processing failures.
+
+## Solution
+To resolve the "too many tokens" error, you must ensure your request fits within the 4081-token context window using one of the following methods:
+1. **Shorten the prompt**: Manually reduce the length of your input text. Remove non-essential context, repetitive instructions, or excessive data to bring the total token count under the 4081 limit.
+2. **Enable prompt truncation**: Utilize the `prompt_truncation` parameter in your API request to handle oversized inputs automatically. You can set this to:
+   - `AUTO`: The API will automatically truncate the input to fit the context window.
+   - `START`: The API will discard tokens from the beginning of the prompt.
+   - `END`: The API will discard tokens from the end of the prompt.
+3. **Adjust the max_tokens parameter**: In some scenarios, the API evaluates the limit based on the prompt size plus the `max_tokens` value (the requested length of the completion). Reducing `max_tokens` to a lower value can provide more headroom for your input prompt.
+4. **Split the request**: If the content is too long to be truncated, consider splitting the input into multiple smaller requests and processing them sequentially.
+
+## Suggested Links
+- [https://docs.cohere.com/reference/generate](https://docs.cohere.com/reference/generate)
+- [https://docs.cohere.com/docs/errors](https://docs.cohere.com/docs/errors)

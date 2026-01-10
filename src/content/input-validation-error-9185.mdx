@@ -1,0 +1,32 @@
+---
+title: "Invalid 'functions[1].description': string too long. Expected a string with maximum length 1024, but got a string with length 1058 instead."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "input-validation-error-9185"
+---
+
+## Reason
+
+The **400 Bad Request** error in the Azure OpenAI API occurs because the `description` string within the `functions` or `tools` parameter exceeds the maximum allowed character length. 
+
+Key reasons include:
+1. **Character Limit Violation**: The API enforces a strict limit of **1,024 characters** for the `description` field of any individual function. In this specific log, the provided string was 1,058 characters, triggering the error.
+2. **Validation Layer Failure**: This error occurs at the input validation layer before the model processes the prompt. The API identifies that the input does not conform to the expected JSON schema, resulting in a `BadRequestError` with the specific error code `string_above_max_length`.
+3. **Metadata Constraints**: While the model's context window can handle large amounts of data, individual API metadata fields like function descriptions have lower architectural limits to ensure efficient processing during tool selection.
+
+## Solution
+To resolve the 400 status error caused by a length violation in the function description, follow these remediation steps:
+1. **Trim the Description**: Manually shorten the `description` string for the identified function (e.g., `functions[1]`) to ensure it is **1,024 characters or fewer**.
+2. **Relocate Details to the System Message**: If the description requires extensive detail to guide the model, move complex instructions or examples to the **System Message** (System Prompt). The function description should primarily focus on context that helps the model decide *when* to use the tool.
+3. **Split Logic if Necessary**: If a single function's purpose is too complex to describe concisely, consider splitting it into smaller, more specific functions with shorter individual descriptions.
+4. **Audit Automated Generation**: If you are using libraries or scripts to auto-generate function schemas from code docstrings, implement a validation check or truncation logic to enforce the 1,024-character boundary programmatically.
+5. **Adopt the Tools Parameter**: Ensure you are using the modern `tools` parameter instead of the deprecated `functions` parameter, though note that the 1,024-character constraint for function descriptions typically applies to both.
+
+## Suggested Links
+- [https://community.openai.com/t/error-400-related-to-size-of-string/840368](https://community.openai.com/t/error-400-related-to-size-of-string/840368)
+- [https://community.openai.com/t/issue-with-an-error-400-string-too-long/878992](https://community.openai.com/t/issue-with-an-error-400-string-too-long/878992)
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/assisants-api-message-content-maximum-length/829483](https://community.openai.com/t/assisants-api-message-content-maximum-length/829483)
+- [https://community.openai.com/t/function-call-description-max-length/529902](https://community.openai.com/t/function-call-description-max-length/529902)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)

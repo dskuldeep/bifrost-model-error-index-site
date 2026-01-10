@@ -1,0 +1,37 @@
+---
+title: "Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."
+provider: "anthropic"
+provider_icon: "/logos/anthropic.png"
+solved: true
+slug: "insufficient-balance-error-9225"
+---
+
+## Reason
+
+The error message indicating a 400 status code with the message "Your credit balance is too low to access the Anthropic API" occurs because your current credit balance is insufficient to process requests to the Anthropic API (Claude API). This error is triggered when the system performs a real-time check against your account's prepaid credit balance during an API call and finds that the available funds do not meet the minimum required amount to process the request.
+
+Key causes include:
+1. Depleted prepaid credits on a "Build" or self-service billing tier.
+2. Reaching the monthly usage limit on a postpaid account.
+3. Attempting to use the API with a zero or negative balance, which can occur if previous requests were processed before the billing system updated your usage.
+4. A common point of confusion is that a Claude Pro web subscription (at $20/month) does not provide credits for the Anthropic API; these are separate billing systems.
+
+## Solution
+To resolve this error and restore access to the API, you must ensure your account has a positive and sufficient credit balance. Follow these steps:
+1. Log in to the [Anthropic Console](https://console.anthropic.com/).
+2. Navigate to the **Settings** tab and select the **Billing** or **Plans & Billing** section.
+3. Review your current balance. If you are on a prepaid tier, click **Add Funds** or **Purchase Credits**.
+4. Enter the amount of credits you wish to purchase (note that Anthropic typically requires a minimum purchase of $5 USD).
+5. Complete the payment process to apply the credits to your account.
+6. (Recommended) Enable **Auto-recharge** (or auto-reload) in the billing settings. This feature automatically tops up your balance when it falls below a threshold you define, preventing service interruptions in the future.
+7. Verify that you have enough credits to cover the token usage for the specific model you are calling (e.g., Claude 3.5 Sonnet or Claude 3 Opus).
+
+## Suggested Links
+- [https://github.com/Aider-AI/aider/issues/804](https://github.com/Aider-AI/aider/issues/804)
+- [https://codingmall.com/knowledge-base/25-global/1533-how-do-i-handle-errors-and-exceptions-when-using-the-anthropic-python-sdk](https://codingmall.com/knowledge-base/25-global/1533-how-do-i-handle-errors-and-exceptions-when-using-the-anthropic-python-sdk)
+- [https://community.make.com/t/too-low-credit-balance-for-connecting-claude/52640](https://community.make.com/t/too-low-credit-balance-for-connecting-claude/52640)
+- [https://docs.anthropic.com/en/api/errors](https://docs.anthropic.com/en/api/errors)
+- [https://support.anthropic.com/en/articles/9201141-transitioning-from-the-api-private-beta-to-general-availability](https://support.anthropic.com/en/articles/9201141-transitioning-from-the-api-private-beta-to-general-availability)
+- [https://www.restack.io/p/anthropic-answer-api-pricing-cat-ai](https://www.restack.io/p/anthropic-answer-api-pricing-cat-ai)
+- [https://support.anthropic.com/en/articles/8324391-how-can-i-buy-credits](https://support.anthropic.com/en/articles/8324391-how-can-i-buy-credits)
+- [https://support.anthropic.com/en/articles/7996393-how-do-i-add-funds-to-my-api-account](https://support.anthropic.com/en/articles/7996393-how-do-i-add-funds-to-my-api-account)

@@ -1,0 +1,39 @@
+---
+title: "Your input image may contain content that is not allowed by our safety system."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "content-violation-error-9027"
+---
+
+## Reason
+
+The **400 status error** with the message "Your input image may contain content that is not allowed by our safety system" occurs when the OpenAI API's automated moderation layer flags an image for violating safety guidelines. This is most common when using vision-capable models like **GPT-4o** or **GPT-4-turbo**.
+
+Key reasons for this rejection include:
+
+*   **Safety System Violations**: The image may trigger filters designed to block categories such as hate speech, sexual content, graphic violence, harassment, or self-harm.
+*   **CAPTCHA Defense**: OpenAI has a specific built-in safeguard to prevent its models from being used to solve or bypass CAPTCHAs. Even innocuous images that resemble CAPTCHA puzzles may be blocked.
+*   **Personally Identifiable Information (PII)**: Images containing sensitive personal or business information—such as names, home addresses, private emails, or phone numbers—are frequently flagged to protect privacy.
+*   **Automated Classifiers and False Positives**: The safety system uses neural classification models that may occasionally misinterpret benign visual patterns (like specific textures, medical imagery, or color-inverted lanes) as policy violations.
+
+## Solution
+To resolve the content violation error, you must ensure your input aligns with OpenAI's usage policies and the specific requirements of the Vision API. Follow these steps:
+1.  **Review and Modify the Image Content**
+    *   Inspect the image for any prohibited visual elements including violence, nudity, or hate symbols.
+    *   Ensure the image does not contain PII such as credit card numbers, ID cards, or personal contact details.
+2.  **Eliminate CAPTCHA-Like Features**
+    *   Avoid uploading images that feature grid-based selection tasks, distorted text, or other patterns typically found in CAPTCHAs.
+3.  **Validate Image Technicals**
+    *   Verify the image is in a supported format: **PNG**, **JPEG**, **WEBP**, or non-animated **GIF**.
+    *   Ensure the file size is under the **20 MB** limit per image.
+4.  **Implement the OpenAI Moderation API**
+    *   Use the `omni-moderation-latest` model via the Moderations endpoint to pre-screen images. This tool can identify exactly which safety category is being triggered before you send the request to the more expensive Chat Completion models.
+5.  **Troubleshoot Persistent False Positives**
+    *   Try cropping the image to remove peripheral details that might be confusing the classifier.
+    *   If the image is harmless but consistently blocked, try a different resolution or use the `detail: low` parameter to see if high-resolution artifacts are triggering the filter.
+
+## Suggested Links
+- [https://openai.com/policies/usage-policies/](https://openai.com/policies/usage-policies/)
+- [https://platform.openai.com/docs/guides/vision](https://platform.openai.com/docs/guides/vision)
+- [https://platform.openai.com/docs/guides/moderation](https://platform.openai.com/docs/guides/moderation)

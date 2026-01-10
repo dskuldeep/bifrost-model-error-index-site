@@ -1,0 +1,38 @@
+---
+title: "Invalid file format. Supported formats: ['flac', 'm4a', 'mp3', 'mp4', 'mpeg', 'mpga', 'oga', 'ogg', 'wav', 'webm']"
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "invalid-file-format-error-9252"
+---
+
+## Reason
+
+The `400 Bad Request` status error with the message "Invalid file format" occurs when the audio file uploaded to the OpenAI API (specifically the Transcription or Translation endpoints) does not match the platform's supported file specifications.
+
+Key reasons for this failure include:
+1. **Unsupported Format**: The file extension is not among the acceptable types. OpenAI currently supports `flac`, `m4a`, `mp3`, `mp4`, `mpeg`, `mpga`, `oga`, `ogg`, `wav`, and `webm`.
+2. **Codec/Container Mismatch**: The file may have a supported extension but contains an internal encoding (codec) that the API cannot parse. For instance, renaming an unsupported `.aac` file to `.mp3` without transcoding will trigger this error.
+3. **MIME Type Issues**: If the request header does not correctly identify the file type or if the binary data is corrupted, the API will reject the request as a "Bad Request."
+
+## Solution
+To resolve the "Invalid file format" error, follow these remediation steps to ensure your file meets OpenAI's technical requirements:
+1. **Convert to a Supported Format**: Use professional audio conversion software or command-line tools like **FFmpeg** to transcode your file. 
+   *   Example command to convert to MP3: `ffmpeg -i input.ext -vn -ar 44100 -ac 2 -b:a 192k output.mp3`
+   *   Ensure the output is one of: `flac`, `m4a`, `mp3`, `mp4`, `mpeg`, `mpga`, `oga`, `ogg`, `wav`, or `webm`.
+2. **Verify Extension Accuracy**: Ensure the file extension accurately reflects the file's internal data structure. Avoid manual renaming; always use a conversion tool to ensure the bitstream is properly formatted for the target extension.
+3. **Manage File Size Limits**: OpenAI's Audio API has a strict **25MB** upload limit. If your file is too large:
+   *   Compress the audio by reducing the bitrate (e.g., to 96kbps or 128kbps).
+   *   Split the audio into segments smaller than 25MB using a tool like FFmpeg or PyDub before sending multiple requests.
+4. **Check Request Configuration**: Verify that your API request is sent using `multipart/form-data` and that the file is correctly passed in the `file` parameter. Ensure the file is not empty or corrupted before transmission.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/what-file-types-are-supported-by-gpts-for-uploading-files-and-what-are-the-specific-file-size-limitations/678393](https://community.openai.com/t/what-file-types-are-supported-by-gpts-for-uploading-files-and-what-are-the-specific-file-size-limitations/678393)
+- [https://community.make.com/t/question-re-400-invalid-file-format-supported-formats-flac-m4a-mp3-mp4-mpeg-mpga-oga-ogg-wav-webm/28238](https://community.make.com/t/question-re-400-invalid-file-format-supported-formats-flac-m4a-mp3-mp4-mpeg-mpga-oga-ogg-wav-webm/28238)
+- [https://community.openai.com/t/what-file-types-are-actually-supported/929529](https://community.openai.com/t/what-file-types-are-actually-supported/929529)
+- [https://community.openai.com/t/has-the-whisper-error-been-solved/433315](https://community.openai.com/t/has-the-whisper-error-been-solved/433315)
+- [https://platform.openai.com/docs/api-reference/audio](https://platform.openai.com/docs/api-reference/audio)
+- [https://github.com/openai/whisper/discussions/799](https://github.com/openai/whisper/discussions/799)
+- [https://dev.to/mxro/optimise-openai-whisper-api-audio-format-sampling-rate-and-quality-29fj?comments_sort=top](https://dev.to/mxro/optimise-openai-whisper-api-audio-format-sampling-rate-and-quality-29fj?comments_sort=top)
+- [https://platform.openai.com/docs/guides/speech-to-text](https://platform.openai.com/docs/guides/speech-to-text)

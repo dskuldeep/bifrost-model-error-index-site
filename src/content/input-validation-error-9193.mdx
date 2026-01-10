@@ -1,0 +1,32 @@
+---
+title: "Invalid 'tools[0].function.description': string too long. Expected a string with maximum length 1024, but got a string with length 1784 instead."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-validation-error-9193"
+---
+
+## Reason
+
+The HTTP 400 (Bad Request) error occurs because the string provided in the `tools[n].function.description` field exceeds the maximum allowable character limit. 
+
+In the OpenAI API schema, the description field for a function is used to provide the model with context on when and how to call that specific tool. This field has a strict validation constraint of **1,024 characters**. In this specific instance, the API received a string with a length of 1,784 characters, triggering a validation failure. Because this description is part of the system prompt's overhead, OpenAI enforces these limits to manage context window efficiency and ensure schema integrity.
+
+## Solution
+To resolve the `string too long` error and ensure your API request is accepted, follow these remediation steps:
+1. **Truncate the Description**: Manually review the function description and shorten it to be under the 1,024-character limit. Focus on the core purpose of the function and the specific conditions under which it should be triggered.
+2. **Optimize for Conciseness**: Remove redundant language or detailed technical implementation details that the model does not need. Use clear, keyword-rich phrases that describe the function's utility.
+3. **Implement Client-Side Validation**: Add logic to your application to check the length of `tools` descriptions before the request is sent. This allows you to catch and handle errors locally rather than waiting for an API rejection.
+4. **Refactor Complex Functions**: If a function requires an excessively long description to be understood, consider splitting it into two or more specialized functions with simpler definitions.
+5. **Review Automated Pipelines**: If your function descriptions are dynamically generated (e.g., from code docstrings), update the generation logic to enforce a maximum character count and alert developers when a description is too long.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/issue-with-an-error-400-string-too-long/878992](https://community.openai.com/t/issue-with-an-error-400-string-too-long/878992)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://community.openai.com/t/error-400-related-to-size-of-string/840368](https://community.openai.com/t/error-400-related-to-size-of-string/840368)
+- [https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c](https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c)
+- [https://community.openai.com/t/function-call-description-max-length/529902](https://community.openai.com/t/function-call-description-max-length/529902)
+- [https://github.com/home-assistant/core/issues/121325](https://github.com/home-assistant/core/issues/121325)
+- [https://community.openai.com/t/assisants-api-message-content-maximum-length/829483](https://community.openai.com/t/assisants-api-message-content-maximum-length/829483)
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)

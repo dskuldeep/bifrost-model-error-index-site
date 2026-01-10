@@ -1,0 +1,36 @@
+---
+title: "\"input\" is a required property"
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-validation-error-9160"
+---
+
+## Reason
+
+The HTTP **400 Bad Request** error with the message `"input" is a required property` indicates that the OpenAI API received a request that failed schema validation. This error specifically occurs when using endpoints such as **Embeddings** (`/v1/embeddings`) or **Moderations** (`/v1/moderations`), which require an `input` parameter to process.
+
+Key reasons for this error include:
+1.  **Missing or Incorrect 'input' Field**: The API requires a top-level field named `input` in the JSON request body. If this key is missing, misspelled, or null, the request will be rejected.
+2.  **Invalid Request Structure**: The request body may not be formatted as valid JSON, or the `input` field may be incorrectly nested within another object rather than being at the root level.
+3.  **Strict Validation Enforcement**: OpenAI enforces strict schema validation. If the `input` property is omitted or contains an unsupported data type (e.g., passing a boolean or a deeply nested object instead of a string or array of strings), a 400 error is triggered.
+4.  **Endpoint Mismatch**: This error often occurs if a developer mistakenly uses the request structure for the Chat Completions API (which uses `messages`) while targeting an endpoint that expects `input` (like Embeddings).
+
+## Solution
+To resolve the 400 error and properly provide the `input` property, follow these remediation steps:
+1.  **Include the 'input' Field**: Ensure that your JSON request body contains the key `"input"` at the top level.
+2.  **Verify Data Presence and Type**: Confirm that the `input` field is not empty. Depending on the endpoint, it must be either a string (e.g., `"input": "Your text here"`) or an array of strings (e.g., `"input": ["text one", "text two"]`).
+3.  **Validate Request Structure**: Review your code to ensure the JSON is not improperly nested. The structure should look like this for an embeddings request:
+    ```json
+    {
+      "model": "text-embedding-3-small",
+      "input": "The food was delicious and the service was excellent."
+    }
+    ```
+4.  **Check for Empty Values**: Confirm that the variable being passed to the `input` field is initialized and contains text. Passing an empty string or an empty array can sometimes trigger validation failures.
+5.  **Review Endpoint Documentation**: If you are trying to generate a chat response, verify you are hitting the `/v1/chat/completions` endpoint and using the `messages` parameter instead of `input`. If you are using Embeddings or Moderations, stick to the `input` parameter.
+
+## Suggested Links
+- [https://platform.openai.com/docs/api-reference/embeddings/create](https://platform.openai.com/docs/api-reference/embeddings/create)
+- [https://platform.openai.com/docs/api-reference/moderations/create](https://platform.openai.com/docs/api-reference/moderations/create)
+- [https://platform.openai.com/docs/guides/error-codes](https://platform.openai.com/docs/guides/error-codes)

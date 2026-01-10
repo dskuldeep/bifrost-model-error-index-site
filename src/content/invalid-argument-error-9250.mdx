@@ -1,0 +1,36 @@
+---
+title: "Invalid response recieved from google: [{\"error\":{\"code\":400,\"message\":\"* GenerateContentRequest.contents: contents is not specified\\n\",\"status\":\"INVALID_ARGUMENT\"}}]"
+provider: "google"
+provider_icon: "/logos/google.png"
+solved: true
+slug: "invalid-argument-error-9250"
+---
+
+## Reason
+
+The `400 Bad Request` error, specifically the `INVALID_ARGUMENT` status with the message `"GenerateContentRequest.contents: contents is not specified"`, indicates that the request sent to the Google Gemini/Generative AI API is missing a mandatory parameter or has an invalid structure.
+
+Key reasons for this error include:
+
+- **Missing Mandatory `contents` Field**: The Google AI API requires the `contents` field to be present in the `GenerateContentRequest` body. This field is the core of the request, containing the conversation history and the current prompt.
+- **Incorrect Request Structure**: The structure of the JSON payload might be malformed or improperly nested. If the API cannot find the `contents` key at the expected root level of the JSON object, it treats the parameter as unspecified.
+- **Argument Validation Failure**: The `INVALID_ARGUMENT` status signifies that the request failed the API's schema validation. This can occur if the `contents` field is provided but is empty, or if it does not conform to the expected array-of-objects format.
+
+## Solution
+To resolve the `400 Bad Request` and `INVALID_ARGUMENT` errors, ensure your request body is correctly structured and includes all required fields. Follow these steps:
+1. **Specify the `contents` field**: Verify that the `contents` parameter is included at the top level of your JSON request. This is a non-optional field for content generation.
+2. **Structure the `contents` array correctly**: The `contents` field must be an array of objects. Each object should typically contain a `role` (e.g., "user" or "model") and a `parts` array containing the actual text or data.
+3. **Check the JSON structure**: Ensure the overall JSON body conforms to the expected format for the specific endpoint you are calling (e.g., `v1beta/models/gemini-pro:generateContent`).
+4. **Validate all arguments**: Ensure that all other parameters in the request, such as `generationConfig` or `safetySettings`, are valid and meet the API's technical criteria.
+
+## Suggested Links
+- [https://www.hostinger.com/tutorials/how-to-fix-400-bad-request-error](https://www.hostinger.com/tutorials/how-to-fix-400-bad-request-error)
+- [https://discuss.ai.google.dev/t/am-i-using-the-filedata-uri-part-wrong/1494](https://discuss.ai.google.dev/t/am-i-using-the-filedata-uri-part-wrong/1494)
+- [https://kinsta.com/knowledgebase/400-bad-request/](https://kinsta.com/knowledgebase/400-bad-request/)
+- [https://www.googlecloudcommunity.com/gc/AI-ML/Gemini-s-safety-config-400-error-from-today/m-p/712366](https://www.googlecloudcommunity.com/gc/AI-ML/Gemini-s-safety-config-400-error-from-today/m-p/712366)
+- [https://www.googlecloudcommunity.com/gc/Workspace-Q-A/Seeing-400-error-while-trying-to-send-a-mail/m-p/536255](https://www.googlecloudcommunity.com/gc/Workspace-Q-A/Seeing-400-error-while-trying-to-send-a-mail/m-p/536255)
+- [https://developers.google.com/drive/api/guides/handle-errors](https://developers.google.com/drive/api/guides/handle-errors)
+- [https://cloud.google.com/php/docs/reference/cloud-ai-platform/latest/V1.GenerateContentRequest](https://cloud.google.com/php/docs/reference/cloud-ai-platform/latest/V1.GenerateContentRequest)
+- [https://ai.google.dev/api/generate-content](https://ai.google.dev/api/generate-content)
+- [https://www.dreamhost.com/blog/400-bad-request-error/](https://www.dreamhost.com/blog/400-bad-request-error/)
+- [https://ai.google.dev/api/rest/v1/models/generateContent](https://ai.google.dev/api/rest/v1/models/generateContent)

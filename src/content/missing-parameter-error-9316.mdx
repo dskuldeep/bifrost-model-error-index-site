@@ -1,0 +1,54 @@
+---
+title: "you must provide a model parameter"
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "missing-parameter-error-9316"
+---
+
+## Reason
+
+The error **"You must provide a model parameter"** with an HTTP **400 status code** indicates that an OpenAI API request was submitted without the mandatory `model` field in the payload. 
+
+This parameter is a strict requirement because it tells the OpenAI gateway which specific engine or architecture should process the request. Without this instruction, the server cannot determine the computational requirements, pricing, or logic needed to fulfill the request, leading to a "Bad Request" response. This commonly occurs when:
+1. The `model` key is entirely missing from the JSON body.
+2. The key is misspelled (e.g., using `Model` instead of `model`).
+3. The request is sent to an endpoint where the model is required but was left out of the client-side configuration.
+
+## Solution
+To resolve the "You must provide a model parameter" error, ensure that your API request is properly structured with the required model identifier. Follow these remediation steps:
+
+**1. Include the Model Parameter in the Request Body**
+Ensure your JSON payload includes a `model` field. This field must specify a valid, non-deprecated model identifier.
+
+**2. Use Correct API Endpoints**
+Verify that you are targeting the correct endpoint for your specific task:
+
+*   **Chat Completions**: Use `https://api.openai.com/v1/chat/completions` for chat-based models like `gpt-4o` or `gpt-3.5-turbo`.
+*   **Legacy Completions**: Use `https://api.openai.com/v1/completions` for older models like `gpt-3.5-turbo-instruct`.
+*   **Embeddings**: Use `https://api.openai.com/v1/embeddings` for embedding models.
+
+**3. Validate Request Syntax and Parameters**
+Review your code to ensure all necessary parameters are provided alongside the model:
+
+*   **Model Parameter**: Specify a supported identifier, such as `"gpt-4o"`, `"gpt-4"`, or `"gpt-3.5-turbo"`.
+*   **Task-Specific Fields**: For chat completions, ensure the `messages` array is present. For legacy completions, ensure the `prompt` field is present.
+*   **JSON Formatting**: Ensure the request body is valid JSON and that the `model` key is at the root level of the object.
+
+**Example Request (Curl):**
+
+```bash
+curl https://api.openai.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -d '{
+    "model": "gpt-4o",
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'
+```
+
+## Suggested Links
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-model](https://platform.openai.com/docs/api-reference/chat/create#chat-create-model)
+- [https://platform.openai.com/docs/models](https://platform.openai.com/docs/models)
+- [https://platform.openai.com/docs/api-reference/completions/create#completions-create-model](https://platform.openai.com/docs/api-reference/completions/create#completions-create-model)
+- [https://platform.openai.com/docs/api-reference/embeddings/create#embeddings-create-model](https://platform.openai.com/docs/api-reference/embeddings/create#embeddings-create-model)

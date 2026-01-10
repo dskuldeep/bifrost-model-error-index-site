@@ -1,0 +1,39 @@
+---
+title: "Invalid image URL. The URL must be a valid HTTP or HTTPS URL, or a data URL with base64 encoding."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "input-validation-error-9147"
+---
+
+## Reason
+
+The Azure OpenAI API returns a 400 Bad Request error with the message "Invalid image URL" when vision-capable models (such as GPT-4o or GPT-4 Turbo with Vision) cannot access or parse the provided image source. This issue is typically caused by the following factors:
+1.  **Invalid URL Encoding**: The image URL may contain encoded characters that are not properly handled by the API. A common example occurs with Firebase Storage URLs, where characters like `%2F` (used instead of `/`) or complex query parameters can cause the URL to be interpreted as invalid.
+2.  **Incorrect URL Format**: The input provided does not follow a standard HTTP or HTTPS protocol, or it is not a correctly formatted data URL for base64-encoded images.
+3.  **Private Access Restrictions**: If the image is stored in a private Azure Blob Storage container or behind a firewall, the API will fail to fetch it. The service requires either public access or a URL with a valid Shared Access Signature (SAS) token.
+4.  **Malformed Data URLs**: When passing images via base64, the string must strictly adhere to the `data:<media_type>;base64,<data>` format. Missing the media type or the `base64` prefix will result in this error.
+5.  **Incomplete URL Components**: The URL may be missing essential elements such as the protocol (http/https), the domain name, or the full path to the image resource.
+
+## Solution
+To resolve the "Invalid image URL" error, follow these verification and remediation steps:
+1.  **Verify URL Accessibility**: Ensure the URL is a valid HTTP or HTTPS link. Test the URL in a browser or via a tool like `curl` from a public network to confirm the image is reachable.
+2.  **Correctly Format Data URLs**: If using base64 encoding, ensure the string is formatted exactly as follows:
+    `data:image/jpeg;base64,{base64_data}`
+    Replace `image/jpeg` with the correct MIME type (e.g., `image/png`, `image/webp`).
+3.  **Configure Azure Blob Access**: For images stored in private Azure Blob Storage, append a Shared Access Signature (SAS) token to the URL. Ensure the SAS token has 'Read' permissions and is currently valid (not expired).
+4.  **Sanitize URL Encoding**: Check the URL for malformed characters or double-encoding issues. If your storage provider uses complex query strings, try simplifying the path or using a proxy URL if the API continues to reject the format.
+5.  **Check Image Requirements**:
+    *   Ensure the image file size is within the limit (generally 20MB per image for Azure OpenAI).
+    *   Confirm the image is in a supported format: PNG, JPEG, WEBP, or non-animated GIF.
+6.  **Validate Protocol and Domain**: Double-check that the URL string includes the complete protocol (`https://`) and a valid domain or IP address.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://learn.microsoft.com/fi-fi/azure/ai-services/openai/reference](https://learn.microsoft.com/fi-fi/azure/ai-services/openai/reference)
+- [https://community.openai.com/t/gpt-4-vision-error-badrequesterror-400-invalid-image/516486](https://community.openai.com/t/gpt-4-vision-error-badrequesterror-400-invalid-image/516486)
+- [https://learn.microsoft.com/en-us/answers/questions/2108677/how-can-i-allow-azure-openai-to-access-a-private-b](https://learn.microsoft.com/en-us/answers/questions/2108677/how-can-i-allow-azure-openai-to-access-a-private-b)
+- [https://community.openai.com/t/gpt-4o-sometime-not-able-to-access-image-from-url/903528](https://community.openai.com/t/gpt-4o-sometime-not-able-to-access-image-from-url/903528)
+- [https://community.openai.com/t/how-to-send-base64-images-to-assistant-api/752440](https://community.openai.com/t/how-to-send-base64-images-to-assistant-api/752440)
+- [https://community.openai.com/t/error-sending-base64-image-data-in-api-request-to-gpt-4-vision-model/495864](https://community.openai.com/t/error-sending-base64-image-data-in-api-request-to-gpt-4-vision-model/495864)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/gpt-with-vision](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/gpt-with-vision)

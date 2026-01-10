@@ -1,0 +1,36 @@
+---
+title: "messages.0.content.2.image.source: image exceeds 5 MB maximum: 5591868 bytes > 5242880 bytes"
+provider: "anthropic"
+provider_icon: "/logos/anthropic.png"
+solved: true
+slug: "image-size-error-9074"
+---
+
+## Reason
+
+The `HTTP 400 Bad Request` error in the Anthropic API occurs because the image payload exceeds the strict 5 MB (5,242,880 bytes) size limit. In this instance, the image provided was 5,591,868 bytes, which is approximately 5.33 MB.
+
+Key technical factors include:
+1. **Base64 Encoding Overhead**: Anthropic requires images to be sent as base64-encoded strings within the `source` object. Base64 encoding increases the file size by approximately 33%. A file that is 4 MB on disk may exceed the 5 MB limit once it is encoded for the API request.
+2. **Strict Validation**: The API performs a validation check on the size of the decoded data. If the image data (post-decoding) exceeds 5,242,880 bytes, the request is rejected immediately.
+3. **Vision Model Constraints**: While Claude can process multiple images, the 5 MB limit applies to each individual image source provided in the `content` array.
+
+## Solution
+To resolve the `HTTP 400 Bad Request` error and ensure your image meets the Anthropic API requirements, follow these remediation steps:
+1. **Resize the Image**: Lower the resolution of the image. Anthropic recommends that images do not exceed 1568 pixels on their longest side for optimal performance and cost-efficiency.
+2. **Compress the Image**: Apply compression to the image file. Using a quality setting of 75-85% in JPEG or WebP formats can significantly reduce file size with minimal impact on model perception.
+3. **Convert Image Format**: If you are using a lossless format like PNG or a high-resolution format like HEIF, convert the file to JPEG or WebP. Anthropic supports `image/jpeg`, `image/png`, `image/gif`, and `image/webp`.
+4. **Use an Image Resize API or Library**: Automate the optimization process using libraries like Sharp (Node.js) or Pillow (Python) before sending the request. You can also use services like EWWW Image Optimizer.
+5. **Calculate for Encoding**: When checking file sizes locally, aim for a raw file size under 3.7 MB to ensure the final base64 string remains under the 5 MB limit during transmission.
+
+## Suggested Links
+- [https://www.restack.io/p/anthropic-answer-http-400-bad-request-cat-ai](https://www.restack.io/p/anthropic-answer-http-400-bad-request-cat-ai)
+- [https://wordpress.org/support/topic/image-upload-with-anthropic-api/](https://wordpress.org/support/topic/image-upload-with-anthropic-api/)
+- [https://forum.cursor.com/t/unable-to-reach-anthropic/22766](https://forum.cursor.com/t/unable-to-reach-anthropic/22766)
+- [https://github.com/mckaywrigley/chatbot-ui/issues/1611](https://github.com/mckaywrigley/chatbot-ui/issues/1611)
+- [https://github.com/continuedev/continue/issues/2006](https://github.com/continuedev/continue/issues/2006)
+- [https://github.com/langgenius/dify/issues/11177](https://github.com/langgenius/dify/issues/11177)
+- [https://www.abstractapi.com/guides/other/best-image-resize-api](https://www.abstractapi.com/guides/other/best-image-resize-api)
+- [https://docs.anthropic.com/en/docs/build-with-claude/vision](https://docs.anthropic.com/en/docs/build-with-claude/vision)
+- [https://forum.bubble.io/t/resize-photo-client-side-before-upload/144334](https://forum.bubble.io/t/resize-photo-client-side-before-upload/144334)
+- [https://docs.anthropic.com/en/docs/build-with-claude/vision#image-constraints](https://docs.anthropic.com/en/docs/build-with-claude/vision#image-constraints)

@@ -1,0 +1,30 @@
+---
+title: "Invalid value for \"function_call\": no function named \"generate_analytics\" was specified in the \"functions\" parameter."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "function-call-error-9064"
+---
+
+## Reason
+
+This error indicates that the OpenAI API received a request where the `function_call` parameter was set to a specific function name, but that function was not defined within the `functions` parameter of the same request.
+
+Key reasons for this failure include:
+1. **Missing Definition**: The `function_call` option requires that the specified function name must be explicitly defined in the `functions` list. If the schema for the function is missing, the API cannot validate the call.
+2. **Name Mismatch**: The name provided in the `function_call` parameter does not exactly match the `name` property defined in the function's JSON schema.
+3. **API Protocol Violation**: This results in a 400 Bad Request error because the model is being instructed to use a specific tool that the API does not recognize as available in the current context.
+
+## Solution
+To resolve the "Invalid value for 'function_call'" error, you must ensure that the function name is correctly registered and defined in your API request payload.
+
+Follow these steps to fix the issue:
+1. **Synchronize Function Names**: Verify that the function name specified in the `function_call` parameter (e.g., `"generate_analytics"`) matches the `name` field inside one of the objects in the `functions` array exactly.
+2. **Verify the Functions Array**: Ensure that the `functions` parameter is included in your request and contains the complete list of all function definitions the model might need to call.
+3. **Check for Case Sensitivity**: Function names are case-sensitive. Ensure there are no capitalization differences or accidental typos (e.g., `Generate_Analytics` vs `generate_analytics`).
+4. **Validate Schema Formatting**: Ensure the function definitions follow the required JSON Schema structure. If a definition is malformed, the API may ignore it, causing the `function_call` to reference a non-existent function.
+5. **Check API Versioning**: If you are using the newer `tools` and `tool_choice` parameters instead of the legacy `functions` and `function_call`, ensure you are not mixing the two formats in a single request, as they are handled differently by the API.
+
+## Suggested Links
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-functions](https://platform.openai.com/docs/api-reference/chat/create#chat-create-functions)

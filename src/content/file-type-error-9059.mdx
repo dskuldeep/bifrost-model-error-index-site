@@ -1,0 +1,35 @@
+---
+title: "You uploaded an unsupported image. Please make sure your image is valid."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "file-type-error-9059"
+---
+
+## Reason
+
+The OpenAI API returns a 400 error during image uploads when the request fails to meet specific processing requirements. The primary reasons include:
+
+*   **Unsupported Format or Size**: The image exceeds the 20 MB size limit per file. Additionally, OpenAI only supports specific MIME types: `image/png`, `image/jpeg`, `image/gif`, and `image/webp`.
+*   **Image Corruption or Invalidity**: The file may be corrupted, truncated, or improperly formatted, rendering it unreadable by the vision model even if the file extension is correct.
+*   **Malformed Request Parameters**: The API request may contain incorrect headers, such as a missing or invalid `Authorization` field, or the request body may not adhere to the expected JSON schema for the Vision API.
+*   **Encoding Issues**: When using base64 encoding, the string may be improperly formatted or missing the required data URI prefix. 
+*   **Network Disruptions**: While less common for this specific error, packet loss or high latency during the upload process can lead to an incomplete or invalid payload being received by the server.
+
+## Solution
+To resolve the image upload error, follow these remediation steps:
+1.  **Validate Image Constraints**: Verify that the image file size is strictly below 20 MB and the file format is one of the supported types (`png`, `jpeg`, `gif`, or `webp`).
+2.  **Verify File Integrity**: Ensure the image is not corrupted by attempting to open it in a standard viewer. If generating images programmatically, verify the output buffer is complete.
+3.  **Check Base64 Formatting**: If you are sending images via base64, ensure the string is correctly encoded and includes the appropriate prefix, such as `data:image/jpeg;base64,` followed by the encoded data.
+4.  **Use Hosted URLs**: For more efficient handling and to avoid common encoding pitfalls, consider passing a publicly accessible image URL in the request body instead of base64 data.
+5.  **Review Request Headers**: Confirm that the API request includes a valid API key and that the `Content-Type` is set to `application/json`.
+6.  **Retry the Request**: If the error persists despite valid formatting, implement a retry with exponential backoff to rule out intermittent server-side or network issues.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/uploading-images-to-the-chatgpt-api/985494](https://community.openai.com/t/uploading-images-to-the-chatgpt-api/985494)
+- [https://community.openai.com/t/400-error-on-gpt-vision-emerges-out-of-nowhere-solved/606227](https://community.openai.com/t/400-error-on-gpt-vision-emerges-out-of-nowhere-solved/606227)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://community.openai.com/t/best-practice-for-handling-image-uploading-on-production/873362](https://community.openai.com/t/best-practice-for-handling-image-uploading-on-production/873362)
+- [https://community.openai.com/t/api-error-400-unsupported-image-for-portrait-orientation-pictures/894714](https://community.openai.com/t/api-error-400-unsupported-image-for-portrait-orientation-pictures/894714)
+- [https://platform.openai.com/docs/guides/vision](https://platform.openai.com/docs/guides/vision)

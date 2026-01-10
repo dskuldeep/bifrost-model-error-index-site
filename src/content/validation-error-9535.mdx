@@ -1,0 +1,33 @@
+---
+title: "Additional properties are not allowed (\"result\", \"type\" were unexpected) - \"messages.17\""
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "validation-error-9535"
+---
+
+## Reason
+
+The error **"Additional properties are not allowed ('result', 'type' were unexpected)"** indicates that the OpenAI API encountered fields in the request body that do not conform to its strict JSON schema. Specifically, the suffix `- "messages.17"` identifies that the violation occurred within the 18th element (index 17) of the `messages` array.
+
+Key reasons for this error include:
+1. **Invalid Request Structure**: The Chat Completion API expects each object in the `messages` array to contain only specific, predefined keys such as `role`, `content`, `name`, `tool_calls`, and `tool_call_id`. Adding arbitrary keys like `result` or `type` triggers a validation failure.
+2. **Schema Validation**: OpenAI uses rigorous JSON Schema validation for all API endpoints. Any property not explicitly defined in the API's specification is rejected to prevent unpredictable model behavior.
+3. **Incorrect Parameter Names**: This error often occurs when developers accidentally pass metadata or raw response objects from a previous API call (which might include fields like `type` or `result`) back into the `messages` history without sanitizing the objects first.
+4. **Indexing Errors**: The API specifically points to the exact location of the error (e.g., `messages.17`), helping to pinpoint which specific message object contains the unauthorized properties.
+
+## Solution
+To resolve the "Additional properties are not allowed" error, you must align your request payload strictly with the official OpenAI API schema.
+
+Follow these steps to remediate the issue:
+1. **Identify the Erroneous Object**: Use the index provided in the error message (e.g., `messages.17`) to locate the exact message object in your code that is causing the failure.
+2. **Sanitize Message Objects**: Review the identified message object and remove any keys that are not supported. For standard chat messages, ensure you are only using `role`, `content`, and optionally `name`. If you are handling tool outputs, ensure you are using `tool_call_id` and `role: "tool"` correctly.
+3. **Review API Documentation**: Consult the OpenAI Chat Completion API reference to verify the allowed properties for the specific API version and model you are using.
+4. **Validate Request Payload**: Implement a local validation step or use a schema validation library to check your JSON payload against the OpenAI spec before sending the request.
+5. **Use Official SDKs**: Utilize the official OpenAI Python or Node.js libraries. these SDKs provide built-in type checking and validation that can catch unexpected properties during development rather than at runtime.
+6. **Cleanse Recycled Data**: If you are building a conversation history by appending previous assistant responses, ensure you only extract the necessary fields (`role` and `content`) rather than passing the entire raw response object back to the API.
+
+## Suggested Links
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)
+- [https://platform.openai.com/docs/guides/structured-outputs](https://platform.openai.com/docs/guides/structured-outputs)
+- [https://platform.openai.com/docs/guides/text-generation/chat-completions-api](https://platform.openai.com/docs/guides/text-generation/chat-completions-api)

@@ -1,0 +1,34 @@
+---
+title: "\"parameters\" is a required property - \"functions.0\""
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "validation-error-9522"
+---
+
+## Reason
+
+The error message `"parameters" is a required property - "functions.0"` indicates a schema validation failure within the Azure OpenAI API request. This specifically occurs when using the legacy **Function Calling** feature. 
+
+Key reasons for this error include:
+
+*   **Missing Parameters in Function Definition**: The `functions` array expects each function object to contain a `parameters` property. This error triggers when the first item in the array (index 0) lacks this property, even if the function requires no arguments.
+*   **Invalid Request Payload**: The payload may be incorrectly formatted or contain invalid JSON that does not match the expected API schema.
+*   **Incorrect API Keys or Authentication**: Using an incorrect, expired, or invalid API key, or targeting the wrong API endpoint, can result in a 400 error.
+*   **Rate Limiting**: Exceeding the Tokens Per Minute (TPM) or Requests Per Minute (RPM) limits set for the Azure OpenAI resource.
+*   **Parameter Compatibility**: Using parameters that are unsupported by the specific model version, such as using `max_completion_tokens` instead of `max_tokens` where necessary.
+*   **Incorrect HTTP Headers**: Missing or incorrectly configured headers, such as `Content-Type` or the `api-key` header.
+
+## Solution
+To resolve the "parameters is a required property" error and other 400 Bad Request issues, follow these steps:
+1.  **Define the Parameters Property**: Ensure every object inside the `functions` array includes the `parameters` key. If the function requires no arguments, you must still provide a valid JSON schema object, for example: `"parameters": {"type": "object", "properties": {}}`.
+2.  **Verify Request Payload**: Use a JSON validator to ensure the entire request body is correctly formatted and complies with the expected structure for the Azure OpenAI Chat Completion API.
+3.  **Validate API Keys and Authentication**: Confirm that the `api-key` header is correctly set and that the resource endpoint matches the region of your deployment.
+4.  **Comply with Rate Limits**: Monitor your usage in the Azure Portal to ensure you are not exceeding the assigned quotas.
+5.  **Use Compatible Parameters**: Check the documentation for your specific model version to ensure you are using supported parameters (e.g., verify compatibility for `max_tokens` vs `max_completion_tokens`).
+6.  **Correct HTTP Headers**: Ensure the `Content-Type` header is set to `application/json` and the `api-key` or `Authorization` headers are properly configured.
+7.  **Consider Migrating to Tools**: For modern implementations, Azure OpenAI recommends moving from the legacy `functions` parameter to the `tools` parameter.
+
+## Suggested Links
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)

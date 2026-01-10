@@ -1,0 +1,45 @@
+---
+title: "Additional properties are not allowed ('question', 'question_variations' were unexpected) - 'messages.0'"
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "input-validation-error-9152"
+---
+
+## Reason
+
+The `400 Bad Request` error in the Azure OpenAI API indicates that the request payload contains properties that do not conform to the expected JSON schema. Specifically, the message `Additional properties are not allowed ('question', 'question_variations' were unexpected) - 'messages.0'` signifies that the first object in your `messages` array includes keys that the API does not recognize.
+
+Key reasons for this error include:
+1. **Invalid Request Configuration**: The Chat Completions API expects specific properties within the `messages` objects, such as `role`, `content`, and optionally `name` or `tool_calls`. The properties `question` and `question_variations` are not valid keys for a message object in this context.
+2. **API Endpoint and Version Issues**: There may be a mismatch between the request format and the requirements of the specific API version or endpoint (e.g., `/chat/completions` vs. `/assistants`). Newer or specific preview versions of the API enforce strict schema validation and will reject any extra metadata included in the message objects.
+3. **Content and Policy Violations**: While less common for this specific error string, the API may reject requests that do not strictly adhere to structural requirements as part of its initial validation and content management policy checks.
+
+## Solution
+To resolve the `400` status error, you must modify your request to align with the Azure OpenAI API's expected schema. Follow these steps:
+1. **Remove Unexpected Properties**: Remove the `question` and `question_variations` keys from all objects within the `messages` array. These fields are likely remnants of a prompt template or internal logic that should not be passed directly to the API.
+2. **Map Data to Standard Fields**: If the content stored in `question` is intended to be the user's prompt, move that text into the `content` property and ensure the `role` is set appropriately (e.g., `"role": "user"`).
+3. **Verify Request Structure**: Ensure your request follows the standard Chat Completion format:
+
+```json
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "Your actual question text goes here"
+    }
+  ]
+}
+```
+4. **Check API Documentation**: Review the documentation for the specific API version and model you are targeting. Ensure that no deprecated fields are being used and that the structure matches the endpoint's requirements.
+5. **Review Third-Party Frameworks**: If you are using an orchestration layer like LangChain, Flowise, or a custom SDK, ensure that variables are being correctly interpolated into the `content` string rather than being passed as additional keys in the JSON body.
+
+## Suggested Links
+- [https://community.openai.com/t/content-is-required-property-error-400/486260](https://community.openai.com/t/content-is-required-property-error-400/486260)
+- [https://github.com/FlowiseAI/Flowise/issues/195](https://github.com/FlowiseAI/Flowise/issues/195)
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://github.com/Azure/azure-sdk-for-net/issues/43953](https://github.com/Azure/azure-sdk-for-net/issues/43953)
+- [https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md](https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md)
+- [https://github.com/danny-avila/LibreChat/discussions/3115](https://github.com/danny-avila/LibreChat/discussions/3115)
+- [https://community.openai.com/t/azure-open-ai-assistant-api-connection-error/662198](https://community.openai.com/t/azure-open-ai-assistant-api-connection-error/662198)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)

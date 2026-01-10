@@ -1,0 +1,37 @@
+---
+title: "The model `gpt-4o` does not exist or you do not have access to it."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "access-error-9000"
+---
+
+## Reason
+
+The `404` status error with the message "The model `gpt-4o` does not exist or you do not have access to it" occurs when the OpenAI API cannot locate the requested model resource for your specific account. This is typically caused by one of the following factors:
+1. **Usage Tier Requirements**: Access to flagship models like `gpt-4o` requires your OpenAI account to be at least **Usage Tier 1**. This tier is reached once you have made a successful payment of $5 or more to your API credit balance. Free-tier accounts generally do not have API access to the `gpt-4o` model.
+2. **Incorrect Model Identifier**: The API is case-sensitive and strictly requires the identifier `gpt-4o`. Common errors include using `gpt4o` (missing hyphen) or `gpt-4-o`.
+3. **Azure OpenAI Deployment Mismatch**: If you are using Azure OpenAI, the error often occurs because the API call uses the model name instead of the specific **Deployment Name** you defined in the Azure AI Studio. The endpoint URL must target the deployment name, not the base model identifier.
+4. **Project and Organization Permissions**: OpenAI accounts using the "Projects" feature can restrict specific API keys to certain models. If `gpt-4o` is not in the "Allowed models" list for your project or organization, the request will fail.
+5. **API Version Compatibility**: Using an outdated API version or an incorrect endpoint (e.g., using the completions endpoint for a chat-based model) can result in a `404 Not Found` error.
+
+## Solution
+To resolve the access error, follow these troubleshooting and remediation steps:
+1. **Verify Your Usage Tier**: Log in to the [OpenAI Billing Dashboard](https://platform.openai.com/account/billing/overview). Ensure you have added at least $5 in credits and that your account is listed as **Tier 1** or higher. Note that it may take up to 30 minutes for tier changes to propagate after a payment.
+2. **Check Model Availability in Playground**: Visit the [OpenAI Playground](https://platform.openai.com/playground). Check if `gpt-4o` appears in the model selection dropdown. If it is missing there, your account does not yet have access to the model.
+3. **Confirm the Model Identifier**: Ensure your code uses the exact string `gpt-4o`. For Azure OpenAI, verify that your `azure_deployment` parameter matches the name given during resource creation, which may differ from the base model name.
+4. **Review Project Restrictions**: If you are part of an organization, go to **Settings > Projects**, select your project, and ensure `gpt-4o` is included in the **Model usage** permissions.
+5. **Refresh API Credentials**: In some cases, existing API keys created before a tier upgrade may not recognize new model permissions. Generate a new API key and test it with a simple request to the `/v1/chat/completions` endpoint.
+6. **Azure-Specific Endpoint Check**: Ensure your Azure endpoint follows this format: `https://{your-resource-name}.openai.azure.com/openai/deployments/{your-deployment-name}/chat/completions?api-version=2024-02-15-preview`.
+
+## Suggested Links
+- [https://github.com/langchain-ai/langchain/issues/13284](https://github.com/langchain-ai/langchain/issues/13284)
+- [https://community.openai.com/t/how-to-set-billing-limits-and-restrict-model-usage-for-a-project-via-openai-api/1087771](https://community.openai.com/t/how-to-set-billing-limits-and-restrict-model-usage-for-a-project-via-openai-api/1087771)
+- [https://codingmall.com/knowledge-base/25-global/768-how-can-i-restrict-openai-api-key-access-to-specific-ip-addresses-or-domains](https://codingmall.com/knowledge-base/25-global/768-how-can-i-restrict-openai-api-key-access-to-specific-ip-addresses-or-domains)
+- [https://community.openai.com/t/gpt-4-is-not-available-in-playground-and-api-usage/317090](https://community.openai.com/t/gpt-4-is-not-available-in-playground-and-api-usage/317090)
+- [https://community.openai.com/t/getting-404-not-found-error-for-api-endpoint-in-postman/903181](https://community.openai.com/t/getting-404-not-found-error-for-api-endpoint-in-postman/903181)
+- [https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096](https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096)
+- [https://community.openai.com/t/api-access-to-gpt-4-no-longer-working/610484](https://community.openai.com/t/api-access-to-gpt-4-no-longer-working/610484)
+- [https://www.restack.io/p/ai-debugging-answer-openai-api-troubleshooting-cat-ai](https://www.restack.io/p/ai-debugging-answer-openai-api-troubleshooting-cat-ai)
+- [https://platform.openai.com/docs/guides/rate-limits/usage-tiers](https://platform.openai.com/docs/guides/rate-limits/usage-tiers)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models)

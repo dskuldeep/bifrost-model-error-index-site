@@ -1,0 +1,29 @@
+---
+title: "Invalid value for \"function_call\": no function named \"GenBugReportFunc\" was specified in the \"functions\" parameter."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "function-call-error-9066"
+---
+
+## Reason
+
+The Azure OpenAI API returns a 400 Bad Request error when there is a configuration mismatch in the function calling parameters. This specific error occurs when the value provided in the `function_call` parameter does not have a corresponding entry in the `functions` list.
+
+Key reasons for this failure include:
+1. **Name Mismatch**: The function name specified (e.g., "GenBugReportFunc") must exactly match one of the names defined within the `functions` array. Any typo or omission in the definitions will cause the API to reject the request.
+2. **Parameter Deprecation**: The `functions` and `function_call` parameters are legacy features. Azure OpenAI has deprecated these in favor of the more flexible `tools` and `tool_choice` parameters. Using legacy parameters with newer models or API versions can sometimes lead to stricter validation errors.
+3. **Invalid Request Structure**: A 400 error indicates the server cannot process the request due to a client-side error, such as malformed JSON or referencing a resource that hasn't been defined in the payload.
+
+## Solution
+To resolve the 400 status error and ensure compatibility with modern Azure OpenAI models, follow these remediation steps:
+1. **Verify Function Specification**: Double-check the `functions` array in your request. Ensure that the function name "GenBugReportFunc" is defined exactly as it is called in the `function_call` parameter.
+2. **Migrate to Tools and Tool_Choice**: Update your API calls to use the current standard. Replace the deprecated `functions` parameter with `tools` and the `function_call` parameter with `tool_choice`.
+3. **Structure the Tools Payload Correctly**: When migrating to `tools`, ensure the tool is defined as an object with a `type: "function"` property. For example:
+   - Set `tools` to an array containing your function definitions.
+   - Set `tool_choice` to `{"type": "function", "function": {"name": "GenBugReportFunc"}}` if you wish to force that specific function.
+4. **Check API Version Compatibility**: Ensure your deployment is using an API version that supports tools (such as `2023-12-01-preview`, `2024-02-15-preview`, or later GA versions). Older API versions may not recognize the `tools` parameter.
+
+## Suggested Links
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)

@@ -1,0 +1,38 @@
+---
+title: "Invalid schema for response_format 'speech_analysis': In context=(), 'required' is required to be supplied and to be an array including every key in properties. Extra required key 'original' supplied."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "invalid-schema-error-9289"
+---
+
+## Reason
+
+The **400 Bad Request** error occurs when the JSON schema provided in the `response_format` for OpenAI's Structured Outputs is malformed or violates specific validation rules required for strict adherence.
+
+Key reasons for this failure include:
+1.  **Property and Required Key Mismatch**: In Structured Outputs (where `strict: true` is set), OpenAI requires that every key defined in the `properties` object must be listed in the `required` array. Conversely, any key listed in the `required` array must exist in `properties`. The error message `Extra required key 'original' supplied` indicates that 'original' was listed as required but was missing from the defined properties.
+2.  **Missing Mandatory Schema Fields**: For strict validation, the schema must include specific keywords that are often optional in standard JSON Schema, such as `additionalProperties: false` for every object and a non-empty `required` array.
+3.  **Model Compatibility**: Only specific models (e.g., `gpt-4o`, `gpt-4o-mini`, and `gpt-4o-2024-08-06` or later) support the `json_schema` response format with `strict: true`.
+4.  **Schema Nesting and Complexity**: OpenAI limits schemas to a specific depth (typically 5 levels) and a total number of properties. Exceeding these limits or using unsupported keywords (like `default` in some contexts) can trigger a 400 error.
+
+## Solution
+To resolve the "Invalid schema for response_format" error, follow these remediation steps:
+1.  **Align Properties and Required Keys**: Ensure your `required` array and `properties` object are perfectly synchronized. Every property you define must be marked as required, and you cannot list a key in `required` if it is not defined in `properties`.
+2.  **Enable Strict Mode Requirements**: If using `strict: true` in your `response_format`:
+    *   Add `"additionalProperties": false` to the root of your schema and to every nested object definition.
+    *   Ensure all fields are included in the `required` list (OpenAI does not support optional fields in strict mode; use a union type with `null` to emulate optionality).
+3.  **Validate Model Support**: Ensure you are using a compatible model version, such as `gpt-4o-2024-08-06` or newer. Earlier models may not support the `json_schema` type.
+4.  **Check API Key and Permissions**: Verify that your API key is active and has sufficient permissions (and tier access) to use the requested model and Structured Outputs feature.
+5.  **Simplify the Schema**: If the schema is highly complex, reduce the nesting depth and remove any unsupported JSON Schema keywords. Use simple types (string, number, boolean, object, array, enum).
+6.  **Verify Headers**: Confirm that your request uses `Content-Type: application/json` and that the body is a valid, stringified JSON object.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://community.openai.com/t/structured-outputs-invalid-schema-for-response-format-extra-required-key-supplied-openai-zod-dont-work-together-for-nested-structures/989579](https://community.openai.com/t/structured-outputs-invalid-schema-for-response-format-extra-required-key-supplied-openai-zod-dont-work-together-for-nested-structures/989579)
+- [https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c](https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c)
+- [https://community.openai.com/t/sorry-i-couldnt-process-the-response-correctly/513153](https://community.openai.com/t/sorry-i-couldnt-process-the-response-correctly/513153)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096](https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096)
+- [https://platform.openai.com/docs/guides/structured-outputs](https://platform.openai.com/docs/guides/structured-outputs)

@@ -1,0 +1,39 @@
+---
+title: "-3555 is less than the minimum of 1 - 'max_tokens'"
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "validation-error-9545"
+---
+
+## Reason
+
+The `400 Bad Request` error, specifically the message stating that a value (e.g., `-3555`) is less than the minimum of 1 for the `max_tokens` parameter, occurs because the OpenAI API requires `max_tokens` to be a positive integer of at least
+1.
+
+Key technical reasons for this error include:
+1. **Invalid Parameter Value**: The `max_tokens` parameter defines the upper bound for tokens generated in the model's completion. Setting this to 0 or a negative number is logically invalid and fails OpenAI's schema validation.
+2. **Underflow in Dynamic Calculations**: This error often occurs when code dynamically calculates the available response space using the formula: `max_tokens = model_context_limit - prompt_tokens`. If the input prompt is larger than the model's total context window, the resulting value becomes negative, triggering this specific error message.
+3. **Reservation vs. Usage**: In OpenAI's architecture, `max_tokens` acts as a reservation within the context window. If the prompt already consumes the entire window, there is no space left to reserve even a single token for the output.
+
+## Solution
+To resolve this error, you must ensure that the `max_tokens` (or `max_completion_tokens` for newer models like o1) is always an integer greater than or equal to
+1. Follow these remediation steps:
+1. **Implement Minimum Value Logic**: Wrap your token calculations in a safety function to ensure the value never drops below
+1. For example, use `Math.max(1, calculated_limit)` in JavaScript or `max(1, calculated_limit)` in Python.
+2. **Validate Prompt Length**: Before sending the request, use a tokenizer library like `tiktoken` to count the tokens in your input. If the prompt length is too close to or exceeds the model's context limit (e.g., 4,096 for GPT-3.5 or 128,000 for GPT-4o), you must truncate the prompt or use a model with a larger context window.
+3. **Audit Dynamic Configurations**: Check for middleware or SDK settings (such as in LlamaIndex, LangChain, or Weaviate) that might be automatically calculating `max_tokens` based on an incorrect model context constant.
+4. **Handle Edge Cases**: If your application allows users to provide long inputs, implement a check to return a user-friendly error or summarize the input before it reaches the API, preventing negative token values from being generated.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/clarification-for-max-tokens/19576](https://community.openai.com/t/clarification-for-max-tokens/19576)
+- [https://github.com/huggingface/huggingface_hub/blob/main/src/huggingface_hub/inference/_generated/_async_client.py](https://github.com/huggingface/huggingface_hub/blob/main/src/huggingface_hub/inference/_generated/_async_client.py)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://community.openai.com/t/is-the-max-tokens-parameter-of-the-completions-endpoint-applicable-for-all-or-each-response/89395](https://community.openai.com/t/is-the-max-tokens-parameter-of-the-completions-endpoint-applicable-for-all-or-each-response/89395)
+- [https://www.restack.io/p/openai-python-answer-max-tokens-configuration-cat-ai](https://www.restack.io/p/openai-python-answer-max-tokens-configuration-cat-ai)
+- [https://github.com/run-llama/llama_index/issues/12633](https://github.com/run-llama/llama_index/issues/12633)
+- [https://community.openai.com/t/openai-parameter-max-tokens-minimum/613450](https://community.openai.com/t/openai-parameter-max-tokens-minimum/613450)
+- [https://github.com/ChatGPTNextWeb/NextChat/discussions/3208](https://github.com/ChatGPTNextWeb/NextChat/discussions/3208)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-max_tokens](https://platform.openai.com/docs/api-reference/chat/create#chat-create-max_tokens)
+- [https://cookbook.openai.com/examples/how_to_count_tokens_with_tiktoken](https://cookbook.openai.com/examples/how_to_count_tokens_with_tiktoken)

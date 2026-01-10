@@ -1,0 +1,38 @@
+---
+title: "Invalid or unsupported file uri: https://multion-research.s3.amazonaws.com/contrastive_evaluationsplan_playground/tmpd8gwztsk.png"
+provider: "google"
+provider_icon: "/logos/google.png"
+solved: true
+slug: "unsupported-file-error-9499"
+---
+
+## Reason
+
+The 400 Bad Request error occurs when the Google API (such as Gemini or Vertex AI) fails to process the provided file URI. This error is typically triggered by one of the following factors:
+1. **Unsupported URI Scheme**: Many Google AI endpoints do not support external HTTPS URIs directly for multimodal prompts. They often require files to be hosted in Google Cloud Storage (using the `gs://` protocol) or passed as base64-encoded data.
+2. **Invalid URL Syntax or Encoding**: The URL may contain illegal characters, malformed syntax, or incorrect percent-encoding (such as `%2F` issues) that prevents the API from correctly parsing the path.
+3. **File Size and Format Constraints**: The target file might exceed the API's maximum size limit (typically 20MB for most image models) or use an unsupported MIME type. Supported formats generally include PNG, JPEG, WEBP, HEIC, and HEIF.
+4. **Accessibility Issues**: If the URI points to a private or protected resource (like a restricted S3 bucket), Google's servers will be unable to fetch the content, resulting in an invalid URI error.
+5. **Malformed Request Structure**: The JSON payload might be incorrectly structured, or headers might be missing, causing the API to misinterpret the URI field.
+6. **Server-Side Glitches**: In rare cases, temporary server-side issues or regional outages within Google's infrastructure can lead to a 400 error despite a valid request.
+
+## Solution
+To resolve the "Invalid or unsupported file uri" error, follow these remediation steps:
+1. **Verify URI Accessibility and Syntax**: Ensure the URL is publicly accessible and correctly formatted. Test the link in a browser to confirm it points directly to the file and does not require authentication.
+2. **Switch to Google Cloud Storage (GCS)**: If you are using Vertex AI, upload the file to a GCS bucket and provide the path in the `gs://bucket-name/object-name` format. This is the most reliable way to reference external files in Google's ecosystem.
+3. **Use Base64 Encoding**: For files under the size limit, consider encoding the image as a base64 string and including it directly in the request body rather than referencing a URI.
+4. **Confirm File Compatibility**: Ensure the file format is supported (PNG, JPEG, WEBP, etc.) and that the file size is within the allowable limits for the specific model you are using.
+5. **Inspect HTTP Request Headers**: Verify that your `Content-Type` is set correctly (usually `application/json`) and that the file URI is passed within the correct parameter field according to the API documentation.
+6. **Clear Cache and Retry**: Clear any local caches and retry the request. If the issue persists, check the Google Cloud Service Health dashboard for any ongoing API-specific outages.
+7. **Validate API Requirements**: Review the latest Google API documentation to ensure all required parameters for multimodal inputs are present and correctly nested in your request.
+
+## Suggested Links
+- [https://www.hostinger.com/tutorials/how-to-fix-400-bad-request-error](https://www.hostinger.com/tutorials/how-to-fix-400-bad-request-error)
+- [https://community.openai.com/t/400-errors-on-gpt-vision-api-since-today/534538](https://community.openai.com/t/400-errors-on-gpt-vision-api-since-today/534538)
+- [https://kinsta.com/knowledgebase/400-bad-request/](https://kinsta.com/knowledgebase/400-bad-request/)
+- [https://community.openai.com/t/gpt-4-vision-error-badrequesterror-400-invalid-image/516486](https://community.openai.com/t/gpt-4-vision-error-badrequesterror-400-invalid-image/516486)
+- [https://www.googlecloudcommunity.com/gc/Workspace-Q-A/Seeing-400-error-while-trying-to-send-a-mail/m-p/536255](https://www.googlecloudcommunity.com/gc/Workspace-Q-A/Seeing-400-error-while-trying-to-send-a-mail/m-p/536255)
+- [https://developers.google.com/drive/api/guides/handle-errors](https://developers.google.com/drive/api/guides/handle-errors)
+- [https://www.googlecloudcommunity.com/gc/AI-ML/Ground-Model-Responses-Error/m-p/791134](https://www.googlecloudcommunity.com/gc/AI-ML/Ground-Model-Responses-Error/m-p/791134)
+- [https://ai.google.dev/gemini-api/docs/vision](https://ai.google.dev/gemini-api/docs/vision)
+- [https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/send-multimodal-prompts](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/send-multimodal-prompts)

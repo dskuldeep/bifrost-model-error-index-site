@@ -1,0 +1,31 @@
+---
+title: "Additional properties are not allowed (\"meta\" was unexpected) - \"messages.1\""
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "invalid-input-error-9255"
+---
+
+## Reason
+
+The error `Additional properties are not allowed ("meta" was unexpected) - "messages.1"` occurs because the OpenAI Chat Completions API enforces a strict JSON schema for all request payloads. When the API encounters a field that is not part of its official specification—such as a custom `meta` property—it rejects the request with a 400 Bad Request error.
+
+Specifically, the error indicates:
+1. **Schema Violation**: The `messages` array in your request contains an object with an unsupported property named `meta`.
+2. **Targeted Location**: The notation `messages.1` points to the second item in the zero-indexed `messages` array as the source of the validation failure.
+3. **Strict Validation**: OpenAI does not support arbitrary metadata or custom keys within the message objects, requiring only recognized fields like `role`, `content`, `name`, `tool_calls`, and `tool_call_id`.
+
+## Solution
+To fix this error, you must ensure your request conforms exactly to the OpenAI API's expected schema by removing any non-standard fields. Follow these steps:
+1. **Locate the Invalid Entry**: Use the index provided in the error message (e.g., `messages.1`) to find the specific message object in your code that contains the `meta` property.
+2. **Remove the Unexpected Property**: Delete the `meta` key and any other additional properties from the message object. Only keep fields explicitly supported by the API, such as `role`, `content`, and `name`.
+3. **Review Request Structure**: Compare your implementation against the OpenAI API reference to ensure all objects within the payload use valid keys.
+4. **Handle Metadata Externally**: If your application needs to track metadata for specific messages, store that information in your local database or application state rather than including it in the API request body.
+5. **Verify the Schema**: Before sending the payload, ensure that the `messages` objects strictly follow the format:
+   - `role`: "system", "user", "assistant", or "tool".
+   - `content`: The text content of the message.
+   - Optional recognized fields: `name`, `tool_calls`, `tool_call_id`.
+
+## Suggested Links
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)
+- [https://platform.openai.com/docs/guides/text-generation](https://platform.openai.com/docs/guides/text-generation)

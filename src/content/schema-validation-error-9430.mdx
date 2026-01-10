@@ -1,0 +1,43 @@
+---
+title: "Invalid schema for function 'guidance_web_qna': In context=('properties', 'query_variations'), array schema missing items"
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "schema-validation-error-9430"
+---
+
+## Reason
+
+The **400 Bad Request** error occurs because the JSON schema provided for a function or tool definition does not comply with the expected specification. In this specific case, the Azure OpenAI API is unable to parse the `guidance_web_qna` function because the `query_variations` property is defined as an array but lacks the mandatory `items` descriptor.
+
+Key reasons for this error include:
+1. **Missing Items Schema**: In JSON Schema (Draft 4 or later, which Azure OpenAI uses for function calling), any property defined with `"type": "array"` must also include an `items` field to define the data type of the elements within that array. Leaving this out causes a validation failure.
+2. **Incorrect Schema Formatting**: The request payload may have structural issues, such as misplaced brackets or incorrect nesting of the `properties` object, leading the validator to find an incomplete array definition.
+3. **Model-Specific Validation**: Azure OpenAI's underlying models (like GPT-4-Turbo or GPT-4o) enforce strict schema validation for Tool Calling. Parameters that do not match the expected data types or are missing mandatory fields in the schema definition will result in this error.
+
+## Solution
+To resolve this schema validation error, you must update the function definition for `guidance_web_qna` to include a valid schema for the `query_variations` array. 
+
+Follow these steps to remediate the issue:
+1. **Locate the Function Definition**: Find the JSON object where you define the `guidance_web_qna` function in your API request (usually within the `functions` or `tools` parameter).
+2. **Update the Array Schema**: Ensure that the `query_variations` property includes the `items` keyword. For example, if the array should contain strings, your schema should look like this:
+   ```json
+   "query_variations": {
+     "type": "array",
+     "items": {
+       "type": "string"
+     }
+   }
+   ```
+3. **Verify Data Types**: Check that all other properties within the schema have a clearly defined `type` (e.g., `string`, `integer`, `object`) and that required fields are listed in the `required` array at the appropriate level.
+4. **Check for Mandatory Fields**: Ensure the overall structure includes the required root fields for a function: `name`, `description` (optional but recommended), and `parameters`.
+5. **Validate with a JSON Schema Validator**: Before sending the request, test your schema against a JSON Schema validator to ensure it is syntactically correct and includes all necessary keywords for the specified types.
+6. **Review API Documentation**: Consult the official Azure OpenAI documentation on function calling to ensure you are using supported keywords (e.g., Azure OpenAI may not support certain advanced JSON Schema keywords like `additionalProperties` depending on the model version).
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue](https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue)
+- [https://yourazurecoach.com/2023/05/17/validate-payloads-in-azure-api-management/](https://yourazurecoach.com/2023/05/17/validate-payloads-in-azure-api-management/)
+- [https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md](https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)
+- [https://json-schema.org/understanding-json-schema/reference/array](https://json-schema.org/understanding-json-schema/reference/array)

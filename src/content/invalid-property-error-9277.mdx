@@ -1,0 +1,29 @@
+---
+title: "Additional properties are not allowed (\"functions\" was unexpected) - \"messages.0\""
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "invalid-property-error-9277"
+---
+
+## Reason
+
+The HTTP 400 status error in Azure OpenAI, specifically the message `"Additional properties are not allowed ("functions" was unexpected) - "messages.0""`, indicates that the request payload does not conform to the API's expected schema. 
+
+Key reasons for this failure include:
+1. **Invalid Request Structure**: The error path `messages.0` explicitly points to the first object in your `messages` array. This usually occurs when the `functions` property is incorrectly nested inside a message object rather than being placed at the root level of the JSON request body.
+2. **Incorrect Data Types**: The API expects specific types for all fields. If a field like `content` is provided as an array or object when a string is expected, or if a parameter is passed with an incorrect type, the schema validation will fail.
+3. **API Version and Feature Incompatibility**: Function calling requires specific API versions (such as `2023-07-01-preview` or later) and compatible model versions (e.g., `gpt-35-turbo-0613` or `gpt-4-0613`). Using an older API version or an unsupported model will result in the `functions` property being treated as an unexpected addition.
+4. **Non-Compliance with API Schema**: The request payload may contain legacy or unauthorized fields that the current API endpoint does not recognize. Starting with the `2023-12-01-preview` version, the `functions` and `function_call` properties have been deprecated in favor of the `tools` and `tool_choice` schema.
+
+## Solution
+To resolve the "Additional properties are not allowed" error, align your request structure with the official Azure OpenAI schema by following these steps:
+1. **Review and Relocate Properties**: Ensure that properties like `functions` or `tools` are placed at the root of your JSON request body. They should not be part of the individual message objects within the `messages` array.
+2. **Remove Unauthorized Fields**: Scan your request for any fields not supported by the specific endpoint you are calling. If you are using newer API versions (post-December 2023), consider migrating from `functions` to the `tools` array.
+3. **Verify API Version and Model**: Confirm that your deployment uses a model version that supports function calling (e.g., `0613` versions or newer). Additionally, ensure your request URL includes a supported `api-version` parameter, such as `2023-07-01-preview` or `2024-02-15-preview`.
+4. **Check Data Types**: Validate that all fields match the required data types. For example, ensure the `role` is a valid string (system, user, assistant, or tool) and the `content` adheres to the expected format for that role.
+5. **Consult Official Documentation**: Reference the Azure OpenAI Service REST API documentation to verify the exact schema requirements for the Chat Completions endpoint.
+
+## Suggested Links
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)

@@ -1,0 +1,51 @@
+---
+title: "The provided input does not match the expected type 'array' for the 'functions' field. Ensure that the input structure is an array as required."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "input-type-error-9136"
+---
+
+## Raw Error Text
+
+```text
+{'default': [{'type': 'function', 'function': {'name': 'create_summary_of_suggestion', 'parameters': {'type': 'object', 'description': "Once a user has responded 3 times generate a summary of a user's suggestion", 'properties': {'title': {'type': 'string', 'description': 'A short 70 character sentence that describes the users suggestion'}, 'summary': {'type': 'string', 'description': "A summary of the user's suggestion written from their perspective"}, 'why': {'type': 'string', 'description': 'a short description that explains why the user made this suggestion'}}, 'required': ['title', 'summary', 'why']}}}]} is not of type 'array' - 'functions'
+```
+
+## Reason
+
+The 400 Bad Request error occurs because the Azure OpenAI API received a payload that does not conform to the expected JSON schema for function calling. Specifically, the error message `{'default': [...]} is not of type 'array' - 'functions'` indicates that the `functions` parameter was passed as a dictionary/object instead of a list.
+
+Key reasons for this failure include:
+
+**Incorrect JSON Schema**
+The API expects the `functions` parameter to be a top-level array of function objects. In this case, the data was wrapped in a key named `default`, causing a schema validation failure.
+
+**Invalid Request Configuration**
+The `functions` parameter may not be recognized if the specific model or API configuration does not support function calling. If the request structure is incorrect, the gateway or model validator will reject it as an invalid request error.
+
+**API Endpoint and Version Issues**
+Function calling is only supported in specific API versions (e.g., `2023-07-01-preview` and later). Using an older or incompatible API version will result in the `functions` parameter being treated as an unknown or malformed input.
+
+**Content and Policy Violations**
+While less common for schema errors, requests can be blocked if the function definitions or descriptions trigger Azure OpenAI’s content management policies or safety filters.
+
+## Solution
+To resolve the 400 status error and correctly implement function calling in Azure OpenAI, follow these remediation steps:
+1. **Validate JSON Schema**: Ensure the `functions` parameter is a flat array of objects. Remove any wrappers like `default`. The correct structure should look like `"functions": [ { "name": "...", "parameters": { ... } } ]`.
+2. **Ensure Correct API Endpoint and Version**: Update your request URL to use a supported API version, such as `2023-07-01-preview`, `2023-12-01-preview`, or later. Verify that your deployed model (e.g., GPT-3.5-Turbo or GPT-4) supports function calling.
+3. **Check Request Parameters**: Verify that all required fields within the function definition (like `name`, `parameters`, and `required` properties) are present and correctly typed according to the JSON Schema standard.
+4. **Migrate to Tools API**: Since the `functions` parameter is being deprecated, consider migrating to the `tools` and `tool_choice` parameters, which provide enhanced functionality and are the current standard for Azure OpenAI.
+5. **Authentication and Credentials**: Confirm that your Azure OpenAI API key and endpoint URL are correct and that your resource has the necessary permissions to execute chat completion requests.
+6. **Rate Limiting**: Check your Azure portal to ensure your resource hasn't exceeded its TPM (Tokens Per Minute) or RPM (Requests Per Minute) quotas.
+7. **Network and Middleware**: Ensure no intermediary proxy or API gateway is transforming the JSON body in a way that introduces the `default` key or changes the array structure before it reaches the Azure endpoint.
+
+## Suggested Links
+- [https://learn.microsoft.com/en-us/answers/questions/1356848/unable-to-use-function-calling-in-deployed-models](https://learn.microsoft.com/en-us/answers/questions/1356848/unable-to-use-function-calling-in-deployed-models)
+- [https://github.com/instructor-ai/instructor/issues/961](https://github.com/instructor-ai/instructor/issues/961)
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://github.com/openai/openai-python/issues/517](https://github.com/openai/openai-python/issues/517)
+- [https://github.com/spring-projects/spring-ai/issues/1787](https://github.com/spring-projects/spring-ai/issues/1787)
+- [https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md](https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)

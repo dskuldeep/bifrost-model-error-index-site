@@ -1,0 +1,29 @@
+---
+title: "Invalid request: \"functions\" and \"tools\" cannot both be provided. \"functions\" are deprecated; use the \"tools\" parameter instead."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "request-parameter-error-9393"
+---
+
+## Reason
+
+This error occurs because the OpenAI API does not allow the simultaneous use of the legacy `functions` parameter and the modern `tools` parameter in a single Chat Completions request. 
+
+Key reasons for this conflict include:
+1. **Mutually Exclusive Parameters:** The `functions` and `tools` parameters are architecturally different and cannot be processed together. The API requires a single, consistent method for defining external capabilities.
+2. **Deprecation of Functions:** OpenAI has officially deprecated the `functions` parameter in favor of the more robust `tools` framework. This transition was designed to support advanced features like parallel function calling, which allows the model to invoke multiple functions in a single turn.
+3. **Schema Mismatch:** Including both parameters creates a mismatch in the request configuration, as the API expects the newer `tools` schema for all modern integrations.
+
+## Solution
+To resolve the 400 status error, you must update your API request to use the `tools` parameter exclusively. Follow these steps to migrate your implementation:
+1. **Remove the `functions` Parameter:** Eliminate the `functions` and `function_call` keys from your request payload entirely.
+2. **Migrate to the `tools` Schema:** Reformat your function definitions into the `tools` array. Each entry should be an object with a `type` (set to `"function"`) and a `function` object containing your original definition.
+3. **Update Call Logic:** If you previously used `function_call` to force a specific function, replace it with the `tool_choice` parameter.
+4. **Refactor Response Handling:** Update your code to handle the API response. Instead of looking for `message.function_call`, look for the `message.tool_calls` array, as the model can now return multiple tool invocations at once.
+5. **Verify Against Documentation:** Ensure your request structure adheres to the latest OpenAI API guidelines to maintain compatibility with current and future model versions.
+
+## Suggested Links
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-tools](https://platform.openai.com/docs/api-reference/chat/create#chat-create-tools)
+- [https://openai.com/blog/new-models-and-developer-products-announced-at-devday](https://openai.com/blog/new-models-and-developer-products-announced-at-devday)

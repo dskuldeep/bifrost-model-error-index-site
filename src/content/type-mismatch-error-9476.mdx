@@ -1,0 +1,36 @@
+---
+title: "'0.1' is not of type 'number' - 'temperature'"
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "type-mismatch-error-9476"
+---
+
+## Reason
+
+The `400 Bad Request` error with the message `'0.1' is not of type 'number' - 'temperature'` indicates a schema validation failure within the OpenAI API. This occurs for the following reasons:
+1. **Incorrect Data Type**: The most common cause is passing the `temperature` value as a string (e.g., `'0.1'`) instead of a numeric literal (e.g., `0.1`). The API expects a float or integer, and quoting the value causes the JSON parser to interpret it as a string.
+2. **Invalid Parameter Value**: The OpenAI API enforces specific constraints on the `temperature` parameter. If the value is not a valid number or falls outside the expected constraints of the model's schema, a 400 error is triggered. For instance, while most models default to 1, they strictly require the input to be numeric.
+
+## Solution
+To resolve this error and ensure the `temperature` parameter is accepted, follow these remediation steps:
+1. **Convert to Numeric Type**: Ensure that the `temperature` value is passed as a numeric type. If you are pulling the value from an environment variable or a text input field, explicitly cast it to a number (e.g., `parseFloat(temp)` in JavaScript or `float(temp)` in Python) before sending the request.
+2. **Verify Supported Ranges**: Ensure the temperature value is within the standard supported range, which is typically between 0 and
+2. Values outside this range may be rejected by the API's validation logic.
+3. **Check Model Compatibility**: Confirm that the specific model you are using supports the provided temperature value. While the 0 to 2 range is standard for models like GPT-4 and GPT-3.5-Turbo, specific model versions or configurations may have different requirements.
+
+**Key Actions Summary**:
+1. Remove quotes around the value to ensure it is sent as `0.1` rather than `'0.1'`.
+2. Validate that the chosen value is between 0 and
+2.
+3. Verify the API request body structure matches the OpenAI documentation for the specific model endpoint.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://github.com/jupyterlab/jupyter-ai/issues/994](https://github.com/jupyterlab/jupyter-ai/issues/994)
+- [https://github.com/Nutlope/aicommits/issues/137](https://github.com/Nutlope/aicommits/issues/137)
+- [https://community.openai.com/t/request-failed-with-status-code-400/39242](https://community.openai.com/t/request-failed-with-status-code-400/39242)
+- [https://community.studio3t.com/t/openai-implementation-is-incorrect-temperature-seems-to-be-set-at-1/1633](https://community.studio3t.com/t/openai-implementation-is-incorrect-temperature-seems-to-be-set-at-1/1633)
+- [https://github.com/openai/openai-python/issues/1362](https://github.com/openai/openai-python/issues/1362)
+- [https://www.coltsteele.com/tips/understanding-openai-s-temperature-parameter](https://www.coltsteele.com/tips/understanding-openai-s-temperature-parameter)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-temperature](https://platform.openai.com/docs/api-reference/chat/create#chat-create-temperature)

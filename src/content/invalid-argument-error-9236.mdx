@@ -1,0 +1,27 @@
+---
+title: "Invalid response recieved from google: [{\"error\":{\"code\":400,\"message\":\"Please use a valid role: user, model.\",\"status\":\"INVALID_ARGUMENT\"}}]"
+provider: "google"
+provider_icon: "/logos/google.png"
+solved: true
+slug: "invalid-argument-error-9236"
+---
+
+## Reason
+
+The **400 Bad Request** error with the status **INVALID_ARGUMENT** occurs when the Google Generative AI (Gemini) API receives a request containing an invalid or incorrectly formatted parameter. 
+
+Key reasons for this specific error include:
+1. **Invalid Role Specification**: The error message "Please use a valid role: user, model" indicates that the `role` field within the `contents` object contains an unsupported value. While other providers may use roles like `assistant`, Google's API strictly expects `user` (for the prompt) or `model` (for the response history).
+2. **Incorrect Request Syntax**: The API expects a specific JSON structure. If required fields are missing or if parameters are provided in a format that does not match the expected schema, the API will return a 400 error.
+3. **Client-Side Validation Issue**: This is a client-side error. It indicates the problem lies within the request payload being sent to Google's servers rather than a server-side failure.
+
+## Solution
+To resolve the `INVALID_ARGUMENT` error and ensure your request is correctly formatted, follow these steps:
+1. **Verify the Role Parameter**: Check the `role` field in your request payload. Ensure it is set to either `user` or `model`. If you are migrating from a different LLM provider, remember to map `assistant` roles to `model`.
+2. **Check Request Syntax**: Validate that your JSON structure matches the Google Gemini API requirements. Each content object should typically include a `role` and a `parts` array.
+3. **Review API Documentation**: Refer to the official Google AI documentation for the specific model and endpoint you are using to ensure you are utilizing the correct parameter names and allowed values.
+4. **Test with Minimal Parameters**: Attempt to send a request with only the absolute minimum required parameters (e.g., a single message with the `user` role). If successful, gradually add more parameters to isolate the specific field causing the validation failure.
+
+## Suggested Links
+- [https://ai.google.dev/api/rest/v1beta/Content](https://ai.google.dev/api/rest/v1beta/Content)
+- [https://ai.google.dev/gemini-api/docs/quickstart](https://ai.google.dev/gemini-api/docs/quickstart)

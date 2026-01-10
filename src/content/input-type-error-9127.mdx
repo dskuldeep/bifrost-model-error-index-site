@@ -1,0 +1,30 @@
+---
+title: "\"sadasdas\" is not of type \"number\" - \"temperature\""
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-type-error-9127"
+---
+
+## Reason
+
+The error occurs because the OpenAI API expects the `temperature` parameter to be a numeric data type, but it received a string instead. In your specific request, the value `"sadasdas"` was provided as a string, which violates the API's schema requirements. This data type mismatch results in an HTTP 400 Bad Request error, as the server cannot process the invalid syntax.
+
+## Solution
+To resolve the 400 status error related to the `temperature` parameter, ensure the value provided is a valid number. Follow these steps:
+1. **Convert to Numeric Type**: Replace the string value (e.g., `"sadasdas"`) with a raw float or integer.
+2. **Adhere to Valid Range**: Ensure the numeric value is between 0 and
+2. While 2.0 is the technical maximum, it is generally recommended to stay between 0 and 1 for more stable and coherent results.
+3. **Cast Variables**: If you are pulling the temperature value from an environment variable or a database, explicitly cast it to a number in your code (for example, using `parseFloat()` in JavaScript or `float()` in Python) before sending the request.
+
+**Examples of Correct Usage:**
+
+- **JSON**: `"temperature": 0.7` 
+- **Python**: `temperature=0.5` 
+- **Node.js**: `temperature: 1` 
+
+Avoid using any non-numeric characters or enclosing the number in quotation marks.
+
+## Suggested Links
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-temperature](https://platform.openai.com/docs/api-reference/chat/create#chat-create-temperature)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)

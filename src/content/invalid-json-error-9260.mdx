@@ -1,0 +1,52 @@
+---
+title: "Invalid JSON payload received due to unrecognized field 'additionalProperties' in the configuration schema. Ensure the field is correctly specified."
+provider: "google"
+provider_icon: "/logos/google.png"
+solved: true
+slug: "invalid-json-error-9260"
+---
+
+## Raw Error Text
+
+```text
+Invalid JSON payload received. Unknown name "additionalProperties" at 'generation_config.response_schema.properties[0].value.items': Cannot find field. Invalid JSON payload received. Unknown name "additionalProperties" at 'generation_config.response_schema': Cannot find field.
+```
+
+## Reason
+
+The **400 Bad Request** error occurs when the Google Gemini API (or Vertex AI) receives a JSON payload that does not conform to its strictly defined schema. Specifically, the error message `Unknown name "additionalProperties"` indicates that the request includes a JSON Schema keyword that the API or SDK does not recognize in that specific context.
+
+Key reasons for this failure include:
+1.  **Unsupported Schema Keywords**: While standard JSON Schema often includes `additionalProperties`, the Google Gemini API's `response_schema` and function calling parameters support only a specific subset of JSON Schema. Keywords like `additionalProperties`, `patternProperties`, and `$ref` frequently trigger this error if the API version or SDK being used has not implemented them.
+2.  **Malformed JSON Syntax**: General syntax errors in the JSON body, such as missing commas, unclosed brackets, or incorrect escaping, will cause the API to reject the entire payload.
+3.  **Strict Field Validation**: The API expects a very specific structure for the `generation_config`. Including fields that are not part of the `response_schema` specification (like `additional_properties` instead of `additionalProperties`, or placing keywords in the wrong nesting level) results in a validation failure.
+4.  **SDK vs. API Mismatch**: In some cases, the underlying Google API may support a feature (like structured outputs), but the client-side SDK (e.g., `google-genai` or `google-cloud-aiplatform`) performs its own validation against an older, stricter schema definition.
+
+## Solution
+To resolve the "Invalid JSON payload" error, ensure your request aligns with the specific schema requirements of the Gemini API:
+1.  **Remove Unsupported Keywords**: Strip `additionalProperties` from your JSON schema. The Gemini API typically defaults to a strict schema where only defined properties are allowed, so this keyword is often redundant or explicitly disallowed.
+2.  **Validate Schema Compatibility**: Verify that you are only using supported fields. Google's structured outputs currently prioritize:
+    *   `type` (e.g., "object", "array", "string", "integer")
+    *   `properties` (for objects)
+    *   `items` (for arrays)
+    *   `required` (a list of all property names)
+    *   `enum` (for string-based enums)
+3.  **Check Nesting and Items**: If you are using an array of objects, ensure the `items` object does not contain `additionalProperties`. The error log specifically pointed to `generation_config.response_schema.properties[0].value.items`, suggesting the issue is deep within an array definition.
+4.  **Use Raw Schema Parameters**: If the SDK's high-level classes (like Pydantic models) are causing the issue, try passing the schema as a raw dictionary/JSON object to the `response_json_schema` or `response_schema` field to bypass client-side validation errors.
+5.  **Review Required Fields**: Ensure that all keys defined in the `properties` object are also listed in the `required` array if you are aiming for strict structured output.
+6.  **Verify Encoding**: Ensure the final payload is valid JSON. Use a JSON linter to check for structural integrity before sending the request.
+
+## Suggested Links
+- [https://www.hostinger.com/tutorials/how-to-fix-400-bad-request-error](https://www.hostinger.com/tutorials/how-to-fix-400-bad-request-error)
+- [https://kinsta.com/knowledgebase/400-bad-request/](https://kinsta.com/knowledgebase/400-bad-request/)
+- [https://www.googlecloudcommunity.com/gc/Workspace-Q-A/Seeing-400-error-while-trying-to-send-a-mail/m-p/536255](https://www.googlecloudcommunity.com/gc/Workspace-Q-A/Seeing-400-error-while-trying-to-send-a-mail/m-p/536255)
+- [https://community.make.com/t/google-authentication-issue-status-code-error-400/3001](https://community.make.com/t/google-authentication-issue-status-code-error-400/3001)
+- [https://community.zapier.com/troubleshooting-99/google-sheets-status-code-400-bad-request-20303](https://community.zapier.com/troubleshooting-99/google-sheets-status-code-400-bad-request-20303)
+- [https://googleanalytics4.co/forums/discussion/invalid-json-payload-error-when-using-google-analytics-4/](https://googleanalytics4.co/forums/discussion/invalid-json-payload-error-when-using-google-analytics-4/)
+- [https://www.youtube.com/watch?v=iO2CW6ymN7U](https://www.youtube.com/watch?v=iO2CW6ymN7U)
+- [https://cloud.google.com/knowledge/kb/publishing-json-message-to-pub-sub-topic-fails-with-400-bad-request-error-000004171](https://cloud.google.com/knowledge/kb/publishing-json-message-to-pub-sub-topic-fails-with-400-bad-request-error-000004171)
+- [https://cloud.google.com/dotnet/docs/reference/Google.Apis/latest/Google.Apis.Auth.GoogleJsonWebSignature](https://cloud.google.com/dotnet/docs/reference/Google.Apis/latest/Google.Apis.Auth.GoogleJsonWebSignature)
+- [https://groups.google.com/g/adwords-api/c/WGSb_7P4Uz4](https://groups.google.com/g/adwords-api/c/WGSb_7P4Uz4)
+- [https://ai.google.dev/gemini-api/docs/structured-output](https://ai.google.dev/gemini-api/docs/structured-output)
+- [https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/control-generated-output](https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/control-generated-output)
+- [https://github.com/googleapis/python-genai/issues/1815](https://github.com/googleapis/python-genai/issues/1815)

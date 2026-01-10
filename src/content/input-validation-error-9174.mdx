@@ -1,0 +1,78 @@
+---
+title: "Invalid base64 image_url."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-validation-error-9174"
+---
+
+## Reason
+
+The "400 Invalid base64 image_url" error occurs when the OpenAI API cannot correctly interpret the image data provided in the request. This is typically caused by one of the following issues:
+
+**Incorrect Format of the Base64 String**
+The API expects a Data URI scheme. If the base64 encoded string is missing the necessary prefix (e.g., `data:image/jpeg;base64,` or `data:image/png;base64,`), or if the prefix does not match the actual file type, the request will fail.
+
+**Incorrect Payload Structure**
+The payload must follow the structured message format. A common mistake is providing the `content` as a simple string or an incorrectly nested object. The `content` field must be an array containing objects where the image is specified within an `image_url` property.
+
+**Model Specific Requirements**
+Vision capabilities are limited to specific models like `gpt-4o`, `gpt-4-turbo`, or `gpt-4-vision-preview`. If a non-vision model is used, or if the base64 string is provided in a field the model does not recognize as a valid image input, this error is triggered.
+
+**Data Corruption or Formatting Errors**
+Base64 strings often contain newline characters, carriage returns, or trailing whitespace depending on the encoding library used. These invisible characters can corrupt the string and lead to a validation failure. Additionally, exceeding the 20MB per-image size limit or providing unsupported formats (only PNG, JPEG, WEBP, and non-animated GIF are supported) will result in a 400 error.
+
+## Solution
+To resolve the "400 Invalid base64 image_url" error, follow these remediation steps:
+
+**1. Verify the Data URI Prefix**
+Ensure your base64 string starts with the correct header for its file type. For example:
+*   `data:image/jpeg;base64,` for JPEG images.
+*   `data:image/png;base64,` for PNG images.
+*   `data:image/webp;base64,` for WEBP images.
+*   `data:image/gif;base64,` for GIF images.
+
+**2. Validate the Payload Schema**
+Confirm that your request follows the Chat Completions API structure exactly. The image should be nested as follows:
+
+```json
+{
+  "role": "user",
+  "content": [
+    {
+      "type": "image_url",
+      "image_url": {
+        "url": "data:image/jpeg;base64,{BASE64_STRING_HERE}"
+      }
+    }
+  ]
+}
+```
+
+**3. Sanitize the Base64 String**
+Before sending the request, clean the base64 string of any formatting artifacts:
+*   Remove all newline characters (`\n`) and carriage returns (`\r`).
+*   Strip any leading or trailing whitespace.
+*   Ensure the string is not truncated (check the end of the string for correct padding, usually `=` or `==`).
+
+**4. Check Image Constraints**
+Ensure the image meets the following technical requirements:
+*   **Size**: Maximum of 20MB per image.
+*   **Type**: Must be PNG, JPEG, WEBP, or non-animated GIF.
+*   **Model**: Ensure the `model` parameter is set to a vision-capable model like `gpt-4o`.
+
+**5. Network and Isolation Test**
+Rule out environmental issues by testing the API call with a simple text-only prompt. If text prompts work but images do not, the issue is isolated to the base64 encoding or the specific image file being processed.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/trying-to-pass-a-base64-encoded-image-with-node/939864](https://community.openai.com/t/trying-to-pass-a-base64-encoded-image-with-node/939864)
+- [https://community.retool.com/t/gpt-4-vision-not-working/32758](https://community.retool.com/t/gpt-4-vision-not-working/32758)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://community.openai.com/t/gpt-4-vision-preview-400-invalid-base64-image-url/679812](https://community.openai.com/t/gpt-4-vision-preview-400-invalid-base64-image-url/679812)
+- [https://community.openai.com/t/issue-with-gpt-4-vision-preview-api-when-passing-base64-encoded-image/517532](https://community.openai.com/t/issue-with-gpt-4-vision-preview-api-when-passing-base64-encoded-image/517532)
+- [https://community.openai.com/t/gpt-4-vision-preview-400-invalid-base64-image-url/679812/4](https://community.openai.com/t/gpt-4-vision-preview-400-invalid-base64-image-url/679812/4)
+- [https://community.openai.com/t/how-to-send-base64-images-to-assistant-api/752440](https://community.openai.com/t/how-to-send-base64-images-to-assistant-api/752440)
+- [https://community.openai.com/t/gpt-4-turbo-vision-api-recognizes-image-url-as-base64-encoded-image-data/734243](https://community.openai.com/t/gpt-4-turbo-vision-api-recognizes-image-url-as-base64-encoded-image-data/734243)
+- [https://platform.openai.com/docs/guides/vision](https://platform.openai.com/docs/guides/vision)
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)

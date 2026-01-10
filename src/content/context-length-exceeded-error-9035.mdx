@@ -1,0 +1,35 @@
+---
+title: "Prompt contains 35868 tokens, too large for model with 32768 maximum context length"
+provider: "mistral-ai"
+provider_icon: "/file.svg"
+solved: true
+slug: "context-length-exceeded-error-9035"
+---
+
+## Reason
+
+The error occurs because the input prompt exceeds the specific context window limit defined for the Mistral AI model being used. In this instance, the prompt contains 35,868 tokens, while the model's architectural limit is 32,768 tokens.
+
+Key factors contributing to this error include:
+1. **Token Calculation**: The total token count includes the user prompt, system instructions, and any conversational history passed in the API request.
+2. **Inherent Architectural Limits**: Large Language Models (LLMs) have a fixed context window. This limit determines the maximum number of tokens the model can process in a single inference cycle. If the request exceeds this value, the server returns a 400 Bad Request error because it cannot allocate the memory required to attend to the entire sequence.
+3. **Model Configuration**: While some Mistral models (like Mistral Large 2) support up to 128k tokens, many deployments or specific model versions are capped at 32k (32,768 tokens).
+
+## Solution
+To resolve the context length error, you must modify the request to fit within the 32,768-token limit. Follow these remediation steps:
+1. **Reduce the Prompt Length**: Trim the input text to ensure the total token count is strictly below 32,768. Focus on removing redundant information or boilerplate text.
+2. **Optimize the Context**: Review the conversation history and system messages. Remove older messages or less relevant context to prioritize the most important information for the model.
+3. **Implement Input Splitting (Chunking)**: If the data cannot be summarized, split the input into smaller segments. Process these segments individually or use a RAG (Retrieval-Augmented Generation) approach to feed only the most relevant chunks into the prompt.
+4. **Use a Tokenizer for Validation**: Before sending the request, use a tokenizer compatible with Mistral models (such as the `mistral-common` Python library) to count tokens locally. This allows you to programmatically truncate prompts before they hit the API.
+5. **Switch to a Larger Context Model**: If your use case consistently requires processing more than 32,768 tokens, consider switching to a model with a larger context window, such as **Mistral Large 2**, which supports up to 128k tokens.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://www.googlecloudcommunity.com/gc/AI-ML/Mistral-Large-2407-Inference-context-length-error/m-p/802826](https://www.googlecloudcommunity.com/gc/AI-ML/Mistral-Large-2407-Inference-context-length-error/m-p/802826)
+- [https://community.openai.com/t/error-code-400-max-token-length/716391](https://community.openai.com/t/error-code-400-max-token-length/716391)
+- [https://community.openai.com/t/request-failed-with-status-code-400/39242](https://community.openai.com/t/request-failed-with-status-code-400/39242)
+- [https://datanorth.ai/blog/context-length](https://datanorth.ai/blog/context-length)
+- [https://learn.microsoft.com/en-us/answers/questions/2117664/my-mistral-large-2407-serverless-deployment-api-is](https://learn.microsoft.com/en-us/answers/questions/2117664/my-mistral-large-2407-serverless-deployment-api-is)
+- [https://community.crewai.com/t/crewai-on-mistral-api-error/1559](https://community.crewai.com/t/crewai-on-mistral-api-error/1559)
+- [https://docs.mistral.ai/capabilities/models/](https://docs.mistral.ai/capabilities/models/)
+- [https://github.com/mistralai/mistral-common](https://github.com/mistralai/mistral-common)

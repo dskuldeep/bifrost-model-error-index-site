@@ -1,0 +1,35 @@
+---
+title: "Value for messages is invalid."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "input-validation-error-9150"
+---
+
+## Reason
+
+The HTTP 400 "Bad Request" error in the Azure OpenAI API, specifically the message "Value for messages is invalid," indicates that the service cannot process the request due to malformed input or structural issues in the payload. 
+
+Key reasons for this error include:
+1.  **Invalid Payload Structure**: The `messages` parameter must be an array of objects. If it is sent as a string, a single object (instead of an array), or is missing required fields like `role` or `content`, the API will reject it.
+2.  **Invalid or Incorrect API Key**: The provided API key might be incorrect, expired, or does not match the specific Azure OpenAI resource deployment.
+3.  **Incorrect URL or Endpoint**: Issues with the endpoint formatting, such as missing path components, incorrect API versions (e.g., using a legacy version for a newer model), or an incorrect domain/port.
+4.  **Invalid or Missing Headers**: Required HTTP headers such as `api-key` (or `Authorization` for Entra ID) and `Content-Type: application/json` may be missing or incorrectly formatted.
+5.  **Exceeding Maximum Context Length**: The total token count (input messages plus the value of `max_tokens`) might exceed the maximum context window supported by the specific model deployment.
+6.  **Unrecognized Request Arguments**: Including parameters that are not supported by the specific API version or model, such as sending Chat Completion parameters to an Embeddings endpoint.
+7.  **Input Validation Errors**: The data provided does not meet specific validation criteria, such as empty message content or unsupported roles.
+
+## Solution
+To resolve the 400 status error and fix the invalid messages value, follow these remediation steps:
+1.  **Validate the Messages Array**: Ensure the `messages` field is a JSON array where each item is an object containing a `role` (e.g., "system", "user", "assistant") and `content`. Ensure `content` is not null or empty unless allowed by the specific model version.
+2.  **Verify API Key and Credentials**: Check that the API key is active and correctly placed in the `api-key` header. If using Azure Entra ID, ensure the `Authorization` header includes the `Bearer` prefix and a valid token.
+3.  **Check the URL and API Version**: Confirm the endpoint follows the pattern: `https://{resource-name}.openai.azure.com/openai/deployments/{deployment-id}/chat/completions?api-version={api-version}`. Ensure the `api-version` is compatible with your model.
+4.  **Correct HTTP Headers**: Verify that the `Content-Type` is set to `application/json` and that no unexpected headers are interfering with the request.
+5.  **Review Token Limits**: Calculate the total tokens for your prompt. If they exceed the model's limit (e.g., 8,192 for GPT-4), reduce the input size or lower the `max_tokens` parameter.
+6.  **Remove Unsupported Arguments**: Review the API reference for the specific model and deployment to ensure all sent parameters (like `temperature`, `top_p`, or `functions`) are supported.
+7.  **Check Structured Output Schemas**: If using `response_format` for JSON schemas, ensure `additionalProperties` is set to `false` and all fields are marked as `required` where necessary.
+
+## Suggested Links
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/chatgpt](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/chatgpt)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models)

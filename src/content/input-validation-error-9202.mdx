@@ -1,0 +1,36 @@
+---
+title: "Input validation error: `inputs` tokens + `max_new_tokens` must be <= 4097. Given: 5013 `inputs` tokens and 128 `max_new_tokens`"
+provider: "together-ai"
+provider_icon: "/file.svg"
+solved: true
+slug: "input-validation-error-9202"
+---
+
+## Reason
+
+The 400 Bad Request error occurs because the total token count—representing the sum of the prompt and the requested completion—exceeds the model's architectural or API-enforced limit. In this specific case, the limit is **4097 tokens**.
+
+Key reasons for this error include:
+1. **Token Limit Breach**: The Together AI API calculates the combined total of `inputs` (the tokens in your prompt) and `max_new_tokens` (the maximum length of the generated response). Here, the sum is 5141 (5013 + 128), which is significantly higher than the allowed 4097.
+2. **Context Window Constraints**: Many models, particularly those based on the Llama-2 architecture, have a native context window of 4096 tokens. The additional token usually accounts for the sequence-start or sequence-end markers.
+3. **Schema Validation**: This error is a hard validation check performed by the API gateway to prevent resource exhaustion and ensure the request stays within the model's operational capacity.
+
+## Solution
+To resolve this input validation error, you must reduce the total token count to 4097 or fewer. Follow these remediation steps:
+1. **Summarize or Truncate Input**: Review the `inputs` text and remove non-essential information. Truncate long contexts or summarize them before sending the request to reduce the initial token footprint.
+2. **Implement Input Chunking**: For large documents or long conversation histories, break the text into smaller, manageable chunks. Process these chunks individually and merge the outputs as needed.
+3. **Optimize Prompt Engineering**: Refine your prompts to be more concise. If using few-shot prompting, reduce the number of examples provided in the input.
+4. **Adjust the `max_new_tokens` Parameter**: Lower the value of `max_new_tokens`. If your input is already near the limit, you must decrease the requested response length to accommodate the combined total.
+5. **Select a Larger Context Model**: If your application requires more than 4097 tokens, consider switching to a model on Together AI with a larger context window, such as Llama-3 (8k+ tokens) or Mistral/Mixtral variants that support 32k or more tokens.
+
+## Suggested Links
+- [https://huggingface.co/spaces/huggingchat/chat-ui/discussions/430](https://huggingface.co/spaces/huggingchat/chat-ui/discussions/430)
+- [https://appwrite.io/docs/products/ai/integrations/togetherai](https://appwrite.io/docs/products/ai/integrations/togetherai)
+- [https://community.openai.com/t/error-code-400-max-token-length/716391](https://community.openai.com/t/error-code-400-max-token-length/716391)
+- [https://github.com/evo-design/evo/issues/95](https://github.com/evo-design/evo/issues/95)
+- [https://community.openai.com/t/fixed-prompt-token-limit-exceeded-error-for-long-conversation-gpt-3-and-gpt-4/294077](https://community.openai.com/t/fixed-prompt-token-limit-exceeded-error-for-long-conversation-gpt-3-and-gpt-4/294077)
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-token-limit](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-token-limit)
+- [https://github.com/huggingface/transformers/issues/28523](https://github.com/huggingface/transformers/issues/28523)
+- [https://github.com/langgenius/dify/issues/2383](https://github.com/langgenius/dify/issues/2383)
+- [https://docs.together.ai/docs/inference-parameters](https://docs.together.ai/docs/inference-parameters)
+- [https://docs.together.ai/docs/models-api](https://docs.together.ai/docs/models-api)

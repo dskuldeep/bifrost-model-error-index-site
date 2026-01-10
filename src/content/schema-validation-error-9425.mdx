@@ -1,0 +1,36 @@
+---
+title: "Invalid schema for function 'get_current_weather': In context=(), object schema missing properties"
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "schema-validation-error-9425"
+---
+
+## Reason
+
+The `400 - Bad Request` error with the message `Invalid schema for function: object schema missing properties` occurs when the JSON Schema provided in a Function Calling or Structured Outputs request is syntactically incomplete. 
+
+Key reasons for this error include:
+1. **Missing 'properties' Field**: The OpenAI API requires that any parameter or nested object defined with `"type": "object"` must also include a `"properties"` key. Even if the object is intended to be empty or dynamic, the schema validator expects the `properties` object to be explicitly defined.
+2. **Invalid API Request Structure**: The overall structure of the request—including tools, functions, and parameters—may not align with the specific format required by the OpenAI Chat Completions API. This includes missing or incorrectly formatted headers or a data payload that does not match the expected API signature.
+3. **Model-Specific Constraints**: Different OpenAI models (such as `gpt-4o` or `gpt-4-turbo`) have varying levels of strictness. When using **Structured Outputs** (where `strict: true` is set), the schema must not contain unsupported keywords and must include all property names in the `required` array.
+4. **Incorrect JSON Payload**: The payload sent to the API may fail validation due to incorrect formatting, missing required fields, or the use of unrecognized request arguments that do not conform to the JSON Schema specification.
+
+## Solution
+To resolve the `Invalid schema` error for the `get_current_weather` function, follow these remediation steps:
+1. **Explicitly Define 'properties'**: Inspect your function definition. For every item where you have specified `"type": "object"`, ensure you include a `"properties": {}` block. If the object has no sub-properties, provide an empty object `{}`.
+2. **Align with Structured Outputs Requirements**: If you are using the `strict: true` mode, ensure that every property defined in the `properties` object is also listed in the `required` array. Additionally, set `"additionalProperties": false` within the object schema.
+3. **Verify API Request Parameters**: Ensure all required parameters for the `get_current_weather` function are included and conform to the data types (e.g., string, integer) specified in your schema.
+4. **Check Request Structure and Headers**: Confirm that your API call includes the correct `Content-Type: application/json` header and that the `functions` or `tools` array is correctly placed in the root of the JSON body.
+5. **Validate JSON Schema**: Before sending the request, use a JSON Schema validator to ensure the syntax is correct. Pay close attention to nested objects, as the error `In context=()` often points to a root-level or deeply nested object missing its property definitions.
+6. **Review Model Documentation**: Reference the OpenAI API documentation for Function Calling to ensure you are not using deprecated fields or unsupported JSON Schema features (like `default` values or specific `pattern` constraints not supported by the model).
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c](https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c)
+- [https://github.com/sashabaranov/go-openai/issues/432](https://github.com/sashabaranov/go-openai/issues/432)
+- [https://community.openai.com/t/request-failed-with-status-code-400/39242](https://community.openai.com/t/request-failed-with-status-code-400/39242)
+- [https://community.openai.com/t/structured-outputs-invalid-schema-error-only-when-deployed/980579](https://community.openai.com/t/structured-outputs-invalid-schema-error-only-when-deployed/980579)
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)
+- [https://platform.openai.com/docs/guides/structured-outputs](https://platform.openai.com/docs/guides/structured-outputs)

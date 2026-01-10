@@ -1,0 +1,31 @@
+---
+title: "\"0.1\" is not of type \"number\" - \"temperature\""
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "type-mismatch-error-9475"
+---
+
+## Reason
+
+The "400 Bad Request" error with the message `"0.1" is not of type "number" - "temperature"` occurs when the OpenAI API receives a parameter value as a string that strictly requires a numeric data type.
+
+Key causes include:
+1. **Invalid Parameter Type**: The API expects the `temperature` parameter to be a numeric value (e.g., `0.1`). If the value is enclosed in quotes (e.g., `"0.1"`), the JSON parser treats it as a string, triggering a schema validation failure.
+2. **Environment Variable Casting**: In many development environments, values retrieved from `.env` files or system environment variables are read as strings by default. If these values are passed directly to the API without conversion, they will cause a type mismatch.
+3. **Model-Specific Constraints**: While most models accept a range between 0 and 2, certain models have specific restrictions. For instance, some newer models (like the `o1` series) may not support the `temperature` parameter at all, or might only support the default value of `1`. Passing a formatted string where a numeric value or no value is expected can lead to this error.
+
+## Solution
+To resolve the type mismatch for the `temperature` parameter, follow these remediation steps:
+1. **Convert the temperature value to a number**: Ensure the value is explicitly cast to a numeric type (float or integer) before it is included in the request body. 
+   - In **Python**, use `float(value)`.
+   - In **JavaScript/Node.js**, use `parseFloat(value)` or `Number(value)`.
+2. **Verify JSON serialization**: Check that your request payload does not accidentally wrap numeric values in double quotes. The parameter should appear as `"temperature": 0.1` rather than `"temperature": "0.1"`.
+3. **Check model-specific constraints**: Verify if the specific model you are using supports the `temperature` parameter. Note that for reasoning models like `o1-preview` or `o1-mini`, the `temperature` parameter is currently unsupported and should be removed from the request.
+4. **Ensure valid ranges**: Confirm that the numeric value is within the allowed range (typically 0 to 2). Values outside this range may trigger different 400 errors related to out-of-bounds constraints.
+5. **Review API documentation**: Consult the latest OpenAI API Reference to verify the expected data types and supported parameters for the specific model version you are targeting.
+
+## Suggested Links
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-temperature](https://platform.openai.com/docs/api-reference/chat/create#chat-create-temperature)
+- [https://platform.openai.com/docs/guides/text-generation](https://platform.openai.com/docs/guides/text-generation)
+- [https://community.openai.com/t/i-am-receiving-an-error-status-code-400/351121](https://community.openai.com/t/i-am-receiving-an-error-status-code-400/351121)

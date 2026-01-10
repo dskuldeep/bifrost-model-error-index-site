@@ -1,0 +1,35 @@
+---
+title: "{\"args\": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]} is not of type \"string\" - \"messages.2.function_call.arguments\""
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "type-mismatch-error-9479"
+---
+
+## Reason
+
+The HTTP 400 Bad Request error in the OpenAI API occurs when the server cannot process the request due to a client-side formatting error or invalid configuration. Based on the raw error text, the primary cause is a **Data Type Mismatch**:
+1. **Invalid Argument Type**: The error message `{"args": [...]} is not of type "string"` specifically targets the `messages.2.function_call.arguments` field. OpenAI requires that the `arguments` within a function call be passed as a **JSON-encoded string**, not as a raw JSON object or array. Passing a literal array (like `[1, 2, 3...]`) triggers this failure.
+2. **Invalid Request Syntax**: General syntax issues, such as invalid characters or improper formatting in the JSON payload, will prevent the server from parsing the request.
+3. **Authentication Issues**: Incorrect, expired, or improperly formatted API keys in the authorization header will result in a 400 error.
+4. **Rate Limiting**: Exceeding the allowed number of requests per minute (RPM) or tokens per minute (TPM) can cause the API to reject incoming requests.
+5. **Middleware or Client Configuration**: Improperly configured interceptors in Axios or other middleware can distort the base URL, headers, or request body before it reaches OpenAI.
+6. **Parameter Constraints**: Using model-specific parameters (like `dimensions` in certain embedding models) that are not supported by the selected model or endpoint.
+
+## Solution
+To resolve the 400 status error, follow these remediation steps:
+1. **Serialize Function Arguments**: Ensure that any object or array passed to the `arguments` field is converted to a string. If using JavaScript, apply `JSON.stringify()` to your arguments object:
+   - **Incorrect**: `arguments: { "args": [1, 2] }` 
+   - **Correct**: `arguments: JSON.stringify({ "args": [1, 2] })`
+2. **Verify API Keys and Authentication**:
+   - Confirm your API key is active on the OpenAI Developer Dashboard.
+   - Ensure there are no leading/trailing spaces or hidden characters in your environment variables.
+3. **Validate Message Structure**: Inspect the message array at the index specified (e.g., `messages[2]`) to ensure it adheres to the OpenAI Chat Completion schema, specifically verifying the `role`, `content`, and `function_call` fields.
+4. **Manage Rate Limits**: Implement exponential backoff or a request queue to ensure your application stays within the usage limits of your current tier.
+5. **Check Middleware/Axios Configuration**: Review your Axios instance for default headers or transformations that might be altering the data type of your request body (e.g., accidentally converting strings back into objects).
+6. **Consult Official Documentation**: Verify that the parameters used (e.g., `model`, `temperature`, `functions`) are compatible with the specific API version and model being invoked.
+
+## Suggested Links
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)
+- [https://platform.openai.com/docs/guides/error-codes](https://platform.openai.com/docs/guides/error-codes)

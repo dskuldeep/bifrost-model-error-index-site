@@ -1,0 +1,29 @@
+---
+title: "\"$.messages\" is too long. Maximum length is 2048, but got 4968 items."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "length-limit-error-9305"
+---
+
+## Reason
+
+The Azure OpenAI API returns a **400 Bad Request** error when the `messages` array in the request payload exceeds the permitted structural limit. While AI models are primarily restricted by token counts (the total volume of text), they also enforce a fixed limit on the number of individual message objects allowed in the conversation history.
+
+Key reasons for this error include:
+1. **Message Array Overflow**: The request provided 4,968 message objects, significantly exceeding the maximum allowed limit of 2,048 items. This limit counts the total number of entries, including system, user, assistant, and tool/function messages.
+2. **Context Length Limit**: OpenAI models have a maximum context window. Even if the total token count is within the model's window, the API enforces specific constraints on the JSON payload size and the number of elements in the `messages` array.
+3. **Invalid Request Configuration**: The payload is non-compliant with the API's schema requirements. This often happens in long-running chat sessions where history is appended indefinitely without truncation or management.
+
+## Solution
+To resolve the error where `$.messages` exceeds the maximum length, you must adjust the request to fit within the 2,048-item limit. Follow these steps:
+1. **Reduce the Number of Items**: Implement logic to prune the `messages` array. Ensure that the total count of objects sent in the request does not exceed 2048.
+2. **Optimize and Trim Context**: Use a "sliding window" approach where only the N most recent messages are kept. Truncating the oldest parts of the conversation history is the most effective way to stay within limits.
+3. **Summarize Previous History**: Instead of passing every historical turn, summarize the earlier conversation and include that summary in a single system or user message. This preserves context while reducing the message count.
+4. **Consolidate Messages**: If your logic generates multiple consecutive messages for the same role, merge their text into a single message object to reduce the array size.
+5. **Split the Request**: If the high item count is due to large datasets or extensive few-shot examples, break the task into multiple smaller API calls.
+6. **Review Model Limits**: Check the specific documentation for your Azure OpenAI model deployment (e.g., GPT-4 or GPT-3.5 Turbo) to ensure you are respecting both the message count limit and the total token context window.
+
+## Suggested Links
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/quotas-limits](https://learn.microsoft.com/en-us/azure/ai-services/openai/quotas-limits)

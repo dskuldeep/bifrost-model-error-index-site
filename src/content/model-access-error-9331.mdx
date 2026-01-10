@@ -1,0 +1,35 @@
+---
+title: "The model `gemini-1.5pro` does not exist or you do not have access to it."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "model-access-error-9331"
+---
+
+## Reason
+
+The 404 error you're encountering with the OpenAI API, specifically the message indicating that the model `gemini-1.5pro` does not exist or you do not have access to it, typically stems from a provider mismatch or naming error. Key reasons include:
+1. **Model Non-Existence (Provider Mismatch)**: The model `gemini-1.5pro` is developed by Google (DeepMind) and is not a valid or recognized model in OpenAI's native model catalog. Attempting to call a Google model through an OpenAI-specific endpoint will result in a 404 error because the model identifier does not exist in OpenAI's system.
+2. **Access Restrictions**: You may lack the necessary permissions or access rights to the specific model identifier you are requesting. This can occur if the API key is not authorized for the requested tier or if there are restrictions set within your organization's project settings.
+3. **Endpoint or Parameter Issues**: There may be an issue with the API endpoint or request parameters. Using an OpenAI-formatted request against an endpoint that does not support the `gemini-1.5pro` identifier will trigger this failure.
+4. **Incorrect Model Catalog**: The model name may be misspelled or formatted incorrectly for the specific gateway or proxy you are using to route requests.
+
+## Solution
+To resolve the 404 error for the `gemini-1.5pro` model when interacting with an OpenAI-compatible interface, follow these steps:
+1. **Verify Model and Provider**: Confirm that you are targeting the correct provider. If you intend to use `gemini-1.5pro`, you must use Google's Vertex AI or Google AI Studio API. If you are using OpenAI, you must use OpenAI models such as `gpt-4o` or `gpt-3.5-turbo`.
+2. **Check API Key Permissions**: Ensure that your API key has the necessary permissions and access rights. If you are using a multi-provider gateway (like Bifrost), verify that the provider (Google) is correctly configured and the key has access to Gemini models.
+3. **Review Endpoint and Parameters**: Double-check the base URL and endpoint used in your request. Ensure the parameters align with the requirements of the model provider you are calling.
+4. **Check Project Settings**: Within your provider's dashboard (OpenAI or Google Cloud), verify that there are no usage limits, billing restrictions, or project-level configurations preventing access to specific models.
+5. **Consult Official Documentation**: Refer to the model provider's documentation to confirm exact model naming conventions (e.g., `gemini-1.5-pro-latest` vs `gemini-1.5-pro`).
+6. **Test with a Standard Model**: Attempt a request using a widely available model (e.g., `gpt-4o-mini` for OpenAI or `gemini-1.5-flash` for Google) to determine if the issue is specific to the `gemini-1.5pro` identifier or a general authentication failure.
+
+## Suggested Links
+- [https://community.openai.com/t/gpt-3-5-turbo-model-gives-me-a-404-error/83297](https://community.openai.com/t/gpt-3-5-turbo-model-gives-me-a-404-error/83297)
+- [https://community.openai.com/t/how-to-set-billing-limits-and-restrict-model-usage-for-a-project-via-openai-api/1087771](https://community.openai.com/t/how-to-set-billing-limits-and-restrict-model-usage-for-a-project-via-openai-api/1087771)
+- [https://community.openai.com/t/api-returning-404-model-not-found-all-of-a-sudden-why-and-how-to-fix/679777](https://community.openai.com/t/api-returning-404-model-not-found-all-of-a-sudden-why-and-how-to-fix/679777)
+- [https://github.com/langchain-ai/langchain/issues/13284](https://github.com/langchain-ai/langchain/issues/13284)
+- [https://community.openai.com/t/can-i-enable-some-models-for-api-key/583110](https://community.openai.com/t/can-i-enable-some-models-for-api-key/583110)
+- [https://community.openai.com/t/getting-404-not-found-error-for-api-endpoint-in-postman/903181](https://community.openai.com/t/getting-404-not-found-error-for-api-endpoint-in-postman/903181)
+- [https://codingmall.com/knowledge-base/25-global/768-how-can-i-restrict-openai-api-key-access-to-specific-ip-addresses-or-domains](https://codingmall.com/knowledge-base/25-global/768-how-can-i-restrict-openai-api-key-access-to-specific-ip-addresses-or-domains)
+- [https://platform.openai.com/docs/models](https://platform.openai.com/docs/models)
+- [https://ai.google.dev/gemini-api/docs/models/gemini](https://ai.google.dev/gemini-api/docs/models/gemini)

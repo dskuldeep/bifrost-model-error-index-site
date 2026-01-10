@@ -1,0 +1,28 @@
+---
+title: "1719 is not of type \"string\" - \"user\""
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "type-validation-error-9491"
+---
+
+## Reason
+
+The **400 Bad Request** error in Azure OpenAI, specifically the message `1719 is not of type "string" - "user"`, occurs because the API's JSON schema validation failed. The service expects specific data types for each field in the request payload, and your request provided a value that does not match these expectations.
+
+Key reasons for this failure include:
+1.  **Strict Type Enforcement**: The `user` field in the Chat Completions API is designed to be a unique identifier for end-users (to help with abuse monitoring). The API specification requires this field to be a **string**. In this instance, the value `1719` was sent as a number (integer) instead of a quoted string (e.g., `"1719"`).
+2.  **Invalid Request Syntax**: The payload does not conform to the expected JSON structure defined in the Azure OpenAI or OpenAI API reference. When the validator encounters a numeric type where a string is mandatory, it rejects the entire request.
+3.  **Schema Validation Rules**: The Azure OpenAI gateway performs pre-flight validation on all incoming JSON. If any field—even an optional one like `user`—contains an incorrect data type, the request is terminated before reaching the model.
+
+## Solution
+To resolve the type validation error, ensure your request payload strictly adheres to the data types defined in the API documentation. Follow these steps:
+1.  **Cast Numeric IDs to Strings**: If you are using a database ID or a numeric identifier for the `user` field, ensure it is wrapped in double quotes in your JSON payload. For example, change `"user": 1719` to `"user": "1719"`.
+2.  **Verify All Field Types**: Audit your entire JSON body against the official API reference. Ensure that fields expecting numbers (like `temperature` or `top_p`) are not sent as strings, and fields expecting strings (like `model` or `user`) are not sent as numbers.
+3.  **Validate JSON Formatting**: Use a JSON linter or validator to ensure the request is syntactically correct and contains no trailing commas or missing quotes that could cause parsing errors.
+4.  **Check for Hidden Characters**: When copy-pasting code or IDs, hidden non-printable characters (like zero-width spaces) can sometimes be included, causing validation to fail. Re-type the problematic field manually if necessary.
+5.  **Update Parameters for API Versions**: Ensure you are using the parameters appropriate for your API version. For instance, newer models and API versions may require `max_completion_tokens` instead of the legacy `max_tokens` parameter.
+
+## Suggested Links
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-user](https://platform.openai.com/docs/api-reference/chat/create#chat-create-user)

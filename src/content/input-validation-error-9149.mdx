@@ -1,0 +1,42 @@
+---
+title: "'Browse graph' does not match '^[a-zA-Z0-9_-]{1,64}$' - 'tools.0.function.name'"
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-validation-error-9149"
+---
+
+## Reason
+
+The error `'Browse graph' does not match '^[a-zA-Z0-9_-]{1,64}$'` occurs because the name assigned to a tool or function in the OpenAI API request does not adhere to the required naming conventions. 
+
+Specifically, the validation fails due to the following constraints defined by the regex pattern `^[a-zA-Z0-9_-]{1,64}$`:
+1. **Permitted Characters**: Only alphanumeric characters (uppercase and lowercase letters, numbers), underscores (`_`), and hyphens (`-`) are allowed.
+2. **Prohibited Characters**: Spaces and special symbols (such as `!`, `@`, `#`, or `.`) are strictly forbidden. The name "Browse graph" contains a space, which is the primary cause of this validation failure.
+3. **Length Requirement**: The name must be between 1 and 64 characters long. 
+
+This validation applies to the `name` field within the `tools` or `functions` array in the Chat Completions and Assistants APIs.
+
+## Solution
+To fix the error, you must rename the function or tool to comply with the regex requirements. Follow these steps:
+1. **Remove or Replace Illegal Characters**: Identify any spaces or unsupported special characters in the name. Replace them with underscores (`_`) or hyphens (`-`).
+2. **Shorten if Necessary**: Ensure the total character count of the name does not exceed 64 characters.
+3. **Consistency Check**: Update all references to this function name in your codebase, including the function definition provided to the API and any logic that handles the model's tool call requests.
+
+**Corrected Examples for "Browse graph":**
+
+- `Browse_graph` (using an underscore)
+- `Browse-graph` (using a hyphen)
+- `BrowseGraph` (using CamelCase)
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://github.com/run-llama/llama_index/issues/8853](https://github.com/run-llama/llama_index/issues/8853)
+- [https://community.openai.com/t/openai-badrequesterror-error-code-400-does-not-match-a-za-z0-9-1-64/709823](https://community.openai.com/t/openai-badrequesterror-error-code-400-does-not-match-a-za-z0-9-1-64/709823)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://community.openai.com/t/problem-with-required-property-when-function-calling/273635](https://community.openai.com/t/problem-with-required-property-when-function-calling/273635)
+- [https://community.openai.com/t/the-format-of-the-name-field-in-the-documentation-is-incorrect/175684](https://community.openai.com/t/the-format-of-the-name-field-in-the-documentation-is-incorrect/175684)
+- [https://community.openai.com/t/how-to-get-the-function-name-in-realtime-api-for-a-function-call/977544](https://community.openai.com/t/how-to-get-the-function-name-in-realtime-api-for-a-function-call/977544)
+- [https://github.com/run-llama/llama_index/issues/9411](https://github.com/run-llama/llama_index/issues/9411)
+- [https://community.openai.com/t/what-is-the-best-way-to-format-the-output-of-a-function-in-the-conversation/306892](https://community.openai.com/t/what-is-the-best-way-to-format-the-output-of-a-function-in-the-conversation/306892)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-tools](https://platform.openai.com/docs/api-reference/chat/create#chat-create-tools)

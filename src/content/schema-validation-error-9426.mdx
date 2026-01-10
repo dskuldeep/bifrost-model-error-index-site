@@ -1,0 +1,41 @@
+---
+title: "Invalid schema for response_format: Expected at most a specified number of enum values in total within a single schema when using structured outputs, but received an excess. Consider reducing the number of enums, or opt out of structured outputs by setting 'strict: false'."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "schema-validation-error-9426"
+---
+
+## Raw Error Text
+
+```text
+Invalid schema for response_format 'attr_standardization': Expected at most 500 enum values in total within a single schema when using structured outputs, but received 617. Consider reducing the number of enums, or use 'strict: false' to opt out of structured outputs.
+```
+
+## Reason
+
+The 400 Bad Request error occurs when the JSON schema provided in the `response_format` (Structured Outputs) exceeds the internal limitations of the Azure OpenAI inference engine. 
+
+Key factors include:
+1. **Exceeding Enum Value Limits**: The API enforces a hard cap on the total number of `enum` values allowed within a single schema. As indicated in the error message, the limit is 500 values, while the provided schema contained 617.
+2. **Constrained Decoding Constraints**: When Structured Outputs are enabled (typically via `strict: true`), the API pre-processes the schema into a formal grammar used for constrained decoding. This ensures the model's output is 100% compliant with the schema. Large enum lists significantly increase the complexity and memory footprint of this grammar compilation process.
+3. **Schema Complexity**: Beyond the count of items, the complexity of the schema—including nesting depth and the total character length of enum strings—triggers validation checks to prevent latency issues and performance degradation during token generation.
+
+## Solution
+To resolve the "Invalid schema for response_format" error, follow these remediation steps:
+1. **Reduce Enum Values**: Audit your schema and remove unnecessary enum items. Ensure that the total count of all items across all `enum` properties is 500 or fewer.
+2. **Disable Strict Mode**: Set `strict: false` within the `json_schema` object of your `response_format`. This switches the model from "Structured Outputs" to "JSON Mode." While JSON Mode ensures the output is valid JSON, it bypasses the constrained decoding engine and its strict 500-enum limit.
+3. **Decompose the Request**: If you require a large number of enums, consider breaking the task into two steps. For example, have the model first classify the output into a broad category, then use a second specialized call with a smaller, filtered enum list.
+4. **Audit Schema Metadata**: Ensure your schema adheres to other related limits, such as a maximum nesting depth of 5 and a total property limit of 100. For schemas with more than 250 enum values, ensure the combined character count of all enum strings does not exceed 7,500 characters.
+5. **Use a Validated Schema Library**: If you are generating schemas dynamically, use libraries like Pydantic (Python) or Zod (TypeScript) to validate the schema structure before sending it to the API.
+
+## Suggested Links
+- [https://community.openai.com/t/error-invalid-schema-for-response-format/1075981](https://community.openai.com/t/error-invalid-schema-for-response-format/1075981)
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://www.googlecloudcommunity.com/gc/AI-ML/Unexpected-400-errors-with-Generated-Output-Schema/td-p/807575](https://www.googlecloudcommunity.com/gc/AI-ML/Unexpected-400-errors-with-Generated-Output-Schema/td-p/807575)
+- [https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue](https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue)
+- [https://community.openai.com/t/500-enums-limitation-in-structured-output/974416](https://community.openai.com/t/500-enums-limitation-in-structured-output/974416)
+- [https://github.com/instructor-ai/instructor/issues/961](https://github.com/instructor-ai/instructor/issues/961)
+- [https://learn.microsoft.com/hi-in/azure/ai-services/openai/quotas-limits](https://learn.microsoft.com/hi-in/azure/ai-services/openai/quotas-limits)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/structured-outputs](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/structured-outputs)
+- [https://platform.openai.com/docs/guides/structured-outputs/supported-schemas](https://platform.openai.com/docs/guides/structured-outputs/supported-schemas)

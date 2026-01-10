@@ -1,0 +1,52 @@
+---
+title: "The completion operation does not work with the specified model. Please choose a different model and try again. You can learn more about which models can be used with each operation here: https://go.microsoft.com/fwlink/?linkid=2197993."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "model-incompatibility-error-9344"
+---
+
+## Raw Error Text
+
+```text
+The completion operation does not work with the specified model, gpt-4-32k. Please choose different model and try again. You can learn more about which models can be used with each operation here: https://go.microsoft.com/fwlink/?linkid=2197993.
+```
+
+## Reason
+
+The "400 Bad Request" error occurs because the **gpt-4-32k** model is being used with an incompatible API operation. Specifically, GPT-4 and GPT-3.5-Turbo models are designed for the **Chat Completions API** and do not support the legacy **Completions API** endpoint.
+
+Key factors contributing to this error include:
+1. **API Endpoint Mismatch**: You are likely calling the `/completions` endpoint (used for older models like text-davinci-003) instead of the `/chat/completions` endpoint required by GPT-4 models.
+2. **Model Architecture**: GPT-4 series models (including `gpt-4-32k`) use a message-based format rather than the single-string prompt format used by legacy completion models.
+3. **Payload Structure**: The request payload likely contains a `prompt` field, whereas GPT-4 models require a `messages` array.
+4. **Model Constraints**: Certain models, especially those in preview or high-context variants like `32k`, have strict requirements regarding the API version and endpoint capability.
+
+## Solution
+To resolve this error, align your API request with the requirements of the GPT-4 architecture by following these steps:
+1. **Switch the API Endpoint**: Update your request URL to use the Chat Completions endpoint. For Azure OpenAI, this typically follows the pattern: `POST {endpoint}/openai/deployments/{deployment-id}/chat/completions?api-version={api-version}`.
+2. **Update the Request Body**: Replace the `prompt` parameter with the `messages` parameter. A standard chat request should look like this:
+   
+   ```json
+   {
+     "messages": [
+       {"role": "system", "content": "You are a helpful assistant."},
+       {"role": "user", "content": "Hello!"}
+     ]
+   }
+   ```
+3. **Verify Model Capabilities**: Consult the official Microsoft Azure OpenAI documentation to confirm which operations are supported for your specific model version.
+4. **Use a Compatible Model for Legacy API**: If your application architecture requires the use of the legacy `/completions` endpoint, you must switch to a supported model such as `gpt-35-turbo-instruct` or legacy `text-davinci` models (if still available in your region).
+5. **Check Deployment Type**: Ensure the deployment in Azure AI Studio matches the intended API call (e.g., ensuring the deployment of `gpt-4-32k` is being accessed via chat-compatible client libraries).
+
+## Suggested Links
+- [https://community.openai.com/t/is-the-rate-limit-tied-to-the-api-or-can-be-cumulative-if-i-have-two-models-deployed/360331](https://community.openai.com/t/is-the-rate-limit-tied-to-the-api-or-can-be-cumulative-if-i-have-two-models-deployed/360331)
+- [https://github.com/langchain-ai/langchain/issues/3137](https://github.com/langchain-ai/langchain/issues/3137)
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/what-are-the-additional-risks-using-gpt-4-turbo-preview-over-gpt-4/705367](https://community.openai.com/t/what-are-the-additional-risks-using-gpt-4-turbo-preview-over-gpt-4/705367)
+- [https://learn.microsoft.com/en-us/answers/questions/1680345/issue-with-authenticating-api-management-with-azur](https://learn.microsoft.com/en-us/answers/questions/1680345/issue-with-authenticating-api-management-with-azur)
+- [https://github.com/langflow-ai/langflow/issues/3860](https://github.com/langflow-ai/langflow/issues/3860)
+- [https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md](https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md)
+- [https://go.microsoft.com/fwlink/?linkid=2197993](https://go.microsoft.com/fwlink/?linkid=2197993)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/chatgpt](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/chatgpt)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models)

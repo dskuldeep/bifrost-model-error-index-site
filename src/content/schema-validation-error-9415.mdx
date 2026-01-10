@@ -1,0 +1,38 @@
+---
+title: "Invalid schema for function \"matching_auto_reply\": \"bool\" is not valid under any of the given schemas"
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "schema-validation-error-9415"
+---
+
+## Reason
+
+The 400 status error in the Azure OpenAI API, specifically the message "Invalid schema for function 'matching_auto_reply': 'bool' is not valid under any of the given schemas," indicates several possible issues:
+
+**Invalid Request Payload**
+The payload you are passing to the API does not conform to the expected schema. This could be due to incorrect or missing fields, or the data types of the fields not matching what the API expects.
+
+**Incorrect Data Types**
+The specific mention of "'bool' is not valid" implies that a value or type definition is not accepted in its current context. In JSON Schema (which Azure OpenAI uses for function calling), the standard type identifier is `"boolean"`. Using `"bool"` is technically invalid and will cause the schema validator to fail.
+
+**API Request Configuration**
+The error can arise from incorrect configuration of the API request itself, such as incorrect headers (e.g., missing `Content-Type: application/json`), invalid API keys, or an incorrect API version/endpoint.
+
+**Rate Limiting or Throttling**
+Although less likely to cause a schema validation error, rate limiting or throttling issues can sometimes manifest as 400 errors if the API request is malformed or if the rate limits are not properly handled by the client infrastructure.
+
+## Solution
+To fix the 400 status error in the Azure OpenAI API due to an "Invalid schema for function" error, follow these remediation steps:
+1. **Verify the request payload**: Ensure that the data you are sending strictly conforms to the expected JSON schema of the API.
+2. **Check data types**: Ensure the data types of the fields in your payload match what the API expects. Specifically, if you have defined a parameter type as `"bool"` in your function definition, change it to `"boolean"` to comply with JSON Schema standards.
+3. **Review API request configuration**: Confirm that the API keys, headers, and API endpoint are correctly set for the specific resource and model deployment you are using.
+4. **Inspect network traffic**: Use tools to inspect network traffic to ensure the payload is not being modified or corrupted before reaching the Azure OpenAI endpoint.
+5. **Adhere to rate limits**: Ensure your application is not exceeding the rate limits (TPM/RPM) imposed by the API for your specific tier.
+
+Additionally, refer to the specific schema documentation for the `matching_auto_reply` function to ensure all required parameters are included and follow the JSON Schema Draft 4 or Draft 7 standards as required by the model version.
+
+## Suggested Links
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)
+- [https://json-schema.org/understanding-json-schema/reference/boolean.html](https://json-schema.org/understanding-json-schema/reference/boolean.html)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)

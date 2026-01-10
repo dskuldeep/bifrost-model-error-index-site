@@ -1,0 +1,51 @@
+---
+title: "The input provided is not of the expected string type. Ensure the input adheres to the format requirements and try again."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-format-error-9100"
+---
+
+## Raw Error Text
+
+```text
+{"input_variables": ["human_input"], "template": "Write a creative, engaging story that brings the scene to life. Describe the characters, setting, and actions in a way that would captivate a young audience the story must contains this \n            Courage Honesty" and based on these stories remained lying edge flowerpotthe flake snow grew larger larger  last like young lady  dressed finest white gauze  made million little flake like star  beautiful delicate  ice  dazzling  sparkling ice  yet lived  eye gazed fixedly  like two star  neither quiet repose  nodded towards window  beckoned hand  little boy frightened  jumped chair  seemed  moment  large bird flew past windowthe next day sharp frost  spring came  sun shone  green leaf appeared  swallow built nest  window opened  little\n\n---\n\neven little bearball  storm music  polar bear went hind leg showed step  never little teaparty white young lady fox  vast  cold  empty hall snow queen  northernlights shone precision one could tell exactly highest lowest degree brightness  middle empty  endless hall snow  frozen lake  cracked thousand piece  piece like  seemed work cunning artificer  middle lake sat snow queen home  said sitting mirror understanding  one best thing worldlittle kay quite blue  yes nearly black cold  observe\n\n-----\n\nsnow white"\n            Human: {human_input}\n            Chatbot:", "_type": "prompt"} is not of type "string" - "prompt"
+```
+
+## Reason
+
+The 400 Bad Request error occurs because the OpenAI API (or a proxy like Bifrost) expected a primitive string for the `prompt` parameter but received a structured JSON object instead. This is a schema validation failure.
+
+Key reasons for this failure include:
+
+**Type Mismatch (Object vs. String)**
+The error message `... is not of type "string" - "prompt"` indicates that the request body contains a complex object (including `input_variables` and `template`) where a flat string is required. This often happens when using prompt orchestration libraries (like LangChain) and passing a `PromptTemplate` object directly to the model instead of the rendered string.
+
+**Malformed Request Structure**
+The structure of the request does not match the API's expected JSON schema. The API expects specific parameters in a predefined format, and providing an object containing template metadata violates these constraints.
+
+**Invalid Syntax or Configuration**
+Issues such as incorrect nesting of JSON fields or passing configuration objects as parameter values will trigger validation errors. The API cannot process the request if the data types for required fields are incorrect.
+
+**Incorrect Data Formatting**
+If the request data is not formatted or serialized correctly into a string before transmission, the API will reject the payload as a malformed request.
+
+## Solution
+To resolve the 400 status error, you must ensure that the `prompt` parameter sent to the API is a valid string. Follow these remediation steps:
+1. **Format the Prompt Template**
+If you are using a template (as seen in the error log with `input_variables`), ensure you render the template into a string before sending the request. For example, if using LangChain, call `.format()` or `.invoke()` on the prompt template to generate the final string content.
+2. **Validate the Request Structure**
+Ensure that the request body adheres to the OpenAI API schema. The `prompt` field must be a string, an array of strings, an array of integers, or an array of arrays of integers. It cannot be a dictionary or JSON object.
+3. **Check API Documentation**
+Refer to the official OpenAI API reference for the specific endpoint you are using (e.g., `/v1/completions`) to confirm the correct parameters and their expected data types.
+4. **Verify Parameter Types**
+Review your code to ensure that no variables intended for other fields are accidentally being nested within the prompt object. Confirm all required parameters are present and correctly typed.
+5. **Ensure Proper Data Encoding**
+Confirm that the request is sent with the header `Content-Type: application/json` and that the payload is properly UTF-8 encoded.
+6. **Test with Minimal Payload**
+Simplify the request to the bare minimum required parameters (e.g., a single hardcoded string for the prompt) to isolate whether the issue is with the template logic or the API configuration.
+
+## Suggested Links
+- [https://platform.openai.com/docs/api-reference/completions/create](https://platform.openai.com/docs/api-reference/completions/create)
+- [https://platform.openai.com/docs/guides/error-codes](https://platform.openai.com/docs/guides/error-codes)
+- [https://json-schema.org/understanding-json-schema/reference/type](https://json-schema.org/understanding-json-schema/reference/type)

@@ -1,0 +1,45 @@
+---
+title: "The provided input does not match the expected type. Ensure that parameters like 'prompt' are correctly formatted as strings."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-type-error-9131"
+---
+
+## Raw Error Text
+
+```text
+{'input_variables': ['augmented_query'], 'template': 'Write a creative, engaging story that brings the scene to life. Describe the characters, setting, and actions in a way that would captivate a young audience the story must contains this \n            \n            Human: {augmented_query}\n            Chatbot:', '_type': 'prompt'} is not of type 'string' - 'prompt'
+```
+
+## Reason
+
+The OpenAI API returned a 400 Bad Request error because the `prompt` parameter was provided as a complex JSON object instead of the required string format. In the provided log, the request contains an object with keys like `input_variables` and `template`, which is a structure typically used by orchestration frameworks (such as LangChain) to manage templates before they are rendered.
+
+Key reasons for this failure include:
+1. **Type Mismatch**: The OpenAI API schema for completion endpoints strictly requires the `prompt` field to be a `string`, `array of strings`, `array of integers`, or `array of arrays of integers`. Passing a dictionary/object violates this schema.
+2. **Incorrect Parameter Handling**: This error often occurs when a developer passes a `PromptTemplate` object directly to an API wrapper or a low-level HTTP client without calling the formatting method first.
+3. **Schema Validation Failure**: The API backend performs strict validation on the request payload. When it encounters internal metadata fields like `_type: prompt` or `input_variables` within the `prompt` field, it rejects the request as malformed.
+
+## Solution
+To resolve the 400 status error, you must ensure that the `prompt` parameter sent in the API payload is a plain text string. Follow these steps to remediate the issue:
+1. **Format the Prompt Template**: If you are using a library like LangChain, do not pass the template object itself. Instead, call the `.format()` method to generate the final string. For example:
+   ```python
+   formatted_prompt = prompt_template.format(augmented_query=your_query_variable)
+   # Pass formatted_prompt to the API call
+   ```
+2. **Correct the Request Structure**: Align your request parameters with the official OpenAI API documentation. Ensure the `prompt` field contains only the rendered text you want the model to complete.
+3. **Verify Field Data Types**: Double-check that all other parameters (such as `max_tokens`, `temperature`, and `top_p`) use the correct data types (integers or floats) and that there are no extra or malformed headers in the request.
+4. **Check the API Endpoint**: If you are trying to use a chat model (like `gpt-4` or `gpt-3.5-turbo`), ensure you are using the `/v1/chat/completions` endpoint and providing a `messages` array instead of a `prompt` string.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://github.com/vllm-project/vllm/issues/1351](https://github.com/vllm-project/vllm/issues/1351)
+- [https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c](https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c)
+- [https://community.zapier.com/code-webhooks-52/help-with-openai-api-request-beta-structure-28992](https://community.zapier.com/code-webhooks-52/help-with-openai-api-request-beta-structure-28992)
+- [https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096](https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096)
+- [https://github.com/Nutlope/aicommits/issues/137](https://github.com/Nutlope/aicommits/issues/137)
+- [https://platform.openai.com/docs/api-reference/completions/create](https://platform.openai.com/docs/api-reference/completions/create)
+- [https://python.langchain.com/docs/concepts/prompt_templates/](https://python.langchain.com/docs/concepts/prompt_templates/)

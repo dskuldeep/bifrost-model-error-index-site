@@ -1,0 +1,39 @@
+---
+title: "Unable to submit request because it has an empty text parameter. Add a value to the parameter and try again. Learn more: https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/gemini"
+provider: "google"
+provider_icon: "/logos/google.png"
+solved: true
+slug: "missing-input-error-9315"
+---
+
+## Reason
+
+The 400 Bad Request error (INVALID_ARGUMENT) occurs when the Google Vertex AI or Gemini API receives a request where a mandatory text field is either null or contains an empty string. This behavior is common in the `GenerateContent` endpoint.
+
+Key reasons for this error include:
+1. **Missing Required Parameter**: The API request lacks the `text` field within the `parts` array of the `contents` object. Every content part in the Gemini API must contain a valid value (text, inline_data, or file_data).
+2. **Empty Content Value**: The `text` parameter is present but assigned an empty string value (`""`). Google's API performs strict validation and rejects requests where the text part has zero length.
+3. **Invalid Request Format**: The JSON payload is malformed or does not align with the expected `GenerateContentRequest` schema, leading the server to reject the request as functionally incomplete.
+4. **SDK/Middleware Edge Cases**: Some integration frameworks or SDKs may inadvertently generate empty message parts during conversation history processing or when filtering user inputs, which triggers this server-side rejection.
+
+## Solution
+To resolve the 400 Bad Request error caused by an empty text parameter, you must ensure that every text-based part of your request contains a valid, non-empty string.
+
+Follow these steps to remediate the issue:
+1. **Verify the text parameter**: Review your request payload to ensure that the `text` property is present inside the `parts` array. A typical structure should look like `"contents": [{"parts":[{"text": "..."}]}]`.
+2. **Ensure Non-Empty Data**: Confirm that the string passed to the `text` parameter is not empty. If your application logic allows for optional text, implement a check to prevent sending the request if the text length is zero.
+3. **Implement a Workaround for Empty Inputs**: If you must send a part but have no specific text, some developers use a single whitespace characters (`" "`) as a workaround, as the API requires at least one character to satisfy the validation.
+4. **Check the Format**: Align your request format with the Google API requirements. Ensure that no null values are being passed where strings are expected.
+5. **Review API Documentation**: Consult the Vertex AI or Gemini model reference to ensure all required parameters for your specific model and method (e.g., `generateContent`) are provided.
+6. **Test the Request**: Re-submit the request after applying these changes to verify the error is resolved.
+
+## Suggested Links
+- [https://www.hostinger.com/tutorials/how-to-fix-400-bad-request-error](https://www.hostinger.com/tutorials/how-to-fix-400-bad-request-error)
+- [https://github.com/cline/cline/issues/417](https://github.com/cline/cline/issues/417)
+- [https://kinsta.com/knowledgebase/400-bad-request/](https://kinsta.com/knowledgebase/400-bad-request/)
+- [https://www.googlecloudcommunity.com/gc/AI-ML/Google-grounding-and-function-calling-error-400/m-p/780587](https://www.googlecloudcommunity.com/gc/AI-ML/Google-grounding-and-function-calling-error-400/m-p/780587)
+- [https://www.googlecloudcommunity.com/gc/Workspace-Q-A/Seeing-400-error-while-trying-to-send-a-mail/m-p/536255](https://www.googlecloudcommunity.com/gc/Workspace-Q-A/Seeing-400-error-while-trying-to-send-a-mail/m-p/536255)
+- [https://github.com/googleapis/google-cloud-go/issues/10309](https://github.com/googleapis/google-cloud-go/issues/10309)
+- [https://developers.google.com/calendar/api/guides/errors?hl=en](https://developers.google.com/calendar/api/guides/errors?hl=en)
+- [https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/gemini](https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/gemini)
+- [https://github.com/google-gemini/generative-ai-js/issues/361](https://github.com/google-gemini/generative-ai-js/issues/361)

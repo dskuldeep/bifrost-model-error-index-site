@@ -1,0 +1,29 @@
+---
+title: "\"Browse graph\" does not match \"^[a-zA-Z0-9_-]{1,64}$\" - \"tools.0.function.name\""
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-validation-error-9148"
+---
+
+## Reason
+
+The "400 - Bad Request" error occurs when an OpenAI API request fails schema validation for a tool or function name. Specifically, the error message `"Browse graph" does not match "^[a-zA-Z0-9_-]{1,64}$"` indicates that the value provided in the `name` field of the first tool (`tools.0.function.name`) violates the required naming conventions.
+
+OpenAI enforces a strict regex pattern for function names to ensure they can be correctly parsed by the model and integrated into generated code. The pattern `^[a-zA-Z0-9_-]{1,64}$` carries the following constraints:
+1. **Allowed Characters**: The name must only contain alphanumeric characters (a-z, A-Z, 0-9), underscores (`_`), or hyphens (`-`).
+2. **Forbidden Characters**: Spaces, dots, and special symbols (like `!`, `@`, `#`) are not allowed. In this case, the space in "Browse graph" triggered the failure.
+3. **Length Limits**: The name must be at least 1 character and no more than 64 characters long.
+4. **Context**: This validation applies to the `name` property within the `function` object of the `tools` array, as well as the legacy `functions` array.
+
+## Solution
+To resolve this validation error, you must rename the function to comply with the supported character set and length requirements. Follow these steps:
+1. **Modify the Function Name**: Locate the tool definition in your API request. Replace any spaces or invalid characters in the `name` field. For example, change `"Browse graph"` to `"browse_graph"` or `"BrowseGraph"`.
+2. **Verify Regex Compliance**: Ensure the new name matches the pattern `^[a-zA-Z0-9_-]{1,64}$`. It should contain only letters, numbers, underscores, or hyphens.
+3. **Check the tools Array**: Confirm that the change is applied specifically to the object indicated by the error path (e.g., `tools[0]`). If you are using multiple tools, ensure all names in the list follow these rules.
+4. **Review API Syntax**: Double-check the structure of your JSON payload to ensure the `function` object is correctly nested within the `tools` array and that all required fields (`name`, `parameters`) are present.
+5. **Update References**: If your code logic or prompts refer to this function by name, ensure those references are updated to match the new sanitized name.
+
+## Suggested Links
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-tools](https://platform.openai.com/docs/api-reference/chat/create#chat-create-tools)

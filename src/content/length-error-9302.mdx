@@ -1,0 +1,32 @@
+---
+title: "[] is too short - \"messages\""
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "length-error-9302"
+---
+
+## Reason
+
+The `400 Bad Request` error with the specific message `[] is too short - "messages"` occurs when an API request is sent to OpenAI's Chat Completion endpoint with an empty messages array. 
+
+Key reasons for this error include:
+1. **Empty Messages Payload**: The Chat Completions API requires the `messages` parameter to be a non-empty list. If your code dynamically builds this array but fails to add any objects (e.g., due to a logic error or missing input), the server rejects the request because it cannot process a conversation with zero context.
+2. **Incorrect or Expired API Key**: The API key used might be incorrect, expired, or not properly configured, preventing the server from authenticating the request.
+3. **Invalid Request Syntax or Configuration**: Issues such as incorrect headers (particularly the `Authorization` field) or an incorrect base URL in your networking library (e.g., Axios or Fetch) can lead to a `400` error.
+4. **Rate Limiting**: Hitting the rate limits set by OpenAI can sometimes result in a `400` error if the requests are excessive or malformed.
+5. **Incorrect Model Parameters**: Using parameters that are not supported by the specified model (such as specifying image dimensions for a text-only model) can trigger this response.
+6. **Network or Server-Side Issues**: Network configuration problems or unexpected server behavior, such as changes in how tokens are counted, may also cause the request to fail.
+
+## Solution
+To resolve the `400 Bad Request` error and specifically the `[] is too short` issue, follow these steps:
+1. **Inspect and Populate Payload**: Ensure that the `messages` field in your request body is a non-empty array containing at least one valid message object with a `role` (e.g., "system", "user", or "assistant") and `content`.
+2. **Verify API Key**: Check that your API key is active, has not expired, and is being passed correctly in the headers.
+3. **Check Request Syntax and Configuration**: Confirm that the request headers, specifically the `Authorization` field (formatted as `Bearer YOUR_API_KEY`), and the base URL are correctly set.
+4. **Validate Model Parameters**: Ensure that all parameters in your request (like `temperature`, `max_tokens`, or `functions`) are supported by the model you are calling.
+5. **Adhere to Rate Limits**: Monitor your usage to ensure you are not exceeding the rate limits defined in your OpenAI account dashboard.
+6. **Inspect Network Traffic**: Use debugging tools or logs to inspect the raw JSON payload being sent to OpenAI to ensure it matches the expected structure and that no fields are being stripped or left empty during serialization.
+
+## Suggested Links
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)
+- [https://platform.openai.com/docs/guides/error-codes](https://platform.openai.com/docs/guides/error-codes)

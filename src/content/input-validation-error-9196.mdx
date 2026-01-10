@@ -1,0 +1,38 @@
+---
+title: "* GenerateContentRequest.contents[0].parts: contents.parts must not be empty."
+provider: "google"
+provider_icon: "/logos/google.png"
+solved: true
+slug: "input-validation-error-9196"
+---
+
+## Reason
+
+The `400 Bad Request` error (specifically `INVALID_ARGUMENT`) in the Google Gemini API occurs when the `GenerateContentRequest` payload fails structural validation. The specific error message `contents.parts: contents.parts must not be empty` indicates that the request was submitted with a content object that lacks the necessary data components.
+
+Key reasons for this failure include:
+1.  **Empty Parts Array**: In the Gemini API schema, the `contents` array consists of `Content` objects, and each object must contain a `parts` array. The API requires this `parts` array to have at least one valid element, such as text string (`text`), binary data (`inline_data`), or a file URI (`file_data`).
+2.  **Missing or Improperly Formatted Data**: The request may contain an invalid argument where a variable intended for the prompt (e.g., a text string or an image) is null, undefined, or an empty array at the time of the API call.
+3.  **Client-Side Malformation**: This is a client-side issue where the JSON payload sent to the server does not conform to the required API contract. This can happen during complex operations like multi-turn chats or when dynamically building prompts where logic fails to populate the final content structure.
+
+## Solution
+To resolve the `400 Bad Request` error and ensure the `GenerateContentRequest` is valid, follow these remediation steps:
+1.  **Populate the Parts Field**: Ensure that the `contents.parts` array contains at least one piece of data. For a simple text prompt, the structure should look like `"contents": [{"parts": [{"text": "Your prompt here"}]}]`.
+2.  **Verify Required Fields**: Check that all required fields in the `GenerateContentRequest` are present and correctly formatted. Ensure you are not passing empty strings or null values to the `parts` array.
+3.  **Validate Arguments**: Verify that variables used to build the request (such as image buffers or text inputs) are properly initialized before being passed to the Generative AI SDK or REST endpoint.
+4.  **Clear Local State**: If you are experiencing this error within a web-based testing tool or IDE, clear any corrupted cache or cookies that might be interfering with the request headers or session data.
+5.  **Audit Browser Extensions**: Disable browser extensions or add-ons that could be modifying or stripping data from outgoing HTTP requests, especially if you are using Google AI Studio or other web-based playgrounds.
+
+## Suggested Links
+- [https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400)
+- [https://github.com/langchain-ai/langchain-google/issues/490](https://github.com/langchain-ai/langchain-google/issues/490)
+- [https://www.googlecloudcommunity.com/gc/AI-ML/Gemini-API-method-models-generateContent-returns-error-code-400/m-p/831749](https://www.googlecloudcommunity.com/gc/AI-ML/Gemini-API-method-models-generateContent-returns-error-code-400/m-p/831749)
+- [https://www.hostinger.com/tutorials/how-to-fix-400-bad-request-error](https://www.hostinger.com/tutorials/how-to-fix-400-bad-request-error)
+- [https://github.com/google-gemini/generative-ai-js/issues/124](https://github.com/google-gemini/generative-ai-js/issues/124)
+- [https://developers.google.com/drive/api/guides/handle-errors](https://developers.google.com/drive/api/guides/handle-errors)
+- [https://kinsta.com/knowledgebase/400-bad-request/](https://kinsta.com/knowledgebase/400-bad-request/)
+- [https://www.googlecloudcommunity.com/gc/Workspace-Q-A/Seeing-400-error-while-trying-to-send-a-mail/m-p/536255](https://www.googlecloudcommunity.com/gc/Workspace-Q-A/Seeing-400-error-while-trying-to-send-a-mail/m-p/536255)
+- [https://github.com/home-assistant/core/issues/120673](https://github.com/home-assistant/core/issues/120673)
+- [https://www.dreamhost.com/blog/400-bad-request-error/](https://www.dreamhost.com/blog/400-bad-request-error/)
+- [https://ai.google.dev/api/rest/v1beta/models/generateContent](https://ai.google.dev/api/rest/v1beta/models/generateContent)
+- [https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/generate-content](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/generate-content)

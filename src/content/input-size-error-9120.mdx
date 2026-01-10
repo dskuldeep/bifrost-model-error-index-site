@@ -1,0 +1,30 @@
+---
+title: "The image size is not allowed to be zero or larger than 20971520 bytes."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "input-size-error-9120"
+---
+
+## Reason
+
+The Azure OpenAI API returns a 400 Bad Request error when an image input violates the service's size constraints. Key reasons for this failure include:
+1. **Size Limit Violation**: The image file size exceeds the maximum limit of 20,971,520 bytes (exactly 20 MB). The error is also triggered if the image data is 0 bytes or the file is empty.
+2. **Base64 Encoding Overhead**: When images are sent as Base64-encoded strings within the JSON payload, the size increases by approximately 33%. A file that is 16 MB on disk may exceed the 20 MB limit once encoded for the API request.
+3. **Invalid Payload Configuration**: The request body may be incorrectly formatted, such as having malformed image data or missing required parameters like the `image_url` object.
+4. **API Request Constraints**: The service enforces specific requirements for image formats (typically PNG, JPEG, WEBP, and non-animated GIF). Using unsupported formats or mis-named parameters (e.g., providing an incorrect key in the JSON) prevents the server from parsing the request.
+5. **Dimension Constraints**: In addition to byte size, images must typically have dimensions between 50 and 16,000 pixels. Inputs outside this range may trigger validation failures.
+
+## Solution
+To resolve the image size error and ensure successful API requests, follow these remediation steps:
+1. **Validate Image Metadata**: Before initiating the API call, verify that the image file size is greater than 0 and strictly less than 20 MB. Check the dimensions to ensure they are within the supported range (50px to 16,000px).
+2. **Compress or Downsample**: If the image exceeds the limit, use an image processing library to reduce the resolution or increase compression. For Vision models, high-resolution originals are often unnecessary as the model typically resizes the input to a lower 'tile' resolution for processing.
+3. **Account for Base64 Growth**: If transmitting the image as a Base64 string, calculate the final size of the encoded string. If the encoded payload exceeds 20 MB, compress the original image further before encoding.
+4. **Review API Parameters**: Confirm that all parameters in the JSON payload are correctly named and nested according to the specific model documentation (e.g., GPT-4o with Vision vs. DALL-E 3).
+5. **Verify File Format**: Ensure the image is saved in a supported format such as `.png`, `.jpg`, `.jpeg`, `.webp`, or a non-animated `.gif`.
+6. **Check Payload Formatting**: Use a JSON validator to ensure the request body is correctly formatted and that image data is being passed through the correct keys (e.g., `url` for publicly accessible links or `data:image/jpeg;base64,...` for encoded strings).
+
+## Suggested Links
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/gpt-with-vision](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/gpt-with-vision)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/dall-e](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/dall-e)
+- [https://platform.openai.com/docs/guides/vision](https://platform.openai.com/docs/guides/vision)

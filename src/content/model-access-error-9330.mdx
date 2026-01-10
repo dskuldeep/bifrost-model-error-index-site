@@ -1,0 +1,64 @@
+---
+title: "The model `opaaaaaaaa` does not exist or you do not have access to it."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "model-access-error-9330"
+---
+
+## Reason
+
+The OpenAI API returns a 404 status error when the requested model cannot be found or the authenticated user does not have permission to use it. This error is typically triggered by one of the following factors:
+
+**Incorrect Model Identifier**
+
+The model name provided in the request, such as `opaaaaaaaa`, is likely a typo or an invalid string. OpenAI requires specific identifiers for its models, such as `gpt-4o`, `gpt-4-turbo`, or `gpt-3.5-turbo`.
+
+**Access Restrictions and Usage Tiers**
+
+OpenAI gates access to certain high-performance models (e.g., the `o1` series or specific `gpt-4` versions) based on Usage Tiers. Users must often reach Tier 5 (determined by lifetime spend and account age) to access the most advanced models via the API. If your account is in a lower tier, the API will report that the model does not exist.
+
+**Endpoint and Parameter Mismatches**
+
+Errors can occur if you attempt to call a model using an incompatible API endpoint. For example, using a chat-optimized model (like GPT-4o) with the legacy `/v1/completions` endpoint instead of `/v1/chat/completions` may result in a failure to locate the model in that context.
+
+**Model Availability and Deprecation**
+
+The requested model may have been deprecated or retired by OpenAI. Additionally, newer models are sometimes subject to staged rollouts, meaning they might not be immediately available to all users or in all geographic regions upon announcement.
+
+## Solution
+To resolve the 404 "model does not exist" error, follow these troubleshooting and remediation steps:
+
+**1. Verify the Model Name**
+
+Cross-reference the model string in your code with the official OpenAI [Model Documentation](https://platform.openai.com/docs/models). Ensure there are no typos and that you are using the exact identifier required (e.g., use `gpt-4o-mini` instead of a placeholder).
+
+**2. Check Usage Tier and Permissions**
+
+Confirm your account eligibility by visiting the **Limits** section of the OpenAI Dashboard. If the model you are attempting to use requires a higher tier (such as Tier 5 for certain `o1` models), you may need to increase your lifetime spend or wait for your account to age into the next tier.
+
+**3. Validate API Endpoint and Parameters**
+
+Ensure your implementation uses the correct endpoint for the model type:
+
+*   **Chat Models:** Use the `/v1/chat/completions` endpoint.
+*   **Legacy Models:** Use the `/v1/completions` endpoint.
+
+Review your request parameters to ensure they align with the requirements of the specific model being called.
+
+**4. Verify Model Status and Availability**
+
+Check if the model is currently active and not deprecated. You can list the models available to your specific API key by performing a `GET` request to the `https://api.openai.com/v1/models` endpoint. If the model does not appear in this list, your key does not have access to it.
+
+## Suggested Links
+- [https://community.openai.com/t/gpt-3-5-turbo-model-gives-me-a-404-error/83297](https://community.openai.com/t/gpt-3-5-turbo-model-gives-me-a-404-error/83297)
+- [https://community.openai.com/t/tier-5-access-but-no-o1-models-api-problem-or-bug-lets-figure-this-out/949204](https://community.openai.com/t/tier-5-access-but-no-o1-models-api-problem-or-bug-lets-figure-this-out/949204)
+- [https://community.openai.com/t/error-that-model-does-not-exist-http-status-code-404-but-it-does-exist/25866](https://community.openai.com/t/error-that-model-does-not-exist-http-status-code-404-but-it-does-exist/25866)
+- [https://github.com/langchain-ai/langchain/issues/13284](https://github.com/langchain-ai/langchain/issues/13284)
+- [https://community.openai.com/t/why-cant-i-access-model-o1-with-my-api-key/1092861](https://community.openai.com/t/why-cant-i-access-model-o1-with-my-api-key/1092861)
+- [https://community.openai.com/t/how-to-set-billing-limits-and-restrict-model-usage-for-a-project-via-openai-api/1087771](https://community.openai.com/t/how-to-set-billing-limits-and-restrict-model-usage-for-a-project-via-openai-api/1087771)
+- [https://codingmall.com/knowledge-base/25-global/768-how-can-i-restrict-openai-api-key-access-to-specific-ip-addresses-or-domains](https://codingmall.com/knowledge-base/25-global/768-how-can-i-restrict-openai-api-key-access-to-specific-ip-addresses-or-domains)
+- [https://community.openai.com/t/query-parameters-arent-working/493094](https://community.openai.com/t/query-parameters-arent-working/493094)
+- [https://community.openai.com/t/api-returning-404-model-not-found-all-of-a-sudden-why-and-how-to-fix/679777](https://community.openai.com/t/api-returning-404-model-not-found-all-of-a-sudden-why-and-how-to-fix/679777)
+- [https://platform.openai.com/docs/models](https://platform.openai.com/docs/models)
+- [https://platform.openai.com/docs/guides/rate-limits/usage-tiers](https://platform.openai.com/docs/guides/rate-limits/usage-tiers)

@@ -1,0 +1,30 @@
+---
+title: "Input validation error: `inputs` cannot be empty"
+provider: "together-ai"
+provider_icon: "/file.svg"
+solved: true
+slug: "input-validation-error-9201"
+---
+
+## Reason
+
+The Together AI API returns a **400 Bad Request** error with the message "inputs cannot be empty" when a request is submitted without the necessary text or data payload required for processing. 
+
+Key reasons for this error include:
+1. **Missing Required Fields**: The request body lacks the `prompt` or `messages` field required by the specific endpoint being used.
+2. **Empty Content**: The value provided for the input field is an empty string (`""`), an empty array, or `null`.
+3. **Validation Criteria**: The API performs a validation check to ensure it has enough context to generate a response; submitting a request that meets the technical JSON structure but lacks actual text content will fail this check.
+
+## Solution
+To resolve input validation errors in the Together AI API, ensure your request adheres to the following steps:
+1. **Verify Input Data**: Check that your `prompt` or `messages` content is not empty. Ensure that any variables used to populate these fields are resolving to non-empty strings before the API call is made.
+2. **Check API Request Format**: Validate that your JSON payload is properly structured. Use a JSON linter to ensure there are no syntax errors and confirm the `Content-Type` header is set to `application/json`.
+3. **Ensure Required Fields**: Include all mandatory parameters based on the endpoint:
+   - For **Chat Completions**, the `messages` array must be present and contain at least one message object with valid `content`.
+   - For **Completions**, the `prompt` field must be present.
+4. **Review API Documentation**: Consult the Together AI documentation to confirm the exact parameter names and requirements for the specific model you are using, as some models may have unique validation rules.
+
+## Suggested Links
+- [https://docs.together.ai/docs/inference-parameters](https://docs.together.ai/docs/inference-parameters)
+- [https://docs.together.ai/reference/completions](https://docs.together.ai/reference/completions)
+- [https://docs.together.ai/reference/chat-completions](https://docs.together.ai/reference/chat-completions)

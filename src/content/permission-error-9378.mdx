@@ -1,0 +1,37 @@
+---
+title: "Request not allowed"
+provider: "anthropic"
+provider_icon: "/logos/anthropic.png"
+solved: true
+slug: "permission-error-9378"
+---
+
+## Reason
+
+A 403 Forbidden error with the message "Request not allowed" occurs when the Anthropic API recognizes the request but refuses to fulfill it. This status is typically triggered by the following factors:
+1. **Incorrect API Key or Permissions**: The API key being used may be invalid, revoked, or lack the necessary permissions for the specific endpoint or feature being accessed.
+2. **Regional Restrictions**: Anthropic services are restricted in certain geographic locations. If the request originates from an unsupported country or via a blocked IP range, the server will deny access.
+3. **Account Billing Status**: This error can occur if the account has an insufficient credit balance, has exceeded its usage limits, or has been flagged for a billing violation.
+4. **Configuration and Model Mismatches**: Providing incorrect model identifiers or parameters that fall outside the allowed scope for your tier can result in a forbidden error.
+5. **Middleware and Integration Issues**: When using integration platforms like Dify, Bifrost, or LangChain, the error may stem from incorrect environment variables, missing provider connections, or issues with upstream authorization to services like Azure OpenAI or OpenAI if they are part of a multi-model workflow.
+
+## Solution
+To resolve the "Request not allowed" error, perform the following remediation steps:
+1. **Verify API Key and Scopes**: Double-check your API key in the Anthropic Console. Ensure it is correctly configured in your environment variables and that it has the appropriate permissions for the requested operation.
+2. **Check Regional Availability**: Confirm that you are accessing the API from a supported region. If you are using a proxy or VPN, ensure it is not routing through a restricted territory.
+3. **Review Account Credits**: Log in to the Anthropic billing dashboard to verify that your account has a positive balance and that no usage caps have been hit.
+4. **Validate Model Identifiers**: Ensure the model name (e.g., `claude-3-5-sonnet-20240620`) is spelled correctly and that your account tier has access to that specific model.
+5. **Audit Middleware Configuration**: If using a gateway or LLMops platform, re-validate the provider settings. Ensure the API keys for Anthropic are properly mapped and that any required connections to auxiliary services are active.
+6. **Test with a Direct Request**: Use a tool like `curl` to make a direct request to the Anthropic API. This helps determine if the issue lies with your code/middleware or with the API key/account itself.
+
+## Suggested Links
+- [https://codingmall.com/knowledge-base/25-global/1533-how-do-i-handle-errors-and-exceptions-when-using-the-anthropic-python-sdk](https://codingmall.com/knowledge-base/25-global/1533-how-do-i-handle-errors-and-exceptions-when-using-the-anthropic-python-sdk)
+- [https://www.hostinger.com/tutorials/error-405-method-not-allowed](https://www.hostinger.com/tutorials/error-405-method-not-allowed)
+- [https://support.anthropic.com/en/articles/10366432-i-m-getting-an-api-connection-error-how-can-i-fix-it](https://support.anthropic.com/en/articles/10366432-i-m-getting-an-api-connection-error-how-can-i-fix-it)
+- [https://github.com/langgenius/dify/issues/5445](https://github.com/langgenius/dify/issues/5445)
+- [https://technologyadvice.com/blog/information-technology/api-error/](https://technologyadvice.com/blog/information-technology/api-error/)
+- [https://forum.cursor.com/t/anthropic-claude-auth-error/18466](https://forum.cursor.com/t/anthropic-claude-auth-error/18466)
+- [https://www.restack.io/p/anthropic-answers-api-limits-cat-ai](https://www.restack.io/p/anthropic-answers-api-limits-cat-ai)
+- [https://docs.anthropic.com/en/api/errors](https://docs.anthropic.com/en/api/errors)
+- [https://docs.anthropic.com/en/docs/about-claude/supported-regions](https://docs.anthropic.com/en/docs/about-claude/supported-regions)
+- [https://status.anthropic.com/](https://status.anthropic.com/)

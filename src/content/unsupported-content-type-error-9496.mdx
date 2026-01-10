@@ -1,0 +1,28 @@
+---
+title: "Invalid content type. image_url is only supported by certain models."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "unsupported-content-type-error-9496"
+---
+
+## Reason
+
+The error "Invalid content type. image_url is only supported by certain models" with a 400 status code occurs because the OpenAI model specified in the request does not have multimodal capabilities. 
+
+Key points regarding this error include:
+
+- **Model Limitations**: The `image_url` parameter is reserved for specific models designed to process image inputs. Using this parameter with a text-only model will result in a validation failure.
+- **Model Capabilities**: While models such as `gpt-4o`, `gpt-4o-mini`, and `gpt-4-turbo` support vision, other standard or legacy models are strictly text-based and cannot analyze image data.
+- **Consistency**: This is a structural error rather than a transient API issue. It indicates that the underlying model architecture is not equipped to parse the content types provided in the request payload.
+
+## Solution
+To resolve the "Invalid content type" error, you must ensure the model choice aligns with the data types being sent. Follow these steps:
+1. **Switch to a Compatible Model**: Update your `model` parameter to a vision-enabled model. Examples include `gpt-4o`, `gpt-4o-mini`, or `gpt-4-turbo`.
+2. **Check Model Documentation**: Verify the technical capabilities of the specific model ID you are using in the official OpenAI model index to ensure it explicitly supports vision tasks.
+3. **Adjust Your API Request**: If you intend to use a text-only model, remove the `image_url` object from your messages array. The `content` field should only contain text strings when using non-multimodal models.
+4. **Validate Request Format**: Ensure your JSON structure follows the specific schema required for vision inputs, where the `content` field is an array of objects rather than a simple string.
+
+## Suggested Links
+- [https://platform.openai.com/docs/guides/vision](https://platform.openai.com/docs/guides/vision)
+- [https://platform.openai.com/docs/models](https://platform.openai.com/docs/models)

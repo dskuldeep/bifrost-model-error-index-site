@@ -1,0 +1,76 @@
+---
+title: "Input required"
+provider: "together-ai"
+provider_icon: "/file.svg"
+solved: true
+slug: "input-error-9086"
+---
+
+## Reason
+
+The Together AI API returns a 400 Bad Request error with the message "Input required" when the server cannot process the request due to missing, malformed, or unauthorized data. Primary causes include:
+
+**Missing Mandatory Fields**
+
+The most specific cause for this error message is the absence of the primary input parameter in the JSON request body. For Chat Completion models, the `messages` array must be provided. For standard Language models, the `prompt` field is required.
+
+**Invalid or Missing API Key**
+
+The API key might be incorrect, expired, or improperly configured. Together AI requires the key to be included in the `Authorization` header using the `Bearer` token authentication scheme.
+
+**Incorrect Request Syntax or Configuration**
+
+The request may contain invalid syntax, such as JSON typos, incorrect data types (e.g., providing a string for a parameter that expects an integer), or missing required headers.
+
+**Data Schema Violations**
+
+The structure of the data sent may not comply with the API's defined schema, such as including parameters that are not supported by the specific model version being called.
+
+**Rate Limiting**
+
+Exceeding the API's allowed frequency of requests can trigger a 400 error if the gateway rejects the request before it reaches the model inference layer.
+
+**Encoding and Middleware Issues**
+
+Encoding problems, particularly with special characters in the request body, can result in a malformed request. Additionally, configuration issues with libraries like Axios or specific middleware can lead to requests being altered or stripped of content during transmission.
+
+## Solution
+To resolve the 400 "Input required" error in the Together AI API, follow these remediation steps:
+
+**1. Verify Mandatory Input Parameters**
+
+Ensure your request body includes the necessary input field for the endpoint you are using:
+
+*   For Chat endpoints: Ensure the `messages` array is present and contains valid message objects.
+*   For Completion endpoints: Ensure the `prompt` string is present.
+
+**2. Validate API Authentication**
+
+Ensure your API key is active and correctly formatted in the request header:
+
+`Authorization: Bearer YOUR_API_KEY`
+
+**3. Check Request Syntax and Data Types**
+
+Review the request body for typos or syntax errors. Ensure that values for parameters like `max_tokens`, `temperature`, and `top_p` are within valid ranges and use the correct data types (e.g., integers vs. floats).
+
+**4. Ensure Schema Compliance**
+
+Compare your request structure against the official Together AI API documentation to ensure all fields are correctly named and placed within the JSON object.
+
+**5. Handle Encoding Correctly**
+
+Ensure the request body is UTF-8 encoded. If your input contains special characters, verify that your programming environment or library is not corrupting the character encoding.
+
+**6. Review Middleware and Library Configurations**
+
+If using a library like Axios, verify that headers and data are not being modified by interceptors. Log the raw outgoing request to confirm that the body is being sent as expected.
+
+**7. Monitor Rate Limits and Quotas**
+
+Check your Together AI dashboard to ensure you have not exceeded your rate limits or usage quotas, as this can sometimes result in rejected requests.
+
+## Suggested Links
+- [https://docs.together.ai/docs/introduction](https://docs.together.ai/docs/introduction)
+- [https://docs.together.ai/reference/chat-completions](https://docs.together.ai/reference/chat-completions)
+- [https://docs.together.ai/docs/inference-parameters](https://docs.together.ai/docs/inference-parameters)

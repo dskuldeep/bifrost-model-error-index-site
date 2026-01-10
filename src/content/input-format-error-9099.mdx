@@ -1,0 +1,58 @@
+---
+title: "Invalid chat format. Expected 'url' field in image_url dict."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-format-error-9099"
+---
+
+## Reason
+
+The 400 Bad Request error `Invalid chat format. Expected 'url' field in image_url dict` occurs when the OpenAI API receives a request payload for vision-capable models (like `gpt-4o` or `gpt-4-turbo`) that does not follow the required schema for image inputs.
+
+Key reasons for this error include:
+1. **Missing Required Fields**: The API requires a content block of type `image_url`. Within that block, there must be a nested dictionary containing a `url` key. If this key is missing, misspelled, or the dictionary is empty, the request fails.
+2. **Incorrect API Request Parameters**: The request structure may be malformed. For example, the `image_url` property might be provided as a string instead of a dictionary, or it may contain unsupported parameters.
+3. **Invalid or Disallowed Content**: The image provided may violate OpenAI's safety terms or usage policies, leading the API to reject the request.
+4. **Model Limitations**: The error can occur if a model is used that does not support image processing (e.g., standard `gpt-3.5-turbo`) while providing image parameters.
+5. **Network and Configuration Issues**: Configuration errors in the API client or intermittent network issues can occasionally lead to malformed requests being sent to the server.
+
+## Solution
+To resolve the 400 status error and fix the image format issue, follow these remediation steps:
+1. **Correct the JSON Payload Structure**: Ensure your request follows the standard OpenAI Vision format. The `content` field should be an array of objects, and the `image_url` object must contain a nested `url` key:
+
+   ```json
+   {
+     "role": "user",
+     "content": [
+       { "type": "text", "text": "What is in this image?" },
+       {
+         "type": "image_url",
+         "image_url": {
+           "url": "https://example.com/image.png"
+         }
+       }
+     ]
+   }
+   ```
+2. **Ensure Image Requirements are Met**: Confirm that the image is less than 20 MB in size and is one of the supported file formats: PNG, JPEG, GIF, or WEBP.
+3. **Verify Model Support**: Ensure the `model` parameter in your request specifies a vision-capable model, such as `gpt-4o`, `gpt-4o-mini`, or `gpt-4-turbo`.
+4. **Check Content Policy**: Verify that the image content does not violate OpenAI's safety policies.
+5. **Format Base64 Correctly**: If using a base64-encoded image, it must be formatted as a Data URL (e.g., `data:image/jpeg;base64,{base64_string}`). If the `data:` prefix is missing, the API will fail to recognize it as a valid URL.
+6. **Administrative Verification**:
+   - Inspect your API key to ensure it is valid, has sufficient quota, and is not expired.
+   - Inspect network traffic for any proxies or gateways that might be stripping fields from the JSON body.
+   - Retry the request to rule out transient server-side issues.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/error-sending-base64-image-data-in-api-request-to-gpt-4-vision-model/495864](https://community.openai.com/t/error-sending-base64-image-data-in-api-request-to-gpt-4-vision-model/495864)
+- [https://community.retool.com/t/gpt-4-vision-not-working/32758](https://community.retool.com/t/gpt-4-vision-not-working/32758)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://github.com/openai/openai-python/issues/887](https://github.com/openai/openai-python/issues/887)
+- [https://community.openai.com/t/gpt-4-vision-api-detail-param-and-token-cost/476448](https://community.openai.com/t/gpt-4-vision-api-detail-param-and-token-cost/476448)
+- [https://community.openai.com/t/using-response-format-in-chat-completion-throws-error/484377](https://community.openai.com/t/using-response-format-in-chat-completion-throws-error/484377)
+- [https://community.openai.com/t/upload-image-to-assistant-via-api/801717](https://community.openai.com/t/upload-image-to-assistant-via-api/801717)
+- [https://github.com/langgenius/dify/issues/3165](https://github.com/langgenius/dify/issues/3165)
+- [https://platform.openai.com/docs/guides/vision](https://platform.openai.com/docs/guides/vision)
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)

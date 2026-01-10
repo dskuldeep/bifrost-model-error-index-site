@@ -1,0 +1,72 @@
+---
+title: "Missing required parameter: 'messages[2].tool_calls[0].type'."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "missing-parameter-error-9320"
+---
+
+## Reason
+
+The error `Missing required parameter: 'messages[n].tool_calls[i].type'` indicates that the OpenAI API received an assistant message containing a `tool_calls` array where one or more objects are missing the mandatory `type` field. 
+
+### Schema Validation Failure
+In the OpenAI Chat Completions API, every tool call object within an assistant message must include a `type` property. Currently, the only supported value is `"function"`. If this property is missing or null, the API rejects the entire request.
+
+### Incorrect Message Sequence
+The error frequently occurs when the sequence of messages is disrupted. Specifically, a message with the role `tool` must always be preceded by an assistant message that contains the original `tool_calls`. If that assistant message is malformed or missing the `type` field, the subsequent tool response cannot be associated correctly.
+
+### Serialization and State Persistence Issues
+When chat histories are stored in databases or persistent storage (such as a LlamaIndex ChatStore), the `tool_calls` objects may be stripped of certain fields during serialization or deserialization. If the `type` field is not explicitly preserved when reloading the chat state, subsequent API calls will fail.
+
+## Solution
+To resolve the `Missing required parameter` error, ensure the message payload strictly adheres to the tool-calling schema requirements:
+
+###
+1. Explicitly Define Tool Call Type
+Ensure that every object in the `tool_calls` array includes the `type` parameter set to `"function"`. If you are manually constructing message objects, use the following structure:
+
+```json
+{
+  "role": "assistant",
+  "tool_calls": [
+    {
+      "id": "call_123",
+      "type": "function",
+      "function": {
+        "name": "get_data",
+        "arguments": "{}"
+      }
+    }
+  ]
+}
+```
+
+###
+2. Validate Message Sequence
+Verify that the conversation flow follows the required order:
+1. A user message provides context.
+2. The assistant responds with a `tool_calls` array (containing `id`, `type`, and `function`).
+3. One or more `tool` messages follow, each referencing the `tool_call_id` from the assistant's message.
+
+###
+3. Sanitize Persistent Storage
+If you are loading messages from a database:
+- Check the stored JSON to confirm that `type: "function"` is present.
+- If using an ORM or a specific library (like LangChain or LlamaIndex), ensure that the model used for storage supports all fields of the tool call object.
+- Implement a validation step to re-insert missing `type` fields before sending the payload to OpenAI.
+
+###
+4. Check Library Versions
+Ensure you are using the latest versions of your AI orchestration frameworks. Older versions of some libraries had issues where they did not correctly pass the `type` parameter when converting internal message objects back to the OpenAI-compatible format.
+
+## Suggested Links
+- [https://community.openai.com/t/content-is-required-property-error-400/486260](https://community.openai.com/t/content-is-required-property-error-400/486260)
+- [https://github.com/run-llama/llama_index/issues/13715](https://github.com/run-llama/llama_index/issues/13715)
+- [https://community.openai.com/t/error-missing-required-parameter-role-when-sending-a-message-to-a-thread-via-openai-api/989022](https://community.openai.com/t/error-missing-required-parameter-role-when-sending-a-message-to-a-thread-via-openai-api/989022)
+- [https://github.com/Nutlope/aicommits/issues/137](https://github.com/Nutlope/aicommits/issues/137)
+- [https://github.com/langchain-ai/langgraphjs/issues/506](https://github.com/langchain-ai/langgraphjs/issues/506)
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/error-for-messages-assistant-tool-calls-id-object/626732](https://community.openai.com/t/error-for-messages-assistant-tool-calls-id-object/626732)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages](https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages)

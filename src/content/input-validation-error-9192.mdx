@@ -1,0 +1,50 @@
+---
+title: "messages.0.content.2.image.source.media_type: Input should be 'image/jpeg', 'image/png', 'image/gif' or 'image/webp'"
+provider: "anthropic"
+provider_icon: "/logos/anthropic.png"
+solved: true
+slug: "input-validation-error-9192"
+---
+
+## Reason
+
+This error occurs because the Anthropic Messages API encountered an unsupported media type in an image content block. Specifically, the validation engine failed at the path `messages.0.content.2.image.source.media_type`, indicating that the third element in the first message's content array contained an invalid `media_type` value.
+
+Anthropic's vision-capable models (such as Claude 3.5 Sonnet and the Claude 3 family) are strictly limited to the following four image MIME types:
+1. `image/jpeg` (for .jpg and .jpeg files)
+2. `image/png` (for .png files)
+3. `image/gif` (for .gif files)
+4. `image/webp` (for .webp files)
+
+If the request uses any other format (such as BMP, TIFF, SVG, or PDF) or if there is a mismatch between the actual file data and the declared `media_type`, the API will return a 400 Bad Request error.
+
+## Solution
+To resolve this input validation error, ensure your request adheres to Anthropic's specific vision requirements:
+1. **Verify the Source Format**: Confirm that the source image is physically saved as a JPEG, PNG, GIF, or WebP file. If the file is in an unsupported format like TIFF or BMP, you must convert it using an image processing library before sending it to the API.
+2. **Correct the media_type Field**: Update the `media_type` string in your JSON payload to exactly match one of the four supported types. Ensure there are no typos or extra spaces.
+3. **Sanitize Base64 Data**: Ensure the `data` field contains only the raw base64-encoded bytes. Do not include the data URI prefix (e.g., `data:image/jpeg;base64,`) inside the `data` string, as this is a common cause of validation failures.
+4. **Check Content Ordering**: Since the error message points to a specific index (`content.2`), verify that the multi-modal request structure is correct. A standard image block should look like this:
+
+```json
+{
+  "type": "image",
+  "source": {
+    "type": "base64",
+    "media_type": "image/jpeg",
+    "data": "/9j/4AAQSkZJRg..."
+  }
+}
+```
+
+## Suggested Links
+- [https://github.com/continuedev/continue/issues/2006](https://github.com/continuedev/continue/issues/2006)
+- [https://community.openai.com/t/400-error-when-i-include-base64-image-in-a-prompt/788596](https://community.openai.com/t/400-error-when-i-include-base64-image-in-a-prompt/788596)
+- [https://docs.anthropic.com/en/api/errors](https://docs.anthropic.com/en/api/errors)
+- [https://github.com/BerriAI/litellm/issues/6893](https://github.com/BerriAI/litellm/issues/6893)
+- [https://community.openai.com/t/request-failed-with-status-code-400/39242/25](https://community.openai.com/t/request-failed-with-status-code-400/39242/25)
+- [https://docs.anthropic.com/en/api/messages](https://docs.anthropic.com/en/api/messages)
+- [https://community.openai.com/t/400-error-on-gpt-vision-emerges-out-of-nowhere-solved/606227](https://community.openai.com/t/400-error-on-gpt-vision-emerges-out-of-nowhere-solved/606227)
+- [https://www.acorn.io/resources/learning-center/claude-api/](https://www.acorn.io/resources/learning-center/claude-api/)
+- [https://community.openai.com/t/400-errors-on-gpt-vision-api-since-today/534538](https://community.openai.com/t/400-errors-on-gpt-vision-api-since-today/534538)
+- [https://www.restack.io/p/anthropic-answer-image-api-cat-ai](https://www.restack.io/p/anthropic-answer-image-api-cat-ai)
+- [https://docs.anthropic.com/en/docs/build-with-claude/vision](https://docs.anthropic.com/en/docs/build-with-claude/vision)

@@ -1,0 +1,37 @@
+---
+title: "The model `ada-v2` does not exist or you do not have access to it."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "model-access-error-9333"
+---
+
+## Reason
+
+The `404` Not Found error with the message "The model `ada-v2` does not exist or you do not have access to it" occurs when the OpenAI API cannot resolve the requested model identifier. This is typically caused by one of the following factors:
+1. **Incorrect Model Identifier**: The specific string `ada-v2` is not a standard model ID in OpenAI's official catalog. Users often mistakenly use this when referring to `text-embedding-ada-002` or legacy versions. Using an incorrect or non-existent ID results in a 404 response.
+2. **Model Deprecation**: OpenAI retired several legacy models, including the original `ada` and various text-search-ada models, on January 4, 2024. If your application is attempting to access a deprecated model, the API will report that it no longer exists.
+3. **Project Access and Permissions**: In the OpenAI dashboard, models must be explicitly enabled within specific projects. If your API key belongs to a project where the requested model is not in the "Allowed Models" list, you will receive an access error.
+4. **Azure OpenAI Specifics**: If using Azure OpenAI, this error occurs if the **Deployment Name** does not match the model name provided in the code, or if the API version specified in the request is incompatible with the deployed model.
+5. **Billing and Credit Status**: Access to certain models may be restricted if your account has an insufficient credit balance or if the account has not been upgraded to a paid tier (Tier 1 or higher).
+
+## Solution
+To resolve the model access error, follow these troubleshooting steps:
+1. **Use the Correct Model ID**: Verify the exact name of the model in the [OpenAI Model Documentation](https://platform.openai.com/docs/models). If you are performing text embedding, ensure you use `text-embedding-ada-002` (or the newer `text-embedding-3-small` / `text-embedding-3-large`) instead of `ada-v2`.
+2. **Verify Project Settings**: Log in to the [OpenAI Platform](https://platform.openai.com/), navigate to **Settings > Projects**, and ensure that your project has the required model enabled in the "Limits" or "Allowed Models" section.
+3. **Confirm API Endpoint**: Ensure your code hits the correct endpoint for the model type. For example, embedding models must use the `/v1/embeddings` endpoint, while chat models use `/v1/chat/completions`.
+4. **Check Azure Deployment Names**: If using Azure OpenAI, go to the Azure OpenAI Studio and verify that the `Deployment Name` matches the identifier you are passing in your API calls. Also, ensure your `api-version` parameter is correct (e.g., `2024-02-15-preview`).
+5. **Validate Billing**: Check your [Billing Overview](https://platform.openai.com/account/billing/overview) to confirm you have an active credit balance. Some accounts require a minimum $5 deposit to unlock access to specific model families.
+6. **Update Client Libraries**: Ensure your `openai` Python or Node.js package is up to date, as older versions may use legacy endpoints or formatting that trigger 404 errors.
+
+## Suggested Links
+- [https://community.openai.com/t/gpt-3-5-turbo-model-gives-me-a-404-error/83297](https://community.openai.com/t/gpt-3-5-turbo-model-gives-me-a-404-error/83297)
+- [https://learn.microsoft.com/en-us/answers/questions/1366050/azure-open-ai-restrict-answers-to-users-based-on-a](https://learn.microsoft.com/en-us/answers/questions/1366050/azure-open-ai-restrict-answers-to-users-based-on-a)
+- [https://community.openai.com/t/api-key-domain-restriction-or-token-server/404732](https://community.openai.com/t/api-key-domain-restriction-or-token-server/404732)
+- [https://community.openai.com/t/openai-error-invalidrequesterror-the-model-gpt-4-does-not-exist-or-you-do-not-have-access-to-it/376230](https://community.openai.com/t/openai-error-invalidrequesterror-the-model-gpt-4-does-not-exist-or-you-do-not-have-access-to-it/376230)
+- [https://github.com/langchain-ai/langchain/issues/13284](https://github.com/langchain-ai/langchain/issues/13284)
+- [https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096](https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096)
+- [https://learn.microsoft.com/en-us/answers/questions/1189176/how-do-i-resolve-error-deploymentnotfound-for-azur](https://learn.microsoft.com/en-us/answers/questions/1189176/how-do-i-resolve-error-deploymentnotfound-for-azur)
+- [https://notegpt.io/blog/openai-api-key-not-working](https://notegpt.io/blog/openai-api-key-not-working)
+- [https://platform.openai.com/docs/models](https://platform.openai.com/docs/models)
+- [https://platform.openai.com/docs/deprecations](https://platform.openai.com/docs/deprecations)

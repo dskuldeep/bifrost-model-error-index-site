@@ -1,0 +1,44 @@
+---
+title: "[] is too short - 'functions'"
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "validation-error-9548"
+---
+
+## Reason
+
+The `400 Bad Request` error message `[] is too short - 'functions'` specifically indicates that the `functions` (or the modern `tools`) parameter was sent as an empty array. OpenAI's API schema requires that if these keys are included in the request, they must contain at least one item.
+
+Additional causes for a `400 Bad Request` in the OpenAI API include:
+1. **Incorrect or Expired API Keys**: The key provided in the header may be malformed, inactive, or revoked.
+2. **Invalid Request Syntax or Configuration**: This includes incorrect base URLs, malformed JSON bodies, or invalid `Authorization` headers.
+3. **Exceeding Maximum Context Length**: Requests that exceed the model's maximum token limit (including both input and requested output tokens) will be rejected.
+4. **Too Many Headers**: Exceeding the internal limit of 8 request headers can trigger a `TooManyHeaders` error.
+5. **Model-Specific Restrictions**: Using parameters that a specific model does not support (e.g., specifying `dimensions` for a model that lacks that capability) results in a validation failure.
+6. **Rate Limiting and Throttling**: While usually a 429 error, certain rapid-fire validation failures under high load can present as 400 errors if the request quota logic is triggered prematurely.
+7. **Server-Side Issues**: Intermittent errors or changes in OpenAI's token counting logic can lead to unexpected validation failures.
+
+## Solution
+To resolve the `[] is too short - 'functions'` error, you must ensure that the `functions` or `tools` key is omitted from your JSON payload if no functions are being provided. 
+
+Follow these remediation steps:
+1. **Conditionally Pass Functions**: Before sending the request, check if your tools/functions array is empty. Only include the `functions` or `tools` key in the payload if the array length is greater than zero.
+2. **Verify API Credentials**: Ensure your API key is correct and currently active in the OpenAI dashboard.
+3. **Review Syntax and Headers**: Validate that your request headers are properly formatted and that you are not sending more than 8 headers total.
+4. **Manage Token Count**: Calculate the expected token usage using a library like `tiktoken` to ensure the request fits within the model's context window.
+5. **Adhere to Model Specs**: Check the OpenAI documentation to confirm that the model you are using supports all provided parameters (e.g., `response_format` or `tool_choice`).
+6. **Implement Rate Limit Handling**: Use exponential backoff and retry logic to stay within your account's rate limits.
+7. **Monitor API Status**: Check the OpenAI status page if you experience intermittent 400 errors that do not appear to be caused by your request payload.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://github.com/JudiniLabs/code-gpt-docs/issues/123](https://github.com/JudiniLabs/code-gpt-docs/issues/123)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://github.com/Nutlope/aicommits/issues/137](https://github.com/Nutlope/aicommits/issues/137)
+- [https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c](https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c)
+- [https://community.openai.com/t/4096-response-limit-vs-128-000-context-window/656864](https://community.openai.com/t/4096-response-limit-vs-128-000-context-window/656864)
+- [https://community.openai.com/t/http-400-bad-request-error-is-always/349622](https://community.openai.com/t/http-400-bad-request-error-is-always/349622)
+- [https://community.openai.com/t/maximum-token-length-allowed/137151](https://community.openai.com/t/maximum-token-length-allowed/137151)
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)
+- [https://github.com/langchain-ai/langchain/issues/16812](https://github.com/langchain-ai/langchain/issues/16812)

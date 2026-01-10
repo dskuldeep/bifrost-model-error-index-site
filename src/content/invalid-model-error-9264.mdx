@@ -1,0 +1,37 @@
+---
+title: "Invalid model stable-diffusion-v1-6. The model argument should be left blank."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "invalid-model-error-9264"
+---
+
+## Reason
+
+The 400 Bad Request error occurs when the OpenAI API receives a model identifier that it does not recognize or that is incompatible with the specific endpoint being called. 
+
+Key causes include:
+1. **Incorrect Model Specification**: The model name `stable-diffusion-v1-6` is not a valid OpenAI model. Stable Diffusion is developed by Stability AI, whereas OpenAI supports models such as GPT-4o, GPT-3.5-Turbo, DALL-E 3, and Whisper.
+2. **API Endpoint Requirements**: Certain OpenAI endpoints have strict constraints on the `model` parameter. In some cases, such as specific legacy image generation requests or internal tool calls within Assistants, the API may expect the model parameter to be left blank or omitted entirely if it is being inherited from a parent configuration.
+3. **Provider Mismatch**: This error often arises when using multi-provider gateways (like Bifrost) where a model intended for one provider is accidentally sent to the OpenAI endpoint.
+4. **General Mismatch**: There is a fundamental disconnect between the model string provided in the request payload and what the API endpoint is programmed to accept.
+
+## Solution
+To resolve the "Invalid model" error and correctly configure your API request, follow these steps:
+1. **Use a Supported OpenAI Model**: Replace `stable-diffusion-v1-6` with a valid OpenAI model identifier relevant to your task:
+    * For text: `gpt-4o`, `gpt-4-turbo`, or `gpt-3.5-turbo`.
+    * For images: `dall-e-3` or `dall-e-2`.
+2. **Verify Endpoint Constraints**: Check the official OpenAI API documentation for the specific endpoint you are calling. Determine if the `model` parameter is required, optional, or must be omitted for that specific version of the API.
+3. **Leave the Model Parameter Blank**: If the error message explicitly states "The model argument should be left blank," remove the `model` key from your JSON request body or set it to `null` (or an empty string, depending on your SDK requirements).
+4. **Review API Gateway Configurations**: If you are using a proxy or management layer, ensure that the routing logic correctly maps the requested model to the intended provider (OpenAI) and that no cross-provider model names are being passed through.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://forum.bubble.io/t/openai-api-error-http-400/263917](https://forum.bubble.io/t/openai-api-error-http-400/263917)
+- [https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c](https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c)
+- [https://www.codecademy.com/article/setting-parameters-in-open-ai](https://www.codecademy.com/article/setting-parameters-in-open-ai)
+- [https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096](https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096)
+- [https://github.com/Nutlope/aicommits/issues/137](https://github.com/Nutlope/aicommits/issues/137)
+- [https://platform.openai.com/docs/models](https://platform.openai.com/docs/models)

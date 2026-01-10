@@ -1,0 +1,51 @@
+---
+title: "Invalid chat format. Content blocks are expected to be either text or image_url type."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-format-error-9092"
+---
+
+## Reason
+
+The error "Invalid chat format. Content blocks are expected to be either text or image_url type" is a 400 Bad Request returned by the OpenAI API when the structure of the `messages` array does not comply with the multi-modal schema. 
+
+Key reasons for this error include:
+1. **Incorrect Content Block Type**: When providing content as an array of objects (multi-modal format), each object must contain a `type` field. If this field is missing or set to an unsupported value (e.g., using `"image"` instead of `"image_url"`), the API will reject the request.
+2. **Malformed Payload Structure**: The `messages` field must be an array of objects. If the `content` within those objects is also an array, every element must strictly adhere to the expected content block schema.
+3. **Incorrect Base64 Implementation**: While the API supports base64-encoded images, they cannot be sent as raw strings or under a custom key. They must be passed within an `image_url` object using a data URI (e.g., `data:image/jpeg;base64,...`).
+4. **Schema Mismatch**: Attempting to use vision-specific formatting (array-based content) with models or endpoints that only support text-only strings can trigger validation failures.
+
+## Solution
+To resolve the "Invalid chat format" error, ensure your request payload strictly adheres to the OpenAI Chat Completions multi-modal schema. Follow these steps:
+1. **Use Valid Content Types**: Ensure every object in the `content` array has a `type` property set to either `"text"` or `"image_url"`.
+2. **Format Text Blocks Correctly**: Text blocks must follow this structure:
+   ```json
+   {
+     "type": "text",
+     "text": "Your prompt here"
+   }
+   ```
+3. **Format Image Blocks Correctly**: Image blocks must follow this structure, even when using base64 data:
+   ```json
+   {
+     "type": "image_url",
+     "image_url": {
+       "url": "https://example.com/image.jpg" 
+     }
+   }
+   ```
+4. **Correctly Encode Base64 Images**: If sending base64 data, it must be prefixed with the correct MIME type and wrapped in the `image_url` key:
+   ```json
+   {
+     "type": "image_url",
+     "image_url": {
+       "url": "data:image/jpeg;base64,{BASE64_ENCODED_STRING}"
+     }
+   }
+   ```
+5. **Verify Model Compatibility**: Ensure the model you are calling (e.g., `gpt-4o`, `gpt-4-turbo`) supports vision capabilities and multi-modal content blocks.
+
+## Suggested Links
+- [https://platform.openai.com/docs/guides/vision](https://platform.openai.com/docs/guides/vision)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages](https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages)

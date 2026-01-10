@@ -1,0 +1,39 @@
+---
+title: "Logit bias value -1000 is invalid or outside of range [-100, 100]"
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-value-error-9223"
+---
+
+## Reason
+
+The error occurs because the `logit_bias` parameter in the OpenAI API request contains a value that falls outside the strictly enforced range of -100 to 100. 
+
+Key points regarding this error include:
+
+*   **Range Constraint:** The OpenAI Chat Completions API requires `logit_bias` values to be integers between -100 and 100. A value such as -1000 is mathematically invalid for this parameter.
+*   **Functionality:** The `logit_bias` parameter is used to modify the likelihood of specific tokens appearing in the model's output. A value of -100 results in a complete ban of the token, while a value of 100 results in the exclusive selection of that token.
+*   **Request Failure:** When a value outside this range is provided, the server returns a `400 Bad Request` status code because it cannot process the invalid input.
+*   **Model Compatibility:** Some newer models, specifically those in the OpenAI **o1** series (such as `o1-preview` and `o1-mini`), do not support the `logit_bias` parameter. Including it in requests to these models will also result in an error.
+
+## Solution
+To resolve this error and ensure your request is processed correctly, follow these remediation steps:
+1.  **Validate Parameter Range:** Review the `logit_bias` object in your API call. Ensure every value assigned to a token ID is an integer within the range of -100 to 100.
+2.  **Verify Model Support:** Check if the specific model you are using supports `logit_bias`. 
+    *   Models like `gpt-4o`, `gpt-4-turbo`, and `gpt-3.5-turbo` support this parameter.
+    *   The **o1** reasoning models currently do not support `logit_bias` during their beta period.
+3.  **Adjust Model Choice:** If your application requires the use of `logit_bias` to constrain outputs and your current model does not support it, switch to a compatible model like `gpt-4o`.
+4.  **Check Token IDs:** Ensure that the keys provided in the `logit_bias` dictionary are valid token IDs associated with the tokenizer used by the model (e.g., the `cl100k_base` tokenizer for GPT-4).
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/logitbias-not-working-properly-for-chatcompletions-api/80883](https://community.openai.com/t/logitbias-not-working-properly-for-chatcompletions-api/80883)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://github.com/Nutlope/aicommits/issues/137](https://github.com/Nutlope/aicommits/issues/137)
+- [https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c](https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c)
+- [https://community.openai.com/t/gpt4o-logit-bias-maximum-value-is-too-low/1006250](https://community.openai.com/t/gpt4o-logit-bias-maximum-value-is-too-low/1006250)
+- [https://community.make.com/t/receiving-unsupported-parameter-logit-bias-error-with-openai-o1-model/64208](https://community.make.com/t/receiving-unsupported-parameter-logit-bias-error-with-openai-o1-model/64208)
+- [https://help.openai.com/en/articles/5247780-using-logit-bias-to-alter-token-probability-with-the-openai-api](https://help.openai.com/en/articles/5247780-using-logit-bias-to-alter-token-probability-with-the-openai-api)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-logit_bias](https://platform.openai.com/docs/api-reference/chat/create#chat-create-logit_bias)
+- [https://platform.openai.com/docs/guides/reasoning/beta-limitations](https://platform.openai.com/docs/guides/reasoning/beta-limitations)

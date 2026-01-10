@@ -1,0 +1,47 @@
+---
+title: "Invalid image data."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "image-validation-error-9077"
+---
+
+## Reason
+
+The HTTP 400 status error in the Azure OpenAI API, specifically the "Invalid image data" message, occurs when the service cannot process the provided visual input. This is typically caused by one of the following factors:
+1. **Unsupported Image Format**: The image is not in one of the required formats. Azure OpenAI currently supports PNG (.png), JPEG (.jpeg and .jpg), WEBP (.webp), and non-animated GIF (.gif).
+2. **Exceeding Size Limits**: The individual image file size exceeds the 20 MB limit. Requests containing multiple images may also fail if the collective payload is too large or if any single image is over the limit.
+3. **Incorrect Request Configuration**: This is a frequent cause for local images. When providing a Base64-encoded image, the string must include the correct Data URI prefix (e.g., `data:image/jpeg;base64,`). Failure to include this prefix or using an incorrect JSON structure (e.g., missing the `image_url` property) will trigger this error.
+4. **Content Filter and Policy Violations**: Azure OpenAI's safety system scans images for policy violations. If an image triggers a content filter (e.g., violence, hate, or sexual content), the API may reject the request with a 400 error.
+5. **API Endpoint and Version Mismatch**: The request might be directed at an API version or endpoint that does not support vision capabilities (like GPT-4 Vision or GPT-4o), or the model deployment name might be incorrect.
+6. **URL Accessibility**: If the image is provided via a URL, the URL must be publicly accessible. The service will return an error if the URL is behind a firewall, requires authentication, or is improperly encoded.
+7. **Rate Limiting and Throttling**: While less common for the specific "Invalid image data" message, hitting service quotas or rate limits can occasionally manifest as a 400 BadRequest error.
+
+## Solution
+To resolve the "Invalid image data" error, follow these troubleshooting and remediation steps:
+1. **Validate Image Format and Size**:
+   - Confirm the image is a PNG, JPEG, WEBP, or non-animated GIF.
+   - Ensure the file size is strictly under 20 MB. If necessary, compress the image or reduce its resolution.
+2. **Verify Request Syntax and Encoding**:
+   - If using **Base64 encoding**, ensure the payload follows this format: `"url": "data:image/jpeg;base64,{BASE64_STRING}"`.
+   - If using **URL input**, verify the link is publicly reachable in a browser without needing login credentials.
+   - Ensure the `max_tokens` parameter is set, as some vision models require an explicit limit to avoid truncated responses.
+3. **Check API Configuration**:
+   - Verify that your `base_url` and `api-key` are correct for your Azure OpenAI resource.
+   - Ensure the API version in your request (e.g., `2024-02-15-preview` or later) is compatible with vision models.
+   - Confirm the deployment name matches a vision-capable model like `gpt-4o` or `gpt-4-vision-preview`.
+4. **Review Content Safety**:
+   - Check if the image could be triggering Azure OpenAI's automated content filters. Try a neutral, standard test image to see if the error persists.
+5. **Monitor Quotas**:
+   - Check the Azure Portal or Azure AI Studio to ensure you have not exceeded your Token Per Minute (TPM) or Request Per Minute (RPM) quotas, which can cause intermittent request failures.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://github.com/openai/openai-openapi/issues/15](https://github.com/openai/openai-openapi/issues/15)
+- [https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue](https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue)
+- [https://docs.spring.io/spring-ai/reference/api/image/azure-openai-image.html](https://docs.spring.io/spring-ai/reference/api/image/azure-openai-image.html)
+- [https://github.com/Azure/azure-sdk-for-net/issues/40855](https://github.com/Azure/azure-sdk-for-net/issues/40855)
+- [https://journeyofthegeek.com/2024/06/19/azure-openai-service-how-to-handle-rate-limiting/](https://journeyofthegeek.com/2024/06/19/azure-openai-service-how-to-handle-rate-limiting/)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/gpt-with-vision](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/gpt-with-vision)
+- [https://platform.openai.com/docs/guides/vision](https://platform.openai.com/docs/guides/vision)
+- [https://github.com/promptfoo/promptfoo/issues/5708](https://github.com/promptfoo/promptfoo/issues/5708)

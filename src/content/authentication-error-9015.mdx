@@ -1,0 +1,40 @@
+---
+title: "API key expired. Please renew the API key."
+provider: "google"
+provider_icon: "/logos/google.png"
+solved: true
+slug: "authentication-error-9015"
+---
+
+## Reason
+
+The `ExpiredKeyMapError` or an "API key expired" message occurs when the Google Maps Platform or Google Cloud API service determines that the provided API key is no longer authorized for use. This typically happens for several documented reasons:
+1. **Key Inactivity**: If an API key or its associated project was created more than 30 days ago and has not been used for any requests during that period, Google may expire the key mapping automatically.
+2. **Account Security Changes**: For projects created within the last 30 days, performing sensitive account actions—such as resetting the password or changing the primary email address—can cause existing API keys to expire as a security precaution.
+3. **Propagation and Recognition Delay**: When a new API key is generated, there may be a technical delay before Google's global infrastructure recognizes it. Using the key immediately after creation can result in a temporary expiration error.
+4. **Billing and Trial Status**: Google Maps Platform requires a valid billing account to remain active. If a free trial period ends, the $300 credit is exhausted, or the linked billing account is suspended, the API keys will stop working.
+5. **Project State**: If the project containing the API key was disabled or deleted in the Google Cloud Console, the key mapping will be invalidated.
+
+## Solution
+To resolve the issue, you must generate a new API key and ensure your project environment is properly configured for billing and API access.
+
+**Step 1: Generate a New API Key**
+1. Log in to the **Google Cloud Console** and select your project.
+2. Navigate to **APIs & Services** > **Credentials** using the sidebar menu.
+3. Click **+ Create Credentials** at the top of the page and select **API key**.
+4. Copy the newly generated key string.
+5. (Optional but recommended) Click **Edit API key** to apply API or application restrictions to secure your key.
+
+**Step 2: Update Your Application**
+1. Replace the expired API key with the new one in your application code, environment variables, or configuration files.
+2. Ensure the new key is correctly integrated into your deployment scripts. If you are using a frontend framework like React, restart your development server to ensure the new environment variables are loaded.
+
+**Step 3: Enable Necessary APIs and Billing**
+1. Navigate to **APIs & Services** > **Enabled APIs & Services** and confirm that the required APIs (e.g., Maps JavaScript API, Geocoding API) are active.
+2. Go to the **Billing** section of the console and verify that your project is linked to an active, valid billing account. Google Maps Platform requires a billing account to be present even for free-tier usage.
+
+## Suggested Links
+- [https://console.cloud.google.com/](https://console.cloud.google.com/)
+- [https://developers.google.com/maps/documentation/javascript/error-messages](https://developers.google.com/maps/documentation/javascript/error-messages)
+- [https://cloud.google.com/docs/authentication/api-keys](https://cloud.google.com/docs/authentication/api-keys)
+- [https://developers.google.com/maps/billing/gmp-billing](https://developers.google.com/maps/billing/gmp-billing)

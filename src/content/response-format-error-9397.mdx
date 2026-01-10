@@ -1,0 +1,36 @@
+---
+title: "\"messages\" must include \"json\" to use \"response_format\" as \"json_object\"."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "response-format-error-9397"
+---
+
+## Raw Error Text
+
+```text
+"messages" must contain the word "json" in some form, to use "response_format" of type "json_object".
+```
+
+## Reason
+
+This error occurs because of a specific constraint in the OpenAI API regarding the use of the `response_format` parameter. When you set the `type` to `json_object`, the API requires that the prompt provided in the `messages` array explicitly instructs the model to generate JSON.
+
+Key reasons for this requirement include:
+1. **Model Priming**: The API expects the input or instructions to contain the word "json" to ensure the model is properly primed to produce a valid JSON string rather than standard conversational text.
+2. **Validation Logic**: OpenAI's server-side validation checks the content of the `messages` (typically the system or user prompt) for the substring "json". If this is missing, the request is rejected with a 400 Bad Request error to prevent potential formatting mismatches.
+3. **Constraint Enforcement**: This is a safeguard to ensure that developers do not accidentally receive non-JSON responses when their application logic specifically expects a JSON-parseable object.
+
+## Solution
+To resolve the error and successfully use `json_object` as your response format, implement the following steps:
+1. **Modify the Prompt**: Ensure that your system or user messages explicitly mention "JSON". For example, change your system message to: "You are a helpful assistant designed to output JSON." or include "Return the data in a JSON format" in the user prompt.
+2. **Check Model Compatibility**: Verify that the model specified in your request supports JSON mode. This feature is available in specific models, including:
+   * `gpt-4o` and `gpt-4o-mini`
+   * `gpt-4-turbo` (and `gpt-4-1106-preview` or later)
+   * `gpt-3.5-turbo-0125` or later versions
+3. **Handle Vision Models**: Note that older vision-specific models like `gpt-4-vision-preview` do not support the `json_object` response format. If you need vision capabilities with JSON output, use `gpt-4o`.
+4. **Ensure Valid JSON Output**: When using JSON mode, the model will always output a string that parses into valid JSON. Ensure your application code is ready to parse the `content` field of the message response using a JSON parser.
+
+## Suggested Links
+- [https://platform.openai.com/docs/guides/text-generation/json-mode](https://platform.openai.com/docs/guides/text-generation/json-mode)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-response_format](https://platform.openai.com/docs/api-reference/chat/create#chat-create-response_format)

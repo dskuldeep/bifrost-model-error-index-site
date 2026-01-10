@@ -1,0 +1,36 @@
+---
+title: "Invalid model: mistra-medium"
+provider: "mistral-ai"
+provider_icon: "/file.svg"
+solved: true
+slug: "invalid-model-error-9262"
+---
+
+## Reason
+
+The "Invalid model" error (typically resulting in a 400 Bad Request) occurs when the Mistral AI API cannot recognize the model identifier specified in the request. This is caused by the following factors:
+1. **Invalid Model Name or Typo**: The model name provided might be misspelled or non-existent. For example, the raw error `mistra-medium` indicates a typo where the letter 'l' is missing from `mistral`.
+2. **Incorrect Model Identifier**: Mistral AI uses specific strings for its models. Using a generic name like `mistral-medium` may fail if the API expects a versioned identifier such as `mistral-medium-latest` or `mistral-medium-2312`.
+3. **Configuration or Syntax Errors**: The request may contain invalid syntax, such as malformed JSON, incorrect headers, or an invalid API key, which prevents the server from correctly parsing the model field.
+4. **Model Availability and Permissions**: Access to specific models (like the Medium or Large tiers) is restricted based on account permissions, subscription level, or regional availability. If the model is not enabled for your specific API key, the system will return an invalid model error.
+
+## Solution
+To resolve the "Invalid model: mistral-medium" error, follow these remediation steps:
+1. **Verify the Model Name**: Ensure the model identifier is spelled correctly. Check for common typos (e.g., `mistra` vs `mistral`) and ensure you are using the exact string required by the API.
+2. **Use Versioned Identifiers**: Update your request to use the official model aliases recommended by Mistral, such as `mistral-medium-latest`, `mistral-small-latest`, or `mistral-large-latest`.
+3. **Check Model Availability via API**: Use the GET `/v1/models` endpoint to list all models available to your specific account. This is the most reliable way to see which identifiers your API key is authorized to use.
+4. **Review Request Configuration**: Inspect your request structure. Ensure the `Authorization` header is correctly formatted as `Bearer YOUR_API_KEY` and the `Content-Type` is set to `application/json`.
+5. **Consult Official Documentation**: Refer to Mistral AI's documentation for the current list of permitted models and any requirements regarding legacy model deprecation.
+6. **Verify Account Permissions**: Access the Mistral AI console to confirm that your billing is active and that your account tier allows access to the requested model.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.make.com/t/400-invalid-model/59048](https://community.make.com/t/400-invalid-model/59048)
+- [https://learn.microsoft.com/en-us/answers/questions/2117664/my-mistral-large-2407-serverless-deployment-api-is](https://learn.microsoft.com/en-us/answers/questions/2117664/my-mistral-large-2407-serverless-deployment-api-is)
+- [https://community.make.com/t/400-invalid-model-llama-3-8b-instruct-how-is-that-possible-if-it-is-actually-permitted/53562](https://community.make.com/t/400-invalid-model-llama-3-8b-instruct-how-is-that-possible-if-it-is-actually-permitted/53562)
+- [https://community.openai.com/t/request-failed-with-status-code-400/39242](https://community.openai.com/t/request-failed-with-status-code-400/39242)
+- [https://github.com/cline/cline/issues/938](https://github.com/cline/cline/issues/938)
+- [https://forum.cloudron.io/topic/11826/using-mistral-api-seems-broken-on-cloudron](https://forum.cloudron.io/topic/11826/using-mistral-api-seems-broken-on-cloudron)
+- [https://github.com/mistralai/platform-docs-public/issues/7](https://github.com/mistralai/platform-docs-public/issues/7)
+- [https://docs.mistral.ai/getting-started/models/](https://docs.mistral.ai/getting-started/models/)
+- [https://docs.mistral.ai/api/#operation/listModels](https://docs.mistral.ai/api/#operation/listModels)

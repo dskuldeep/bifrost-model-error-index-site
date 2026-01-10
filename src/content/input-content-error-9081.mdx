@@ -1,0 +1,31 @@
+---
+title: "Sorry! We\"ve encountered an issue with repetitive patterns in your prompt. Please try again with a different prompt."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-content-error-9081"
+---
+
+## Reason
+
+The **OpenAI API** returns a 400 Bad Request error when its input validation layers detect patterns that the model identifies as invalid or problematic. This typically occurs for the following reasons:
+1. **Repetitive Token Sequences**: The prompt contains large blocks of redundant text, repeating words, or identical sequences of tokens that provide no semantic value. These are often flagged as 'gibberish' or low-entropy noise.
+2. **Safety and Quality Filtering**: The API performs automated validation to defend against prompt injection, jailbreak attempts, or brute-force attacks that use repetitive characters (e.g., thousands of dots or symbols) to confuse the model's processing logic.
+3. **Model Constraints**: The structure of the prompt does not align with the technical expectations of the specific model being used. Some models have stricter limitations regarding input entropy and the amount of redundant content they can process efficiently.
+4. **Injected 'Bad Data'**: This issue is frequently triggered when prompts dynamically include content from external, unverified sources—such as scraped web pages, OCR output, or malformed system logs—which may contain repetitive characters or boilerplate text.
+5. **Conversation History Loops**: In multi-turn chat interactions, if a previous assistant response was highly repetitive and is included in the current request's message history, the validation check may flag the entire prompt as problematic.
+
+## Solution
+To resolve the 400 status error caused by repetitive patterns, implement the following remediation steps:
+1. **Deduplicate and Clean Input**: Manually or programmatically inspect the raw prompt for redundant text. Identify and remove any sequences or tokens that repeat excessively. Ensure that identical words or phrases are not repeated dozens of times in a row.
+2. **Sanitize Data Sources**: Implement a pre-processing layer to clean data before it is sent to the API. This should include removing repetitive strings of punctuation (e.g., '.......') and filtering out noise from scraped content.
+3. **Pre-process Audio/Text Transcripts**: If your input is derived from automated sources, apply pre-processing techniques to remove noise. For audio-to-text workflows, use silence detection or noise floor removal to prevent the transcription of repetitive 'stutter' patterns.
+4. **Format Data Correctly**: Ensure the data is properly formatted and free of excessive whitespace or invalid non-printable characters that might be interpreted as a repeating pattern by the tokenizer.
+5. **Modify Prompt Structure**: If you need to provide multiple similar examples, adjust the structure to use diverse phrasing or structural elements like JSON objects or Markdown tables to break the repetitive flow.
+6. **Manage Message History**: If the error persists in a chat session, check the conversation history. If a previous message is highly repetitive, truncate the history or remove the problematic turns before resending the request.
+7. **Use Client-Side Validation**: Implement checks to validate input diversity before the API call. If the repetition of tokens exceeds a specific threshold, flag the prompt for manual review or automated cleaning.
+
+## Suggested Links
+- [https://platform.openai.com/docs/guides/moderation](https://platform.openai.com/docs/guides/moderation)
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)
+- [https://community.openai.com/t/repetitive-prompt-error-400/724391](https://community.openai.com/t/repetitive-prompt-error-400/724391)

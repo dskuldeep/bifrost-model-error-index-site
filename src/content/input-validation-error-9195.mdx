@@ -1,0 +1,44 @@
+---
+title: "Invalid 'messages[4].tool_calls': empty array. Expected an array with minimum length 1, but got an empty array instead."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-validation-error-9195"
+---
+
+## Reason
+
+The error "Invalid 'messages[4].tool_calls': empty array" occurs when an **assistant** role message in the `messages` array contains the `tool_calls` property, but the array is empty (`[]`). 
+
+According to the OpenAI API schema, the `tool_calls` field is required to have a minimum length of 1 if it is present. This issue typically arises from the following scenarios:
+1. **Reusing Previous Model Outputs**: When passing a previous model response back into the conversation history, some SDKs or methods (such as `client.beta.chat.completions.parse`) may return a message object where `tool_calls` is initialized as an empty array if no tools were triggered. Sending this object back to the API without sanitization causes a validation failure.
+2. **Manual History Construction**: If you are manually building the message history and default the `tool_calls` field to `[]` for all assistant messages, the API will reject the request.
+3. **Strict Schema Enforcement**: The OpenAI API strictly enforces that if the `tool_calls` key exists in the payload, it must contain at least one valid tool call object to be processed correctly.
+
+## Solution
+To fix this error, you must ensure that no message in your request contains an empty `tool_calls` array. Follow these steps:
+1. **Locate the specific message**: Use the index provided in the error message (e.g., index 4) to identify which message in your `messages` array is failing validation.
+2. **Remove the empty array**: If the `tool_calls` field is `[]`, remove the key entirely from the message object or set the value to `null`. An assistant message should only contain the `tool_calls` key if it actually performed a tool call.
+3. **Sanitize message history**: Before sending the request, implement a filter to strip empty `tool_calls` from your history. For example, in Python:
+
+```python
+for message in messages:
+    if "tool_calls" in message and not message["tool_calls"]:
+        del message["tool_calls"]
+```
+4. **Verify the request structure**: Ensure that every assistant message with `tool_calls` is followed by the required `tool` role messages corresponding to each `tool_call_id`.
+5. **Review API documentation**: Consult the OpenAI API reference to ensure your `messages` array strictly adheres to the expected format for tool usage.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/expects-tool-calls-when-none-are-specified/996347](https://community.openai.com/t/expects-tool-calls-when-none-are-specified/996347)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://github.com/continuedev/continue/issues/3403](https://github.com/continuedev/continue/issues/3403)
+- [https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c](https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c)
+- [https://community.openai.com/t/expected-tool-output-for-wrong-call-id/560554](https://community.openai.com/t/expected-tool-output-for-wrong-call-id/560554)
+- [https://community.openai.com/t/managing-messages-array-for-multi-user-chat-with-gpt-3-5-turbo/85976](https://community.openai.com/t/managing-messages-array-for-multi-user-chat-with-gpt-3-5-turbo/85976)
+- [https://community.openai.com/t/formatting-assistant-messages-after-tool-function-calls-in-gpt-conversations/535360](https://community.openai.com/t/formatting-assistant-messages-after-tool-function-calls-in-gpt-conversations/535360)
+- [https://platform.openai.com/docs/guides/text-generation](https://platform.openai.com/docs/guides/text-generation)
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)
+- [https://github.com/openai/openai-python/issues/2061](https://github.com/openai/openai-python/issues/2061)

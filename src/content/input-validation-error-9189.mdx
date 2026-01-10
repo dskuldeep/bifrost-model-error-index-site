@@ -1,0 +1,37 @@
+---
+title: "metadata.user_id: Input should be a valid string"
+provider: "anthropic"
+provider_icon: "/logos/anthropic.png"
+solved: true
+slug: "input-validation-error-9189"
+---
+
+## Reason
+
+The `400 Bad Request` error occurring with the Anthropic API is triggered by a validation failure in the request payload. The specific message `metadata.user_id: Input should be a valid string` indicates that the API's input validation layer (often driven by Pydantic in SDKs) expected a string value for the user identifier but received a different type, such as an integer, boolean, or null.
+
+Key reasons for this error include:
+1. **Type Mismatch in Metadata**: The `metadata.user_id` field must be a valid string. Providing a numeric ID (e.g., `12345`) without quotes will cause a validation error.
+2. **Invalid Request Structure**: The overall JSON body may not conform to the expected schema, such as malformed nested objects or missing mandatory fields.
+3. **Empty Content Requirements**: Anthropic requires that message content blocks be non-empty. Requests containing an empty `messages` array or message objects with empty `content` strings will result in a 400 error.
+4. **Unsupported Parameters**: Including extra fields in the request body that are not recognized by the specific API version can lead to rejection.
+
+## Solution
+To resolve the `400 Bad Request` and input validation errors, follow these remediation steps:
+1. **Validate metadata.user_id**: Ensure that the `user_id` within the `metadata` object is explicitly cast as a string. For example, use `"12345"` instead of `12345`. Anthropic typically uses this field as an opaque identifier for tracking.
+2. **Ensure Non-Empty Messages**: Verify that the `messages` array is present and that every message object contains non-empty text. The API will reject requests where the user or assistant content is an empty string or null.
+3. **Check Parameter Formatting**: Review the request payload against the official Anthropic API schema. Confirm that all required fields (such as `model`, `max_tokens`, and `messages`) are correctly typed and formatted.
+4. **Clean the Request Body**: Remove any deprecated or unsupported parameters that might be present in your implementation. Only use fields defined in the current API documentation to avoid unexpected validation failures.
+5. **Sanitize Identifiers**: If you are passing identifiers in the `metadata` block, ensure they do not contain restricted formats like email addresses or phone numbers if you are using specific proxy wrappers that enforce PII policies.
+
+## Suggested Links
+- [https://github.com/continuedev/continue/issues/2006](https://github.com/continuedev/continue/issues/2006)
+- [https://community.openai.com/t/content-is-required-property-error-400/486260](https://community.openai.com/t/content-is-required-property-error-400/486260)
+- [https://codingmall.com/knowledge-base/25-global/1533-how-do-i-handle-errors-and-exceptions-when-using-the-anthropic-python-sdk](https://codingmall.com/knowledge-base/25-global/1533-how-do-i-handle-errors-and-exceptions-when-using-the-anthropic-python-sdk)
+- [https://kinsta.com/knowledgebase/400-bad-request/](https://kinsta.com/knowledgebase/400-bad-request/)
+- [https://docs.anthropic.com/en/api/errors](https://docs.anthropic.com/en/api/errors)
+- [https://github.com/langgenius/dify/issues/4009](https://github.com/langgenius/dify/issues/4009)
+- [https://forum.cursor.com/t/unable-to-reach-anthropic/22766](https://forum.cursor.com/t/unable-to-reach-anthropic/22766)
+- [https://github.com/cline/cline/issues/261](https://github.com/cline/cline/issues/261)
+- [https://github.com/langchain-ai/langchain/issues/18646](https://github.com/langchain-ai/langchain/issues/18646)
+- [https://docs.anthropic.com/en/api/messages](https://docs.anthropic.com/en/api/messages)

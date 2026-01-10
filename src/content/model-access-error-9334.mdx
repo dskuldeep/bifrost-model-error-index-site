@@ -1,0 +1,43 @@
+---
+title: "The model `ft:gpt-3.5-turbo-1106:clootrack::9iymHAtj` does not exist or you do not have access to it."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "model-access-error-9334"
+---
+
+## Reason
+
+The error message "The model `ft:gpt-3.5-turbo-1106:clootrack::9iymHAtj` does not exist or you do not have access to it" is a standard 404 response indicating that the OpenAI API cannot resolve the requested model identifier under your current authentication context.
+
+Key reasons for this failure include:
+1. **Model Existence and Access Permissions**: This is the most common cause. The `ft:` prefix indicates a fine-tuned model, which is strictly scoped to the organization where it was trained. If your API key belongs to a different organization or project, or if the model has been deleted, the API will return a 404 error.
+2. **API Endpoint and Parameters**: Requests for fine-tuned models must be sent to the correct endpoint (usually Chat Completions). Using the wrong endpoint or passing incompatible parameters for a fine-tuned resource can result in a "model not found" error.
+3. **Organization Mismatch**: If you are a member of multiple organizations, the API may be defaulting to an organization that does not own the model. Accessing a fine-tuned model often requires an explicit `OpenAI-Organization` header.
+4. **Account and Billing Status**: Fine-tuned models require an active, paid subscription. If your account has a past-due balance or lacks a valid payment method, access to custom models may be restricted.
+5. **API Version and Configuration**: Using outdated client libraries (like an old version of the `openai` Python or Node.js SDK) can cause issues with resolving newer model naming conventions.
+6. **Usage Tier Restrictions**: Access to certain models or the ability to run fine-tuned models may be subject to rollout delays or restricted to specific usage tiers (e.g., Tier 1 through Tier 5).
+
+## Solution
+To resolve the 404 error and access your fine-tuned model, follow these remediation steps:
+1. **Verify Model ID and Visibility**: Confirm the model string `ft:gpt-3.5-turbo-1106:clootrack::9iymHAtj` is exactly correct. You can verify visibility by calling the GET `/v1/models` endpoint using your current API key; if the model does not appear in the returned list, your key lacks permission to access it.
+2. **Specify Organization ID**: If your account is associated with multiple organizations, explicitly set the `OpenAI-Organization` header in your API client to match the organization that owns the fine-tuned model.
+3. **Check API Key Validity**: Ensure your API key is active and has not been revoked. If necessary, generate a new key from the [OpenAI API Keys page](https://platform.openai.com/api-keys).
+4. **Review Billing Details**: Visit the [OpenAI Billing Dashboard](https://platform.openai.com/account/billing) to ensure your account is in good standing and has sufficient credits.
+5. **Update API Version and Configuration**: Update your local environment and SDKs to the latest version to ensure full compatibility with fine-tuned model identifiers.
+6. **Check Model Availability**: Confirm that the base model and fine-tuning features are available for your current account tier.
+7. **Monitor System Status**: Check the [OpenAI Status Page](https://status.openai.com/) to ensure there are no active service disruptions affecting model routing or metadata resolution.
+
+If the model is correctly listed in your dashboard but remains inaccessible via the API after these checks, contact OpenAI support for assistance with your specific fine-tuned resource.
+
+## Suggested Links
+- [https://community.openai.com/t/gpt-3-5-turbo-model-gives-me-a-404-error/83297](https://community.openai.com/t/gpt-3-5-turbo-model-gives-me-a-404-error/83297)
+- [https://github.com/Pythagora-io/gpt-pilot/issues/416](https://github.com/Pythagora-io/gpt-pilot/issues/416)
+- [https://community.openai.com/t/api-returning-404-model-not-found-all-of-a-sudden-why-and-how-to-fix/679777](https://community.openai.com/t/api-returning-404-model-not-found-all-of-a-sudden-why-and-how-to-fix/679777)
+- [https://github.com/langchain-ai/langchain/issues/13284](https://github.com/langchain-ai/langchain/issues/13284)
+- [https://community.openai.com/t/tier-5-access-but-no-o1-models-api-problem-or-bug-lets-figure-this-out/949204](https://community.openai.com/t/tier-5-access-but-no-o1-models-api-problem-or-bug-lets-figure-this-out/949204)
+- [https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096](https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096)
+- [https://community.openai.com/t/api-access-to-gpt-4-no-longer-working/610484](https://community.openai.com/t/api-access-to-gpt-4-no-longer-working/610484)
+- [https://notegpt.io/blog/openai-api-key-not-working](https://notegpt.io/blog/openai-api-key-not-working)
+- [https://platform.openai.com/docs/guides/error-codes](https://platform.openai.com/docs/guides/error-codes)
+- [https://platform.openai.com/docs/guides/fine-tuning](https://platform.openai.com/docs/guides/fine-tuning)

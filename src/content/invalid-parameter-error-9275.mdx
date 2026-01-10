@@ -1,0 +1,38 @@
+---
+title: "Invalid parameter: messages with role 'tool' must be a response to a preceeding message with 'tool_calls'."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "invalid-parameter-error-9275"
+---
+
+## Reason
+
+The error `Invalid parameter: messages with role 'tool' must be a response to a preceding message with 'tool_calls'` occurs when the conversation history sent to the OpenAI API violates the strict sequence required for tool/function calling. 
+
+Key reasons for this failure include:
+1. **Broken Message Sequence**: The OpenAI Chat Completions API requires a specific flow. Any message with the `role: "tool"` must be immediately preceded by an `assistant` message that contains a `tool_calls` array. If a `user` message or a standard `assistant` message (without tool calls) is placed between them, the request will fail.
+2. **Chat Store and Memory Integrity**: When using frameworks like LlamaIndex or LangChain, or when loading chat history from a database, the order of messages can become corrupted. If the persistence layer does not maintain strict chronological ordering, the tool response may appear orphaned.
+3. **Context Truncation**: If you are using a sliding window or a token-limit buffer for chat memory, the assistant message containing the `tool_calls` might be truncated/removed while the subsequent `tool` response message is kept. This results in a `tool` message that has no parent call.
+4. **Missing or Incorrect Tool Call IDs**: Every `tool` role message must include a `tool_call_id` that matches an `id` provided by the model in the previous turn. If these identifiers are missing or mismatched, the API treats the message as an invalid sequence.
+
+## Solution
+To resolve this error, ensure your message array follows the mandatory structural requirements for tool interactions. Follow these steps:
+1. **Enforce Strict Message Ordering**: Ensure that every message with `role: "tool"` directly follows the `assistant` message that initiated the tool call. The sequence must be: `assistant` (with `tool_calls`) -> `tool` (with `tool_call_id`).
+2. **Verify Tool Call IDs**: Check that the `tool_call_id` in your tool response message exactly matches the `id` string provided in the assistant's `tool_calls` object from the preceding message.
+3. **Audit Chat History Management**: If you are loading messages from a persistent store (like a SQL database or Redis), verify that the retrieval logic maintains the exact order of insertion.
+4. **Implement Atomic Truncation**: When pruning chat history to save tokens, ensure your logic does not separate a tool call from its response. If you must remove an assistant message containing `tool_calls`, you must also remove all associated `tool` response messages.
+5. **Review API Request Payloads**: Double-check your JSON payload structure. A valid tool response must include the `role`, `content`, and `tool_call_id` fields. For example:
+   `{"role": "tool", "tool_call_id": "call_123", "content": "result_data"}`.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://github.com/run-llama/llama_index/issues/13715](https://github.com/run-llama/llama_index/issues/13715)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://github.com/openai/openai-python/issues/1795](https://github.com/openai/openai-python/issues/1795)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://community.openai.com/t/how-to-preserve-the-context-session-of-a-conversation-with-the-api/324986](https://community.openai.com/t/how-to-preserve-the-context-session-of-a-conversation-with-the-api/324986)
+- [https://learn.microsoft.com/fr-fr/legal/cognitive-services/openai/data-privacy](https://learn.microsoft.com/fr-fr/legal/cognitive-services/openai/data-privacy)
+- [https://learn.microsoft.com/fi-fi/azure/ai-services/openai/reference](https://learn.microsoft.com/fi-fi/azure/ai-services/openai/reference)
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)

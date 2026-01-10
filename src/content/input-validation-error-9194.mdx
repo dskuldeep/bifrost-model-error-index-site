@@ -1,0 +1,42 @@
+---
+title: "Invalid type for 'messages[2].tool_calls[0].function': expected an object, but got a string instead."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-validation-error-9194"
+---
+
+## Reason
+
+The error "Invalid type for 'messages.tool_calls.function': expected an object, but got a string instead" indicates a schema validation failure within the OpenAI Chat Completions API. 
+
+Key details regarding this error include:
+1. **Data Type Mismatch**: The API expects the `function` property within the `tool_calls` array to be a structured JSON object. The error occurs because the request payload provided a string (such as just the function name) instead of that object.
+2. **Schema Requirements**: In the OpenAI API, each tool call must follow a strict hierarchy. If the model or the developer provides the function name as a direct value for the `function` key (e.g., `"function": "get_weather"`), the validation fails.
+3. **Request Context**: This typically happens in a **Bad Request (400)** scenario where the server cannot parse the instruction because it does not match the expected API specification for function calling.
+
+## Solution
+To resolve this error, you must ensure the `function` parameter is correctly formatted as an object within the `tool_calls` array. Follow these remediation steps:
+1. **Restructure the Function Parameter**: Ensure the `function` key maps to an object containing the required fields. A valid tool call structure should look like this:
+
+* `id`: The unique identifier for the tool call.
+* `type`: Set to `"function"`.
+* `function`: An object containing `name` and `arguments`.
+2. **Verify Mandatory Fields**: Inside the `function` object, include:
+
+* `name`: The string name of the function to be called.
+* `arguments`: A JSON-encoded string representing the arguments for the function.
+3. **Audit Request Payload**: Review the code responsible for generating or passing the `messages` array. If you are manually rebuilding a conversation history or handling a model's assistant message, ensure that the `tool_calls` are not being flattened or transformed into strings accidentally.
+4. **Check for Typos**: Verify that there are no misconfigurations in the keys or structural nesting of the JSON payload. Ensure that `tool_calls` is an array of objects, and each object has a `function` key that is also an object.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/api-error-message-mixes-up-object-and-string/827221](https://community.openai.com/t/api-error-message-mixes-up-object-and-string/827221)
+- [https://community.openai.com/t/request-failed-with-status-code-400/39242](https://community.openai.com/t/request-failed-with-status-code-400/39242)
+- [https://community.openai.com/t/expected-tool-output-for-wrong-call-id/560554](https://community.openai.com/t/expected-tool-output-for-wrong-call-id/560554)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://community.openai.com/t/error-400-related-to-size-of-string/840368](https://community.openai.com/t/error-400-related-to-size-of-string/840368)
+- [https://github.com/Nutlope/aicommits/issues/137](https://github.com/Nutlope/aicommits/issues/137)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages-tool_calls](https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages-tool_calls)
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)

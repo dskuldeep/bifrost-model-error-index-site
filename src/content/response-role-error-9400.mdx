@@ -1,0 +1,33 @@
+---
+title: "Expected last role User or Tool (or Assistant with prefix True) for serving but got assistant"
+provider: "mistral-ai"
+provider_icon: "/file.svg"
+solved: true
+slug: "response-role-error-9400"
+---
+
+## Reason
+
+This error occurs because the Mistral AI API enforces a specific sequence of message roles within its chat completion payload. By default, the API expects the conversation to conclude with a prompt that requires a response, which means the last message in the `messages` array must have the role of **user** or **tool**.
+
+If the last message is assigned the **assistant** role, the API interprets this as an attempt to perform "Response Prefixing" (also known as pre-filling). In this scenario, you are providing the initial words of the model's response to guide its output. However, Mistral requires an explicit flag to allow this behavior. If the final message is an `assistant` role and the `prefix` parameter is not set to `true`, the API rejects the request with a 400 Bad Request error.
+
+## Solution
+To resolve this error, adjust the structure of your message history to match Mistral's expected sequence. Follow these steps:
+1. **Verify the Message Order**: Check your `messages` array and ensure that the final object does not have the role `assistant` unless you are intentionally pre-filling the response.
+2. **Change the Last Role to User**: In most cases, ensuring the last message in the list is a `user` message will fix the error. This signals to the model that it is its turn to generate a full response.
+3. **Enable the Prefix Feature**: If you specifically want the model to continue from a pre-defined string (e.g., starting a code block with ```), keep the last message as an `assistant` role but add the `"prefix": true` field to that message object.
+4. **Check for Empty Messages**: Ensure there are no trailing empty assistant messages at the end of your list, which can sometimes be added by automated chat frameworks or UI state managers.
+5. **Review Multi-turn Logic**: If you are using frameworks like CrewAI or LangChain, ensure the integration is correctly handling tool outputs, as failing to provide a `tool` or `user` message after an assistant's tool call can trigger this validation error.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://github.com/langchain-ai/langchain/issues/23703](https://github.com/langchain-ai/langchain/issues/23703)
+- [https://community.openai.com/t/request-failed-with-status-code-400/39242](https://community.openai.com/t/request-failed-with-status-code-400/39242)
+- [https://community.openai.com/t/error-400-already-has-an-active-run/930753](https://community.openai.com/t/error-400-already-has-an-active-run/930753)
+- [https://forum.cloudron.io/topic/11826/using-mistral-api-seems-broken-on-cloudron](https://forum.cloudron.io/topic/11826/using-mistral-api-seems-broken-on-cloudron)
+- [https://community.crewai.com/t/crewai-on-mistral-api-error/1559](https://community.crewai.com/t/crewai-on-mistral-api-error/1559)
+- [https://learn.microsoft.com/en-us/answers/questions/2117664/my-mistral-large-2407-serverless-deployment-api-is](https://learn.microsoft.com/en-us/answers/questions/2117664/my-mistral-large-2407-serverless-deployment-api-is)
+- [https://jan.ai/docs/remote-models/mistralai](https://jan.ai/docs/remote-models/mistralai)
+- [https://docs.mistral.ai/guides/prefix/](https://docs.mistral.ai/guides/prefix/)
+- [https://github.com/mistralai/cookbook/blob/main/mistralai_cookbook/Prefix_Use_Cases.ipynb](https://github.com/mistralai/cookbook/blob/main/mistralai_cookbook/Prefix_Use_Cases.ipynb)

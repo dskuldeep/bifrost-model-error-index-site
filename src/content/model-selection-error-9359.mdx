@@ -1,0 +1,36 @@
+---
+title: "model: claude-3-5-sonnet"
+provider: "anthropic"
+provider_icon: "/logos/anthropic.png"
+solved: true
+slug: "model-selection-error-9359"
+---
+
+## Reason
+
+The `404 Not Found` error when requesting the `claude-3-5-sonnet` model indicates that the Anthropic API cannot find the specified resource. This typically occurs due to one of the following reasons:
+1. **Incorrect Model Identifier**: The API requires exact model strings. Using a colloquial name like `claude-3-5-sonnet` instead of the specific versioned identifier (e.g., `claude-3-5-sonnet-20240620`) or the supported alias (e.g., `claude-3-5-sonnet-latest`) can trigger this error.
+2. **Model Deprecation or Removal**: The requested model version may have been deprecated or removed from the active models list, making it unavailable for new requests.
+3. **Incorrect Endpoint or URL**: The request may be targeting an incorrect or legacy API endpoint. Errors often arise if the base URL includes extra paths or if the endpoint used is no longer valid for the Claude 3.5 series.
+4. **Resource Not Available**: The specific model might not be enabled for your account or region. This is common when using cloud-managed versions (like Vertex AI or AWS Bedrock) where models must be explicitly enabled in the console.
+
+## Solution
+To resolve the `404 Not Found` error for the `claude-3-5-sonnet` model, follow these remediation steps:
+1. **Validate the Model Identifier**: Update your request to use a valid, specific model name. For Claude 3.5 Sonnet, the correct identifier is typically `claude-3-5-sonnet-20240620` or the dynamic alias `claude-3-5-sonnet-latest`.
+2. **Check the API Endpoint**: Ensure your application is pointing to the correct Anthropic Messages API endpoint: `https://api.anthropic.com/v1/messages`. Verify that there are no typos or unnecessary subdirectories in the base URL configuration.
+3. **Verify Model Availability**: 
+- Consult the official Anthropic documentation to confirm that the model is still active.
+- If using a cloud provider (GCP or AWS), navigate to the 'Model Garden' or 'Model Access' page to ensure the Claude 3.5 Sonnet model is enabled for your project and region.
+4. **Contact Support**: If the configuration is verified but the error continues, retrieve the `request-id` from the API response headers. Provide this ID when contacting Anthropic support to help them diagnose account-specific resource issues.
+
+## Suggested Links
+- [https://www.restack.io/p/anthropic-answer-api-curl-cat-ai](https://www.restack.io/p/anthropic-answer-api-curl-cat-ai)
+- [https://community.postman.com/t/api-call-request-404-not-found/55565](https://community.postman.com/t/api-call-request-404-not-found/55565)
+- [https://support.anthropic.com/en/articles/10366432-i-m-getting-an-api-connection-error-how-can-i-fix-it](https://support.anthropic.com/en/articles/10366432-i-m-getting-an-api-connection-error-how-can-i-fix-it)
+- [https://community.make.com/t/integration-with-anthropic-claude/54102](https://community.make.com/t/integration-with-anthropic-claude/54102)
+- [https://codingmall.com/knowledge-base/25-global/1533-how-do-i-handle-errors-and-exceptions-when-using-the-anthropic-python-sdk](https://codingmall.com/knowledge-base/25-global/1533-how-do-i-handle-errors-and-exceptions-when-using-the-anthropic-python-sdk)
+- [https://www.restack.io/p/anthropic-answer-http-400-bad-request-cat-ai](https://www.restack.io/p/anthropic-answer-http-400-bad-request-cat-ai)
+- [https://www.googlecloudcommunity.com/gc/AI-ML/Can-t-Enable-any-Anthropic-Models/m-p/836124](https://www.googlecloudcommunity.com/gc/AI-ML/Can-t-Enable-any-Anthropic-Models/m-p/836124)
+- [https://www.googlecloudcommunity.com/gc/AI-ML/Not-able-to-use-anthropic-claude-3-5-model-API/m-p/830352](https://www.googlecloudcommunity.com/gc/AI-ML/Not-able-to-use-anthropic-claude-3-5-model-API/m-p/830352)
+- [https://github.com/continuedev/continue/issues/1185](https://github.com/continuedev/continue/issues/1185)
+- [https://docs.anthropic.com/en/docs/about-claude/models](https://docs.anthropic.com/en/docs/about-claude/models)

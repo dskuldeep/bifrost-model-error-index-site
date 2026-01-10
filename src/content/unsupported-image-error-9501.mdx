@@ -1,0 +1,32 @@
+---
+title: "You uploaded an unsupported image. Please make sure your image is below 20 MB in size and is of one the following formats: ['webp', 'png', 'jpeg', 'gif']."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "unsupported-image-error-9501"
+---
+
+## Reason
+
+The `400 Bad Request` error in the Azure OpenAI API, specifically the message "You uploaded an unsupported image," indicates that the provided image payload does not comply with the service's technical requirements. This is typically caused by:
+1. **Incorrect Image Format**: The image is not in one of the formats explicitly supported by the vision models. The API accepts only PNG (`.png`), JPEG (`.jpeg`, `.jpg`), WEBP (`.webp`), and non-animated GIF (`.gif`).
+2. **Exceeding Size Limit**: The image file size exceeds the 20 MB threshold permitted by the Azure OpenAI service.
+3. **Unsupported GIF Type**: While GIF is listed as a supported format, animated GIFs may be rejected or only the first frame processed, depending on the specific model deployment and API version.
+
+## Solution
+To resolve the 400 status error and ensure successful image processing, follow these remediation steps:
+1. **Validate Image Format**: Ensure the image is one of the supported types: PNG, JPEG, WEBP, or a non-animated GIF. If the image is in a different format (such as HEIC or BMP), convert it before sending the request.
+2. **Verify File Size**: Confirm that the image size is strictly below the 20 MB limit. If the image exceeds this size, use a compression tool or reduce the resolution to bring the file size within the acceptable range.
+3. **Check Image Dimensions**: Ensure that image dimensions do not exceed internal processing limits. Ideally, the shortest side should be no bigger than 768px and the longest side no bigger than 2048px to prevent unnecessary processing failures or excessive tiling costs in "high" detail mode.
+4. **Inspect Base64 Encoding**: If you are providing the image via a Base64 string, ensure it is properly prefixed with the correct data URI scheme (e.g., `data:image/jpeg;base64,`) and that the string is not corrupted or truncated.
+5. **Review Deployment and Model**: Verify that you are calling a model capable of vision tasks (such as `gpt-4o` or `gpt-4-vision-preview`) and that the deployment is correctly configured in your Azure AI Studio environment.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/maximum-number-of-images-in-a-gpt-4v-request/480233](https://community.openai.com/t/maximum-number-of-images-in-a-gpt-4v-request/480233)
+- [https://learn.microsoft.com/en-us/azure/ai-studio/how-to/data-image-add](https://learn.microsoft.com/en-us/azure/ai-studio/how-to/data-image-add)
+- [https://github.com/Azure/azure-sdk-for-net/issues/40855](https://github.com/Azure/azure-sdk-for-net/issues/40855)
+- [https://community.openai.com/t/400-errors-on-gpt-vision-api-since-today/534538](https://community.openai.com/t/400-errors-on-gpt-vision-api-since-today/534538)
+- [https://learn.microsoft.com/en-us/answers/questions/1690324/azure-openai-assistants-cant-upload-file-with-visi](https://learn.microsoft.com/en-us/answers/questions/1690324/azure-openai-assistants-cant-upload-file-with-visi)
+- [https://community.openai.com/t/gpt-4-vision-file-size-limitations/703324](https://community.openai.com/t/gpt-4-vision-file-size-limitations/703324)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/gpt-with-vision](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/gpt-with-vision)

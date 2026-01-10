@@ -1,0 +1,39 @@
+---
+title: "The response was filtered due to the prompt triggering content management policy. Please modify your prompt and retry. See our documentation for more information on content filtering policies."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "content-policy-violation-error-9021"
+---
+
+## Raw Error Text
+
+```text
+The response was filtered due to the prompt triggering Azure OpenAI"s content management policy. Please modify your prompt and retry. To learn more about our content filtering policies please read our documentation: https://go.microsoft.com/fwlink/?linkid=2198766
+```
+
+## Reason
+
+The `400 Bad Request` error in Azure OpenAI, specifically when accompanied by a content policy message, indicates that the request was rejected by the service's safety guardrails. Key causes include:
+
+*   **Content Management Policy Violation**: The prompt (input) or the generated response (completion) triggered Azure OpenAI's safety filters. These filters use neural multiclass classification models to detect harmful content across four categories: **Hate**, **Sexual**, **Violence**, and **Self-harm**. By default, content at **Medium** or **High** severity levels is blocked.
+*   **Incorrect API Keys or Configuration**: Using an expired, incorrect, or improperly configured API key. The key must match the one provided in the Azure OpenAI resource and be correctly passed in the `api-key` header.
+*   **Rate Limiting and Throttling**: Exceeding the assigned Tokens Per Minute (TPM) or Requests Per Minute (RPM) quotas for your deployment.
+*   **Invalid Request Payload**: The request body may contain malformed JSON, unsupported parameters, or an invalid `messages` array schema.
+*   **Network Issues**: Infrastructure problems such as high latency, packet loss, or incorrect firewall configurations that disrupt the API handshake.
+*   **Jailbreak and Blocklist Triggers**: Specific patterns identified as "jailbreak" attempts or matches against custom blocklists (regex) defined in the Azure OpenAI Studio.
+
+## Solution
+To resolve the content policy violation and general 400 errors, follow these steps:
+1.  **Modify the Input Prompt**: Rephrase the prompt using neutral language. Avoid ambiguous terms that might be flagged as high-risk and remove any content that overtly violates safety categories.
+2.  **Verify API Key and Headers**: Ensure your API key is active and correctly configured in your application environment. Confirm that the `Content-Type` is set to `application/json`.
+3.  **Validate Request Schema**: Double-check the payload against the official API documentation. Ensure parameters like `max_tokens`, `temperature`, and `model` are within valid ranges.
+4.  **Adjust Content Filter Settings**: Use the Azure OpenAI Studio to create a custom content filtering configuration. You can adjust the severity sliders (Low, Medium, High) for each category. Note that strict filtering is on by default.
+5.  **Apply for Modified Access**: If your use case involves sensitive but legitimate content (e.g., medical research or fiction writing), managed customers can apply for "Limited Access" to modify or disable specific content filters.
+6.  **Review Quotas and Throttling**: Check the "Quotas" tab in Azure OpenAI Studio to ensure you are not hitting TPM/RPM limits. Implement exponential backoff in your code to handle rate-limiting gracefully.
+7.  **Debug with Request IDs**: Capture the `apim-request-id` from the error response. Use this ID in Azure Monitor to inspect the specific diagnostic logs for more granular failure details.
+
+## Suggested Links
+- [https://go.microsoft.com/fwlink/?linkid=2198766](https://go.microsoft.com/fwlink/?linkid=2198766)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/content-filtering](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/content-filtering)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/content-filtering](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/content-filtering)

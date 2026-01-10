@@ -1,0 +1,24 @@
+---
+title: "Invalid value for \"tool_choice\": \"tool_choice\" is only allowed when \"tools\" are specified."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-validation-error-9157"
+---
+
+## Reason
+
+This error occurs because the `tool_choice` parameter is used to control the behavior of functions or tools, but the prerequisite `tools` configuration is missing from the API request. 
+
+The `tool_choice` parameter acts as a conditional instruction that relies on a defined list of tools. For example, if `tool_choice` is set to `"required"`, the model is forced to call at least one of the tools provided. If the `tools` array is omitted, empty, or null, the API cannot validate the request because there are no functions available for the model to choose from.
+
+## Solution
+To resolve the 400 status error regarding `tool_choice`, you must ensure the `tools` parameter is correctly defined and populated in your request. Follow these steps:
+1. Add the `tools` parameter to your API request body as an array of objects.
+2. Define at least one tool (typically a `function`) within the `tools` array, ensuring it follows the required JSON schema (including `name`, `description`, and `parameters`).
+3. Verify that the `tool_choice` value matches your intent. Use `"auto"` to let the model decide, `"none"` to prevent tool use, or `"required"` to force the model to select a tool from your defined list.
+4. Ensure you are using a model version that supports the `tools` and `tool_choice` parameters, such as `gpt-4o`, `gpt-4-turbo`, or `gpt-3.5-turbo-0125`.
+
+## Suggested Links
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-tool_choice](https://platform.openai.com/docs/api-reference/chat/create#chat-create-tool_choice)
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)

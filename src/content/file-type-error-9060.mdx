@@ -1,0 +1,34 @@
+---
+title: "Invalid MIME type. Only image types are supported."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "file-type-error-9060"
+---
+
+## Reason
+
+The OpenAI API returns a 400 Bad Request error with the message "Invalid MIME type. Only image types are supported" when a request includes a file or data stream that does not match the specific image formats expected by the endpoint. This typically happens during interactions with vision-capable models (like GPT-4o or GPT-4 Turbo) or the Files API when the purpose is set to vision.
+
+Key reasons include:
+1. **Unsupported File Format**: The API strictly supports a limited set of image formats: PNG (.png), JPEG (.jpeg and .jpg), WEBP (.webp), and non-animated GIF (.gif). Providing other formats like PDF, BMP, TIFF, or SVG will trigger this error.
+2. **Incorrect MIME Type Declaration**: The request may explicitly declare an incorrect MIME type (such as `application/octet-stream` or `text/plain`) for an actual image file, or the MIME type specified in a base64 data URI does not match one of the supported image types.
+3. **Mismatched Content**: The file's internal data structure may be corrupted or not recognized as a valid image by the server's validation layer, even if the file extension or declared MIME type appears correct.
+
+## Solution
+To resolve the "Invalid MIME type" error, ensure your file and request parameters adhere to OpenAI's image requirements. Follow these steps:
+1. **Validate File Format**: Verify that the file being uploaded is one of the supported formats: PNG, JPEG, GIF, or WEBP.
+2. **Check the MIME Type**: Ensure the `Content-Type` header or the data URI prefix correctly identifies the image. Use the following standard MIME types:
+    *   `image/png` for PNG files.
+    *   `image/jpeg` for JPEG and JPG files.
+    *   `image/webp` for WEBP files.
+    *   `image/gif` for GIF files.
+3. **Properly Encode Base64 Data**: If you are providing images via base64 strings, you must include the correct data URI prefix. For example:
+    `data:image/jpeg;base64,{your_base64_encoded_data}`
+4. **Convert Unsupported Files**: If your source file is in an unsupported format (e.g., TIFF, HEIC, or BMP), use an image processing library like Pillow (Python) or Sharp (Node.js) to convert it to JPEG or PNG before sending the request.
+5. **Verify Payload Size**: Ensure the individual image size does not exceed 20MB, as larger files may occasionally trigger generic 400 errors or processing failures.
+
+## Suggested Links
+- [https://platform.openai.com/docs/guides/vision](https://platform.openai.com/docs/guides/vision)
+- [https://platform.openai.com/docs/api-reference/files](https://platform.openai.com/docs/api-reference/files)
+- [https://community.openai.com/t/400-errors-on-gpt-vision-api-since-today/534538](https://community.openai.com/t/400-errors-on-gpt-vision-api-since-today/534538)

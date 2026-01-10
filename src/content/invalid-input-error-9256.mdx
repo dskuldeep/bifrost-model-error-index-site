@@ -1,0 +1,36 @@
+---
+title: "Additional properties are not allowed ('meta' was unexpected) - 'messages.1'"
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "invalid-input-error-9256"
+---
+
+## Reason
+
+The error "Additional properties are not allowed ('meta' was unexpected) - 'messages.1'" with a 400 status code indicates that the OpenAI API received a request payload containing parameters that do not exist in its official schema.
+
+Key reasons for this error include:
+1. **Invalid Request Structure**: The API request is not formatted according to the specifications in the OpenAI API documentation. In this case, the property `meta` was included within a message object, which the API does not recognize.
+2. **Additional Properties Not Allowed**: OpenAI uses strict JSON Schema validation for its endpoints. If a request includes fields that are not explicitly allowed (like custom metadata inside the `messages` array), the server rejects the request entirely.
+3. **Index-Specific Validation**: The suffix `- 'messages.1'` specifically points to the second item in your `messages` array (index 1). This helps identify exactly which message object contains the illegal property.
+4. **Schema Mismatch**: This error typically results from a mismatch between the expected request format and the actual format of the data being sent, often caused by trying to pass internal application data through the API call.
+
+## Solution
+To resolve the "Additional properties are not allowed" error, you must ensure your request body strictly adheres to the OpenAI API's expected format. Follow these steps:
+1. **Identify and Remove Unexpected Properties**: Locate the message object at the index specified in the error (e.g., `messages.1`) and remove any non-standard keys such as `meta`. Message objects should generally only contain keys like `role`, `content`, `name`, and `tool_calls`.
+2. **Review the API Documentation**: Consult the official OpenAI API reference for the Chat Completions endpoint to verify the permitted fields for each object in the `messages` array.
+3. **Validate Request Payload**: Before sending the request, double-check that your code or SDK is not accidentally injecting extra fields. If you are using a logging or tracing library, ensure it is not modifying the payload sent to the API.
+4. **Use Structured Outputs Correctly**: If you are utilizing Structured Outputs, ensure your JSON schema is correctly defined. If `additionalProperties` is set to `false` in your schema, the data sent must match the schema exactly with no extra fields.
+5. **Store Metadata Externally**: If you need to associate metadata with a specific message for your application's logic, store that data in your own database mapped to the OpenAI response ID rather than attempting to pass it through the message object in the API request.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://github.com/openai/openai-node/issues/1161](https://github.com/openai/openai-node/issues/1161)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://community.openai.com/t/request-failed-with-status-code-400/39242/25](https://community.openai.com/t/request-failed-with-status-code-400/39242/25)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://openai.com/index/introducing-structured-outputs-in-the-api/](https://openai.com/index/introducing-structured-outputs-in-the-api/)
+- [https://community.openai.com/t/400-additional-properties-are-not-allowed-file-path-was-unexpected/933897](https://community.openai.com/t/400-additional-properties-are-not-allowed-file-path-was-unexpected/933897)
+- [https://platform.openai.com/docs/guides/structured-outputs](https://platform.openai.com/docs/guides/structured-outputs)
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)

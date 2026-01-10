@@ -1,0 +1,30 @@
+---
+title: "Json mode is not enabled for models/gemini-2.0-flash-thinking-exp-1219"
+provider: "google"
+provider_icon: "/logos/google.png"
+solved: true
+slug: "configuration-error-9017"
+---
+
+## Reason
+
+The 400 status error, specifically the message `Json mode is not enabled for models/gemini-2.0-flash-thinking-exp-1219`, indicates that the model you are targeting does not support the JSON output mode feature. 
+
+This error occurs because the `gemini-2.0-flash-thinking-exp-1219` model is an experimental reasoning model designed to generate a "thinking process" or chain-of-thought as part of its response. Because these thinking models focus on natural language reasoning, they are currently restricted to text-only outputs and do not support structured JSON mode (setting `response_mime_type` to `application/json`) or built-in tool usage. This is a client-side configuration issue where the request settings are incompatible with the specific capabilities of the experimental model.
+
+## Solution
+To resolve the 400 status error caused by enabling JSON mode on an unsupported model, you must adjust your request configuration. Follow these steps:
+1. **Switch to a Supported Model**: Update your configuration to use a Gemini model that supports JSON mode and structured outputs. Recommended models include `gemini-1.5-flash`, `gemini-1.5-pro`, or the non-thinking variant `gemini-2.0-flash-exp`.
+2. **Remove JSON Mode Constraints**: If you must use the `gemini-2.0-flash-thinking-exp` model for its reasoning capabilities, you must disable JSON mode in your `generation_config`. Remove any `response_mime_type: "application/json"` or `response_schema` parameters from your API call.
+3. **Verify Model Compatibility**: Before implementing structured outputs, ensure that the chosen model version is compatible with the features you are using. You can programmatically check model capabilities using the `models.get` or `models.list` methods in the Gemini API.
+4. **Consult Official Documentation**: Refer to the latest Gemini API documentation to confirm the specific feature set and limitations for experimental or thinking-mode models.
+
+## Suggested Links
+- [https://www.hostinger.com/tutorials/how-to-fix-400-bad-request-error](https://www.hostinger.com/tutorials/how-to-fix-400-bad-request-error)
+- [https://discuss.ai.google.dev/t/gemini-2-0-flash-thinking-exp-is-failing-for-json-mode/58241](https://discuss.ai.google.dev/t/gemini-2-0-flash-thinking-exp-is-failing-for-json-mode/58241)
+- [https://kinsta.com/knowledgebase/400-bad-request/](https://kinsta.com/knowledgebase/400-bad-request/)
+- [https://www.googlecloudcommunity.com/gc/Workspace-Q-A/Seeing-400-error-while-trying-to-send-a-mail/m-p/536255](https://www.googlecloudcommunity.com/gc/Workspace-Q-A/Seeing-400-error-while-trying-to-send-a-mail/m-p/536255)
+- [https://developers.google.com/drive/api/guides/handle-errors](https://developers.google.com/drive/api/guides/handle-errors)
+- [https://www.dreamhost.com/blog/400-bad-request-error/](https://www.dreamhost.com/blog/400-bad-request-error/)
+- [https://ai.google.dev/gemini-api/docs/json-mode](https://ai.google.dev/gemini-api/docs/json-mode)
+- [https://ai.google.dev/gemini-api/docs/models/gemini](https://ai.google.dev/gemini-api/docs/models/gemini)

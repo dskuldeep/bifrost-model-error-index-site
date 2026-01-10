@@ -1,0 +1,58 @@
+---
+title: "1 validation error for Request body -> response_format extra fields not permitted (type=value_error.extra)"
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "validation-error-9518"
+---
+
+## Reason
+
+The error message `1 validation error for Request body -> response_format extra fields not permitted (type=value_error.extra)` indicates that the API request contains unauthorized or unrecognized fields within the `response_format` object.
+
+This typically happens for the following reasons:
+1. **Schema Mismatch**: The `response_format` parameter includes keys that are not part of the OpenAI API specification. For example, trying to pass a schema directly under `response_format` rather than nesting it within a `json_schema` property.
+2. **Incorrect Structure**: The API expects a specific structure for the request body. If using "JSON Mode," it expects `{"type": "json_object"}`. If using "Structured Outputs," it expects `{"type": "json_schema", "json_schema": {...}}`. Adding any other fields at the top level of this object triggers a validation failure.
+3. **SDK Limitations**: You may be using an outdated version of the OpenAI SDK that does not recognize newer fields (like `json_schema`), causing the local validator to flag them as "extra" fields before the request is even sent.
+
+## Solution
+To resolve the "400 status error" and the validation failure, you must ensure the request body strictly adheres to the OpenAI API's expected structure. Follow these steps:
+
+**1. Verify API Key and Headers**
+Ensure your API key is valid and the `Authorization` header is correctly formatted as `Bearer YOUR_API_KEY`.
+
+**2. Validate the response_format Object**
+Review your code to ensure the `response_format` matches one of the two supported formats:
+
+- **For JSON Mode**: 
+  ```json
+  "response_format": { "type": "json_object" }
+  ```
+- **For Structured Outputs**: 
+  ```json
+  "response_format": {
+    "type": "json_schema",
+    "json_schema": {
+      "name": "example_schema",
+      "schema": { ... },
+      "strict": true
+    }
+  }
+  ```
+
+**3. Remove Extra Fields**
+Scan the `response_format` block and remove any non-permitted fields. Common mistakes include adding metadata, custom keys, or placing the `strict` flag outside of the `json_schema` wrapper.
+
+**4. Check for Supported Models and Media Types**
+Ensure that the model you are calling supports the requested `response_format`. For example, older models may not support `json_schema`. Additionally, ensure that media types in the `content` object match supported OpenAI formats.
+
+**5. Update the OpenAI Library**
+Run `pip install --upgrade openai` (Python) or `npm install openai@latest` (Node.js) to ensure your client library recognizes the latest API parameters.
+
+**6. Review Official API Documentation**
+Always cross-reference your request structure with the official OpenAI API Reference to ensure all nested fields are valid and correctly placed.
+
+## Suggested Links
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-response_format](https://platform.openai.com/docs/api-reference/chat/create#chat-create-response_format)
+- [https://platform.openai.com/docs/guides/structured-outputs](https://platform.openai.com/docs/guides/structured-outputs)
+- [https://platform.openai.com/docs/guides/text-generation/json-mode](https://platform.openai.com/docs/guides/text-generation/json-mode)

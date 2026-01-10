@@ -1,0 +1,56 @@
+---
+title: "'parameters' is a required property - 'functions.0'"
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "validation-error-9523"
+---
+
+## Reason
+
+The HTTP 400 Bad Request error `'parameters' is a required property - 'functions.0'` occurs when the Azure OpenAI API receives a request containing a function definition that lacks the mandatory JSON Schema `parameters` field. 
+
+Key causes include:
+1. **Missing Mandatory Property**: In the `functions` array of your request payload, the first function object (index 0) is missing the `parameters` key. The API requires this field even if the function accepts no arguments.
+2. **Incorrect Schema Structure**: The request payload may be malformed or fail to follow the strict JSON Schema requirements expected by the Azure OpenAI API for function calling.
+3. **API Version Compatibility**: Using an API version that supports function calling (such as `2023-07-01-preview` or later) without adhering to the specific schema requirements for that version. Older versions may not recognize the function calling parameters correctly, or newer versions may have stricter validation rules.
+4. **Invalid JSON Payload**: Syntax errors or incorrectly named fields in the JSON body can prevent the server from correctly parsing the `parameters` property, leading to a validation failure.
+
+## Solution
+To resolve the `'parameters' is a required property` error, ensure that every function definition in your `functions` array includes a valid `parameters` object. Follow these steps:
+1. **Verify the Function Schema**: Check the first item in your `functions` array (`functions[0]`). Ensure it contains a `parameters` key. If your function does not require any input arguments, the `parameters` property should still be present and defined as an empty JSON Schema object:
+
+```json
+"parameters": {
+  "type": "object",
+  "properties": {}
+}
+```
+2. **Check JSON Payload Integrity**: Validate that your entire request body is a correctly formatted JSON string. Ensure there are no trailing commas or missing brackets that could cause the `parameters` field to be ignored by the parser.
+3. **Align with API Version**: Confirm you are using a supported Azure OpenAI API version (e.g., `2023-07-01-preview`, `2023-12-01-preview`, or `2024-02-15-preview`). Ensure your implementation matches the specific requirements of that version.
+4. **Example of a Correct Function Definition**: Ensure your structure matches this pattern:
+
+```json
+{
+  "name": "get_weather",
+  "description": "Get the current weather",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "location": {"type": "string"}
+    },
+    "required": ["location"]
+  }
+}
+```
+5. **Transition to Tools (Optional)**: If you are using newer models (like GPT-4 Turbo), consider migrating from the deprecated `functions` parameter to the `tools` parameter, which uses a similar but updated structure.
+
+## Suggested Links
+- [https://github.com/FlowiseAI/Flowise/issues/195](https://github.com/FlowiseAI/Flowise/issues/195)
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://forum.bubble.io/t/openai-api-error-http-400/263917](https://forum.bubble.io/t/openai-api-error-http-400/263917)
+- [https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue](https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue)
+- [https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md](https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md)
+- [https://community.openai.com/t/azure-open-ai-assistant-api-connection-error/662198](https://community.openai.com/t/azure-open-ai-assistant-api-connection-error/662198)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)

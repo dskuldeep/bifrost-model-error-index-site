@@ -1,0 +1,39 @@
+---
+title: "prompt is too long: 103078 tokens > 102398 maximum"
+provider: "anthropic"
+provider_icon: "/logos/anthropic.png"
+solved: true
+slug: "input-length-error-9112"
+---
+
+## Reason
+
+The HTTP 400 Bad Request error, specifically categorized as an `invalid_request_error`, occurs when an Anthropic API request exceeds the maximum allowed token limit for the context window. 
+
+Key reasons for this error include:
+1. **Token Limit Exceeded**: The specific message `prompt is too long: 103078 tokens > 102398 maximum` indicates that the cumulative token count of the request—including the system prompt, user messages, assistant conversation history, and tool definitions—has exceeded the model's capacity.
+2. **Context Window Constraints**: Different Anthropic models have varying context windows (e.g., legacy Claude 2 models supported ~100k tokens, while Claude 3 and 3.5 models generally support 200k tokens). If a model is forced to process more than its hard limit, the API rejects the request.
+3. **Request Content Structure**: This error is triggered during the validation phase of the request, meaning the format is correct but the content volume is mathematically invalid for the selected model's infrastructure.
+
+## Solution
+To resolve the "prompt is too long" error, you must ensure your input stays within the model's token constraints. Follow these steps:
+1. **Trim the Prompt**: Manually or programmatically remove non-essential parts of the text to bring the token count below the maximum limit.
+2. **Optimize Prompt Length**: 
+   - Use clear, concise language to convey information.
+   - Provide highly specific instructions to avoid unnecessary preamble.
+   - Utilize system messages effectively to set global context rather than repeating it in every user turn.
+3. **Implement Pre-flight Token Counting**: Use the official Anthropic `count_tokens` API endpoint or the `@anthropic-ai/sdk` to calculate the exact token count before sending the full request. This allows you to catch length issues client-side.
+4. **Dynamic Trimming Logic**: Build a mechanism that automatically truncates the oldest parts of the conversation history or reduces the size of included documents when a certain token threshold (e.g., 95% of the limit) is reached.
+5. **Retry with Adjusted Prompt**: If an automated process detects this error, configure a retry logic that summarizes the current context or trims the input and resubmits the request.
+
+## Suggested Links
+- [https://www.restack.io/p/anthropic-answer-http-400-bad-request-cat-ai](https://www.restack.io/p/anthropic-answer-http-400-bad-request-cat-ai)
+- [https://www.restack.io/p/anthropic-answer-rate-limits-cat-ai](https://www.restack.io/p/anthropic-answer-rate-limits-cat-ai)
+- [https://dev.to/brando90/best-practices-to-handle-prompts-that-are-too-long-for-the-llm-api-eg-anthropic-openai-2m4a](https://dev.to/brando90/best-practices-to-handle-prompts-that-are-too-long-for-the-llm-api-eg-anthropic-openai-2m4a)
+- [https://forum.cursor.com/t/unable-to-reach-anthropic/22766](https://forum.cursor.com/t/unable-to-reach-anthropic/22766)
+- [https://www.restack.io/p/anthropic-answers-api-limits-cat-ai](https://www.restack.io/p/anthropic-answers-api-limits-cat-ai)
+- [https://github.com/cline/cline/issues/923](https://github.com/cline/cline/issues/923)
+- [https://community.openai.com/t/error-code-400-max-token-length/716391](https://community.openai.com/t/error-code-400-max-token-length/716391)
+- [https://docs.anthropic.com/en/api/rate-limits](https://docs.anthropic.com/en/api/rate-limits)
+- [https://signoz.io/guides/claude-api-latency/](https://signoz.io/guides/claude-api-latency/)
+- [https://docs.anthropic.com/en/docs/build-with-claude/token-counting](https://docs.anthropic.com/en/docs/build-with-claude/token-counting)

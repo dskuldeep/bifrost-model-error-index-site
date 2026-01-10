@@ -1,0 +1,42 @@
+---
+title: "Failed to download image from https://quizizz-static.s3.amazonaws.com/_media/quizzes/53170066-0929-44ac-bf56-fb84c2b4acf6-v2. Image size exceeds the limit."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "image-download-error-9073"
+---
+
+## Reason
+
+The HTTP 400 "Bad Request" error in the OpenAI API occurs when the server cannot process a request due to invalid syntax, configuration errors, or violated constraints. In the context of the provided error message, the failure is specifically caused by the following:
+
+**Exceeded Image Size Limit**
+
+The primary cause is the error message "Image size exceeds the limit." OpenAI's Vision models (such as GPT-4o and GPT-4-turbo) impose a strict file size limit of 20MB per image. When you provide an image via a URL, OpenAI's backend attempts to download the file; if the file at that source exceeds this limit, the download fails and triggers a 400 error.
+
+**Invalid Request Syntax or Configuration**
+
+Beyond file size, a 400 error can indicate that the request payload is malformed. This includes invalid parameters, unsupported model configurations, or data structures that do not conform to the API's schema.
+
+**Incorrect or Invalid Data Type**
+
+The API expects specific data types (e.g., an array of message objects for Chat Completions). Providing an unexpected data type or an unsupported image format (OpenAI currently supports PNG, JPEG, WEBP, and non-animated GIF) will result in a 400 status code.
+
+## Solution
+To resolve the 400 status error related to image processing in the OpenAI API, follow these remediation steps:
+1. **Resize the Image**: Ensure the image dimensions are optimized for the Vision API. For high-resolution mode, ensure the shortest side is no larger than 768px and the longest side is no larger than 2048px. Images larger than this will be downscaled by the API, which can consume more tokens without improving accuracy.
+2. **Check Image File Size**: Verify that the image file size does not exceed 20MB. If you are providing the image as a base64-encoded string, ensure the original unencoded file is under the 20MB threshold. If the image is hosted at a URL, check the file size at that source.
+3. **Validate Request Parameters**: Ensure that all parameters in your API request are valid. This includes confirming the model name (e.g., `gpt-4o`), checking that the `image_url` object is correctly structured, and ensuring no unsupported fields are included in the JSON body.
+4. **Verify Image Format**: Confirm that the image being processed is one of the supported formats: `.png`, `.jpeg`, `.jpg`, `.webp`, or non-animated `.gif`.
+5. **Inspect Network Traffic**: Use debugging tools or middleware (such as Postman) to inspect the raw request and response traffic. This helps identify if the image is being corrupted during transmission or if the source URL is returning a large header that might interfere with the download.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c](https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c)
+- [https://community.openai.com/t/request-failed-with-status-code-400/39242](https://community.openai.com/t/request-failed-with-status-code-400/39242)
+- [https://community.openai.com/t/opena-ai-bad-request-error-400/666947](https://community.openai.com/t/opena-ai-bad-request-error-400/666947)
+- [https://community.openai.com/t/gpt-4-vision-file-size-limitations/703324](https://community.openai.com/t/gpt-4-vision-file-size-limitations/703324)
+- [https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096](https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096)
+- [https://community.openai.com/t/image-interpretation-are-token-limits-practical/741508](https://community.openai.com/t/image-interpretation-are-token-limits-practical/741508)
+- [https://platform.openai.com/docs/guides/vision](https://platform.openai.com/docs/guides/vision)

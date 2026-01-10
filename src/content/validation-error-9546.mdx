@@ -1,0 +1,39 @@
+---
+title: "'messages' is a required property"
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "validation-error-9546"
+---
+
+## Reason
+
+The 400 "Bad Request" error in the OpenAI API indicates that the server cannot process the request due to a client-side validation failure. Specifically, the error message `'messages' is a required property` identifies a missing mandatory parameter in the request payload.
+
+Key reasons for this error include:
+1. **Missing Required Properties**: In OpenAI Chat Completion requests, the `messages` field is mandatory and must be an array of message objects. If this key is missing, empty, or misspelled (e.g., using `message` instead of `messages`), the request will fail.
+2. **Invalid Syntax or Configuration**: The request body may contain malformed JSON, incorrect data types, or invalid API headers that prevent the server from parsing the data correctly.
+3. **Rate Limiting and Throttling**: While usually resulting in a 429 status, exceeding specific usage tiers or hitting rapid-fire limits can sometimes trigger a 400 error in certain network configurations or middleware environments.
+4. **Model-Specific Constraints**: Certain parameters are only valid for specific models. For instance, providing a `dimensions` parameter for a model that does not support it will trigger an invalid request error.
+5. **Header Limitations**: OpenAI may impose restrictions on the number or size of headers. Including an excessive number of custom headers or overly large headers can lead to a 400 Bad Request response.
+
+## Solution
+To resolve the 400 status error, ensure your request adheres to the OpenAI API specification by following these steps:
+1. **Include Required Properties**: Verify that the `messages` property is included in the request body for Chat Completion endpoints. The value must be an array of objects (e.g., `[{"role": "user", "content": "Hello"}]`).
+2. **Verify API Keys and Headers**: Check that your API key is valid, active, and correctly passed in the `Authorization` header using the `Bearer {API_KEY}` format.
+3. **Check Request Syntax and Configuration**: Ensure the payload is valid JSON and that all field names and data types match the expected schema defined in the official API reference.
+4. **Adhere to Rate Limits**: Monitor your token and request usage. If you are hitting limits, implement an exponential backoff strategy or request a quota increase through the OpenAI dashboard.
+5. **Comply with Model-Specific Constraints**: Review the requirements for the specific model you are calling. Ensure parameters like `temperature`, `top_p`, or `max_tokens` are within the allowed ranges for that model.
+6. **Inspect Network Traffic**: Use a tool like Postman, `curl -v`, or a network interceptor to inspect the raw HTTP request. Look for unexpected header modifications or payload stripping that might occur during transit.
+
+## Suggested Links
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://github.com/Nutlope/aicommits/issues/137](https://github.com/Nutlope/aicommits/issues/137)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c](https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c)
+- [https://learn.microsoft.com/fi-fi/azure/ai-services/openai/reference](https://learn.microsoft.com/fi-fi/azure/ai-services/openai/reference)
+- [https://cookbook.openai.com/examples/how_to_handle_rate_limits](https://cookbook.openai.com/examples/how_to_handle_rate_limits)
+- [https://www.hostinger.in/tutorials/how-to-fix-400-bad-request-error](https://www.hostinger.in/tutorials/how-to-fix-400-bad-request-error)
+- [https://community.openai.com/t/problem-with-required-property-when-function-calling/273635](https://community.openai.com/t/problem-with-required-property-when-function-calling/273635)

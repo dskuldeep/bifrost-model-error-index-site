@@ -1,0 +1,43 @@
+---
+title: "Invalid role specified: the role must be one of ['system', 'assistant', 'user', 'function']."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-validation-error-9219"
+---
+
+## Raw Error Text
+
+```text
+'useer' is not one of ['system', 'assistant', 'user', 'function'] - 'messages.1.role'
+```
+
+## Reason
+
+The error `"useer" is not one of ['system', 'assistant', 'user', 'function'] - 'messages.1.role'` is an input validation failure, typically returning an HTTP 400 status code. This occurs because the OpenAI API expects the `role` attribute within the `messages` array to match a specific set of predefined strings.
+
+In this specific instance, a typo was detected where the value `"useer"` was provided instead of the correct value `"user"`. The API's error message includes a path—`messages.1.role`—which indicates that the invalid value is located in the second object (index 1) of the messages array. 
+
+Valid roles accepted by the OpenAI Chat Completions API include:
+1. `system`: Used to set the behavior of the assistant.
+2. `user`: Used for instructions or queries provided by the end user.
+3. `assistant`: Used to represent previous responses from the model.
+4. `function` (or `tool` in newer API versions): Used to provide the output of a function call back to the model.
+
+## Solution
+To resolve this validation error and fix the HTTP 400 response, you must correct the typo in your request payload. Follow these remediation steps:
+1. Locate the `messages` array in your API request body.
+2. Identify the specific object indexed at `1` (the second message in the list).
+3. Correct the typo by changing the `role` value from `"useer"` to `"user"`.
+4. Verify that all other message objects in the array use one of the permitted roles: `"system"`, `"user"`, `"assistant"`, or `"function"` (or `"tool"` / `"developer"` depending on the specific model and API version being used).
+5. Double-check that all other parameters, such as `content` or `name`, are correctly formatted and that all required headers (like `Authorization` and `Content-Type`) are present.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/o1-models-do-not-support-system-role-in-chat-completion/953880](https://community.openai.com/t/o1-models-do-not-support-system-role-in-chat-completion/953880)
+- [https://community.openai.com/t/error-400-already-has-an-active-run/930753](https://community.openai.com/t/error-400-already-has-an-active-run/930753)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://community.openai.com/t/error-missing-required-parameter-role-when-sending-a-message-to-a-thread-via-openai-api/989022](https://community.openai.com/t/error-missing-required-parameter-role-when-sending-a-message-to-a-thread-via-openai-api/989022)
+- [https://community.openai.com/t/i-am-receiving-an-error-status-code-400/351121](https://community.openai.com/t/i-am-receiving-an-error-status-code-400/351121)
+- [https://community.openai.com/t/different-roles-in-the-api-and-their-use-cases/718199](https://community.openai.com/t/different-roles-in-the-api-and-their-use-cases/718199)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages](https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages)

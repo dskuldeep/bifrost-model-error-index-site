@@ -1,0 +1,40 @@
+---
+title: "413: Maximum content size limit (26214400) exceeded (26417812 bytes read)"
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "content-size-limit-error-9024"
+---
+
+## Reason
+
+The `413: Maximum content size limit exceeded` error occurs when the request payload sent to the OpenAI API exceeds the server-defined limit of 26,214,400 bytes (exactly 25 MiB). In this specific log, the transmitted data was 26,417,812 bytes, which triggered the restriction.
+
+Key factors contributing to this error include:
+1.  **Whisper API Constraints**: The OpenAI Whisper (speech-to-text) endpoint has a hard limit of 25 MB per audio file upload.
+2.  **Vector Store Limits**: Uploading files to the Assistants API for File Search or Vector Stores is subject to size restrictions; if a file or the collective batch exceeds the limit, the server rejects the request.
+3.  **Base64 Encoding Overhead**: Sending images or files as Base64-encoded strings increases the total payload size by approximately 33%. A file that is 20 MB on disk may exceed 25 MB once encoded into a JSON request.
+4.  **Resource Management**: This server-side restriction is implemented to prevent service degradation and manage server resources by blocking excessively large payloads that could lead to timeouts or abuse.
+
+## Solution
+To resolve the `413: Maximum content size limit exceeded` error, ensure that your request payload is within the 25 MB limit by implementing the following strategies:
+1.  **Split the file into smaller pieces**: Break large files into smaller segments. For audio files (Whisper), use tools like FFmpeg or libraries like `pydub` to segment the audio into 20-24 MB chunks. Ensure you do not split in the middle of a word to maintain transcription accuracy.
+2.  **Optimize file size and format**: Reduce the file size without significant quality loss by using more efficient formats:
+    *   **Audio**: Convert high-bitrate files to compressed formats like MP3, AAC, or OGG/Opus.
+    *   **Images**: Use PNG optimization or convert to WebP/JPEG if appropriate for the specific endpoint.
+3.  **Use Multipart/Form-Data**: Whenever possible, upload files as binary data via `multipart/form-data` instead of Base64-encoding them in a JSON body. This avoids the 33% size increase associated with Base64 encoding.
+4.  **Use streaming or batch uploads**: For large datasets, utilize batch upload endpoints or stream the data in smaller, manageable chunks if the specific API feature supports it.
+5.  **Adjust client/proxy configuration**: 
+    *   If using Node.js with the `axios` library (common in older OpenAI SDK versions), you may need to explicitly set `maxBodyLength: Infinity` or a specific byte value in your request configuration.
+    *   If you are running the request through a proxy (e.g., Nginx), ensure the `client_max_body_size` directive is configured to allow at least 25 MB.
+
+## Suggested Links
+- [https://community.openai.com/t/error-sending-image-to-openai-apierror-413-the-data-value-transmitted-exceeds-the-capacity-limit/469279](https://community.openai.com/t/error-sending-image-to-openai-apierror-413-the-data-value-transmitted-exceeds-the-capacity-limit/469279)
+- [https://community.openai.com/t/help-with-413-the-data-value-transmitted-exceeds-the-capacity-limit-error-in-openai-vector-store-upload/987190](https://community.openai.com/t/help-with-413-the-data-value-transmitted-exceeds-the-capacity-limit-error-in-openai-vector-store-upload/987190)
+- [https://github.com/open-webui/open-webui/discussions/6429](https://github.com/open-webui/open-webui/discussions/6429)
+- [https://community.openai.com/t/how-do-i-get-whisper-to-allow-larger-files-in-the-request/572288](https://community.openai.com/t/how-do-i-get-whisper-to-allow-larger-files-in-the-request/572288)
+- [https://kinsta.com/knowledgebase/413-request-entity-too-large-error/](https://kinsta.com/knowledgebase/413-request-entity-too-large-error/)
+- [https://signoz.io/guides/open-ai-api-latency/](https://signoz.io/guides/open-ai-api-latency/)
+- [https://community.openai.com/t/whisper-maximum-content-size-limit-exceeded/83925](https://community.openai.com/t/whisper-maximum-content-size-limit-exceeded/83925)
+- [https://invertedstone.com/effective-ways-to-reduce-openai-api-costs/](https://invertedstone.com/effective-ways-to-reduce-openai-api-costs/)
+- [https://platform.openai.com/docs/guides/speech-to-text/longer-inputs](https://platform.openai.com/docs/guides/speech-to-text/longer-inputs)

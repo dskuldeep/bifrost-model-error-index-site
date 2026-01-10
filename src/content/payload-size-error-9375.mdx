@@ -1,0 +1,38 @@
+---
+title: "Request payload size exceeds the limit: 20971520 bytes."
+provider: "google"
+provider_icon: "/logos/google.png"
+solved: true
+slug: "payload-size-error-9375"
+---
+
+## Reason
+
+The `400 Bad Request` error with the message "Request payload size exceeds the limit: 20971520 bytes" occurs because the data sent in an HTTP request to a Google API exceeds the hard limit of 20 MB (20,971,520 bytes). 
+
+This limit is strictly enforced to prevent server overloads and is common in the following scenarios:
+1. **BigQuery Streaming**: When using the `tabledata.insertAll` method to stream data, individual requests are limited by the total payload size.
+2. **Google Workspace APIs**: Services like the Google Sheets API have specific limits on the volume of data that can be updated in a single batch request.
+3. **API Gateways**: Google Cloud endpoints or infrastructure components often impose a 20 MB ingress limit on standard HTTP requests.
+4. **Data Density**: Sending a high volume of rows or very large individual records in a single JSON body can easily trigger this threshold.
+
+## Solution
+To resolve the "Request payload size exceeds the limit" error, you must restructure your data transmission to comply with Google's payload constraints. Follow these steps:
+1. **Split Data into Smaller Requests**: Break your dataset into smaller chunks or batches on the client side. Ensure each individual HTTP request remains well under the 20 MB limit to account for JSON overhead and headers.
+2. **Adjust Request Frequency**: Instead of sending one massive payload, send smaller requests more frequently. Ensure your application handles potential rate-limiting (429 errors) if you significantly increase the number of requests.
+3. **Use Appropriate Tools and APIs**:
+    * For BigQuery, use **Load Jobs** (`bq load` or the `jobs.insert` API) for large datasets instead of streaming inserts. Load jobs have much higher limits and are better suited for large-scale data ingestion.
+    * Use the `bq` command-line tool which automatically handles many aspects of large data uploads.
+4. **Implement Chunked Uploads**: If you are uploading files or media, use the **Resumable Upload** protocol. This allows you to upload data in smaller fragments and provides better reliability for large payloads.
+5. **Monitor Payload Size**: Implement client-side validation to calculate the byte size of your JSON payload before sending it. If it exceeds 15-18 MB, automatically split it into a new request.
+
+## Suggested Links
+- [https://kinsta.com/knowledgebase/400-bad-request/](https://kinsta.com/knowledgebase/400-bad-request/)
+- [https://discuss.ai.google.dev/t/request-payload-size-exceeds-the-limit/4253](https://discuss.ai.google.dev/t/request-payload-size-exceeds-the-limit/4253)
+- [https://cloud.google.com/knowledge/kb/error-400-bad-request-request-payload-size-exceeds-the-limit-000004321](https://cloud.google.com/knowledge/kb/error-400-bad-request-request-payload-size-exceeds-the-limit-000004321)
+- [https://www.hostinger.com/tutorials/how-to-fix-400-bad-request-error](https://www.hostinger.com/tutorials/how-to-fix-400-bad-request-error)
+- [https://developers.google.com/sheets/api/limits](https://developers.google.com/sheets/api/limits)
+- [https://forum.knime.com/t/google-sheets-payload-exceeds-limit-of-10485760-bytes/12329](https://forum.knime.com/t/google-sheets-payload-exceeds-limit-of-10485760-bytes/12329)
+- [https://www.googlecloudcommunity.com/gc/Apigee/Content-Length-with-invalid-value-causes-error-400/m-p/538803](https://www.googlecloudcommunity.com/gc/Apigee/Content-Length-with-invalid-value-causes-error-400/m-p/538803)
+- [https://cloud.google.com/bigquery/quotas#streaming_inserts](https://cloud.google.com/bigquery/quotas#streaming_inserts)
+- [https://cloud.google.com/storage/docs/resumable-uploads](https://cloud.google.com/storage/docs/resumable-uploads)

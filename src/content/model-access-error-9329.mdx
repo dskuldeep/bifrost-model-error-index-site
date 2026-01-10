@@ -1,0 +1,53 @@
+---
+title: "The model `o1` does not exist or you do not have access to it."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "model-access-error-9329"
+---
+
+## Reason
+
+The `404 Not Found` error with the message "The model `o1` does not exist or you do not have access to it" indicates that the OpenAI API cannot resolve the requested model identifier within the context of your account's permissions. This typically stems from the following factors:
+
+**Model Availability and Rollout Status**
+
+The `o1` model family, including `o1-preview` and `o1-mini`, is subject to tiered rollout phases. The full `o1` model may not be globally available to all users simultaneously, even those with previous API access.
+
+**Usage Tier Restrictions**
+
+OpenAI restricts access to its latest reasoning models based on Usage Tiers. For example, while `o1-mini` is accessible to most developers in Tier 1 and above, the full `o1` model and `o1-preview` often require reaching Usage Tier 5 (having spent at least $1,000 and waiting 30 days since the first successful payment).
+
+**Incorrect Model Identifier**
+
+Specifying an incorrect string in the `model` parameter will trigger a 404 error. Common mistakes include using `o1` when only `o1-preview` or `o1-mini` is provisioned for the account.
+
+**API Configuration and Metadata**
+
+Issues with the API endpoint configuration, such as using an outdated library version or missing the `OpenAI-Organization` header (if you belong to multiple organizations where only one has access), can prevent the model from being identified.
+
+**Account and Billing State**
+
+Account-level constraints, such as an exhausted credit balance, expired API keys, or accounts that haven't been migrated to the prepaid billing system, can restrict access to high-tier models.
+
+## Solution
+To resolve the model access error, follow these troubleshooting steps:
+1. **Verify the Model Identifier**: Double-check that you are using the exact string supported by your current access level. Try switching between `o1`, `o1-preview`, or `o1-mini` to see which is active for your key.
+2. **Check Your Usage Tier**: Visit the **Settings > Billing** section of the OpenAI Dashboard. Confirm that your account has reached the required Tier (typically Tier 5 for the full `o1` model) to access reasoning models.
+3. **Review Organization and Project Settings**: If you are part of multiple organizations, ensure your API request includes the correct `OpenAI-Organization` or `OpenAI-Project` ID header. Access is granted at the organization level.
+4. **Audit API Key and Billing**: Ensure your API key is active and that your account has a sufficient prepaid balance. OpenAI's newer models often require a history of successful payments before they are unlocked.
+5. **Update SDKs**: Ensure you are using the latest version of the OpenAI Python or Node.js library. Older versions may not correctly handle the parameters or endpoints required for the `o1` series.
+6. **Test via Playground**: Attempt to select the model in the OpenAI API Playground. If it is greyed out or missing there, it confirms the issue is account-level provisioning rather than code-specific.
+7. **Contact OpenAI Support**: If you meet all tier requirements but still cannot access the model, reach out to OpenAI support through the Help Center to verify if your account is in a restricted rollout group.
+
+## Suggested Links
+- [https://github.com/langchain-ai/langchain/issues/13284](https://github.com/langchain-ai/langchain/issues/13284)
+- [https://community.openai.com/t/tier-5-access-but-no-o1-models-api-problem-or-bug-lets-figure-this-out/949204](https://community.openai.com/t/tier-5-access-but-no-o1-models-api-problem-or-bug-lets-figure-this-out/949204)
+- [https://community.openai.com/t/unable-to-access-structured-output-with-o1-model-receiving-404-model-not-found-error/1073332](https://community.openai.com/t/unable-to-access-structured-output-with-o1-model-receiving-404-model-not-found-error/1073332)
+- [https://community.openai.com/t/getting-404-not-found-error-for-api-endpoint-in-postman/903181](https://community.openai.com/t/getting-404-not-found-error-for-api-endpoint-in-postman/903181)
+- [https://notegpt.io/blog/openai-api-key-not-working](https://notegpt.io/blog/openai-api-key-not-working)
+- [https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096](https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096)
+- [https://community.openai.com/t/is-the-o1-model-missing-only-for-me-usage-tier-5/1061302](https://community.openai.com/t/is-the-o1-model-missing-only-for-me-usage-tier-5/1061302)
+- [https://community.openai.com/t/chat-completions-api-giving-me-a-404-error/788279](https://community.openai.com/t/chat-completions-api-giving-me-a-404-error/788279)
+- [https://platform.openai.com/docs/guides/reasoning](https://platform.openai.com/docs/guides/reasoning)
+- [https://platform.openai.com/docs/guides/rate-limits/usage-tiers](https://platform.openai.com/docs/guides/rate-limits/usage-tiers)

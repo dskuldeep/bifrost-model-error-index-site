@@ -1,0 +1,36 @@
+---
+title: "max_tokens: 10000 > 4096, which is the maximum allowed value for claude-2.0"
+provider: "anthropic"
+provider_icon: "/logos/anthropic.png"
+solved: true
+slug: "input-limit-exceeded-error-9117"
+---
+
+## Reason
+
+The `400 Bad Request` error occurs because the `max_tokens` parameter in your API request exceeds the maximum output limit permitted for the `claude-2.0` model. 
+
+Key points regarding this error:
+1. **Limit Violation**: You attempted to set `max_tokens` to 10,000, which is higher than the maximum allowed value of 4,096 for the specified model (`claude-2.0`).
+2. **Error Category**: This is classified as an `invalid_request_error`. It indicates that the request parameters do not comply with the model's technical constraints or the API's validation requirements.
+3. **Output vs. Context**: While Claude 2.0 supports a large context window (100,000 tokens) for input, the `max_tokens` parameter specifically controls the length of the generated completion (output), which is restricted to 4,096 tokens.
+
+## Solution
+To resolve this error, you must adjust your request parameters to stay within the model's supported output limits. Follow these steps:
+1. **Reduce max_tokens**: Lower the `max_tokens` value in your request to 4,096 or less. This ensures the request is technically valid for the `claude-2.0` model.
+2. **Balance Context and Completion**: While managing your token budget, ensure the combination of input tokens and the requested `max_tokens` value fits within the model's architecture. For Claude 2.0, focus primarily on staying below the 4,096 output cap.
+3. **Implement Continuation Logic**: If your use case requires a response longer than 4,096 tokens, you should implement logic to detect truncated responses and send a follow-up request asking the model to 'continue' from its last point.
+4. **Utilize Configuration Presets**: Use environment variables or predefined settings to manage model-specific limits. This prevents manual adjustment errors and ensures that if you switch models (e.g., to a Claude 3 variant), the limits update accordingly.
+5. **Verify Model Capabilities**: If your application consistently needs more than 4,096 output tokens, check the documentation for newer models like Claude 3.5 Sonnet, which may support higher output limits (up to 8,192 tokens) in specific API configurations.
+
+## Suggested Links
+- [https://docs.anthropic.com/en/api/errors](https://docs.anthropic.com/en/api/errors)
+- [https://community.openai.com/t/error-code-400-max-token-length/716391](https://community.openai.com/t/error-code-400-max-token-length/716391)
+- [https://github.com/continuedev/continue/issues/2006](https://github.com/continuedev/continue/issues/2006)
+- [https://github.com/vercel/ai/issues/2772](https://github.com/vercel/ai/issues/2772)
+- [https://community.openai.com/t/request-failed-with-status-code-400/39242/25](https://community.openai.com/t/request-failed-with-status-code-400/39242/25)
+- [https://docs.anthropic.com/en/api/rate-limits](https://docs.anthropic.com/en/api/rate-limits)
+- [https://community.openai.com/t/batch-api-errors-max-tokens-is-too-large/738029](https://community.openai.com/t/batch-api-errors-max-tokens-is-too-large/738029)
+- [https://github.com/langgenius/dify/issues/4009](https://github.com/langgenius/dify/issues/4009)
+- [https://docs.anthropic.com/en/docs/about-claude/models](https://docs.anthropic.com/en/docs/about-claude/models)
+- [https://docs.anthropic.com/en/api/messages](https://docs.anthropic.com/en/api/messages)

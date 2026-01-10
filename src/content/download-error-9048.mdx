@@ -1,0 +1,41 @@
+---
+title: "Error while downloading https://s3-us-west-2.amazonaws.com/quizizz-destination-bkt/dd38b4fd-758f-42d6-b4b4-aebcb71d2e07.jpeg."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "download-error-9048"
+---
+
+## Reason
+
+The OpenAI API returns a 400 Bad Request error when it cannot process a request due to client-side issues or resource accessibility problems. This indicates that the server understands the request but will not fulfill it because of perceived client errors.
+
+Key reasons include:
+1. **Invalid or Expired API Key**: If the API key is incorrect, revoked, or improperly configured in the request headers, the server will fail to authenticate the session.
+2. **Incorrect Request Configuration**: This involves malformed request headers (such as a missing or incorrect `Authorization` field), an incorrect base URL, or invalid JSON syntax in the payload.
+3. **Image Fetching and Accessibility Failures**: In cases involving vision models and image URLs (like the Amazon S3 link in the log), the downloader may fail if the image is private, the URL has expired, or the host's `robots.txt` blocks OpenAI's `gpt-bot` from crawling the resource.
+4. **Model-Specific Parameter Errors**: Providing parameters unsupported by the chosen model—such as specifying dimensions for a model that does not support them—or exceeding the model's context window will trigger a 400 error.
+5. **Rate Limiting and Throttling**: While typically associated with a 429 error, reaching tier-specific limits or rapid request bursts can sometimes manifest as a 400 error due to internal request handling or misconfigured rate-limiting logic.
+6. **Content Restrictions**: Requests that violate OpenAI's safety policies or usage terms, such as prompts that trigger sensitive content filters, are rejected by the API.
+
+## Solution
+To resolve the 400 Bad Request error, follow these troubleshooting and remediation steps:
+1. **Verify API Credentials**: Ensure your API key is active and correctly configured in your environment. Confirm it is passed as a `Bearer` token in the `Authorization` header.
+2. **Check Request Configuration**: Review the base URL, headers, and request body. Ensure the JSON structure matches the official OpenAI API documentation and that no required fields are missing.
+3. **Test Resource Accessibility**: For image-based requests, verify that the URL is public and not protected by firewalls or authentication. For S3 links, ensure the pre-signed URL has not expired and the bucket policy allows access.
+4. **Check Image Specifications**: Confirm that the image format is supported (PNG, JPEG, WEBP, or non-animated GIF) and the file size is below the 20MB limit.
+5. **Use Base64 Encoding as a Fallback**: If URL-based image fetching fails due to network or hosting restrictions, download the image locally and pass it to the API as a base64-encoded string.
+6. **Validate Parameters and Token Usage**: Ensure all parameters like `model`, `max_tokens`, and `temperature` are valid for the specific model. Check that the combined total of prompt tokens and `max_tokens` does not exceed the model's Context Window.
+7. **Inspect the Full API Response**: Review the exact error message in the JSON response body. Look for specific error codes such as `invalid_image_url`, `image_parse_error`, or `invalid_request_error` to identify the precise cause of the failure.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://github.com/openai/openai-openapi/issues/15](https://github.com/openai/openai-openapi/issues/15)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://learn.microsoft.com/en-us/answers/questions/1693832/azure-openai-error-429-request-below-rate-limit](https://learn.microsoft.com/en-us/answers/questions/1693832/azure-openai-error-429-request-below-rate-limit)
+- [https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c](https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c)
+- [https://cookbook.openai.com/examples/how_to_handle_rate_limits](https://cookbook.openai.com/examples/how_to_handle_rate_limits)
+- [https://www.restack.io/p/openai-python-answer-request-failed-400-error-cat-ai](https://www.restack.io/p/openai-python-answer-request-failed-400-error-cat-ai)
+- [https://www.youtube.com/watch?v=no8XKpySbEU](https://www.youtube.com/watch?v=no8XKpySbEU)
+- [https://platform.openai.com/docs/guides/error-codes](https://platform.openai.com/docs/guides/error-codes)
+- [https://platform.openai.com/docs/guides/vision](https://platform.openai.com/docs/guides/vision)

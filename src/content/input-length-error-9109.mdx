@@ -1,0 +1,30 @@
+---
+title: "rayllm.backend.llm.error_handling.PromptTooLongError: Input too long. Recieved 7226 tokens, but the maximum input length is 4096 tokens. (Request ID: 6302c9aa-a4aa-474c-9d10-afd5c2e3e93d)"
+provider: "anyscale"
+provider_icon: "/file.svg"
+solved: true
+slug: "input-length-error-9109"
+---
+
+## Reason
+
+The `PromptTooLongError` (HTTP 400) occurs because the input provided in the request exceeds the model's maximum supported context window. In this instance, the Anyscale backend received 7,226 tokens, while the model or endpoint is configured with a maximum limit of 4,096 tokens.
+
+Key reasons include:
+1. **Context Window Breach**: Every Large Language Model (LLM) has a finite context window—the maximum number of tokens it can process at once. If the sum of the system prompt and user messages exceeds this limit, the request is rejected.
+2. **Client-Side Request Error**: This is a 400 status error, indicating an issue with the request body or values. The error message provides specific details on which parameter or field caused the validation failure.
+3. **Backend Validation**: Anyscale's serving layer (built on Ray LLM/vLLM) validates the prompt length before attempting inference to prevent processing failures and resource exhaustion.
+
+## Solution
+To resolve the `PromptTooLongError` and ensure your request fits within the 4,096-token limit, follow these remediation steps:
+1. **Shorten the Input**: Reduce the number of tokens in your input text to stay within the 4,096-token limit. This may involve manually trimming the prompt or programmatically truncating strings.
+2. **Manage Completion Requests**: Ensure that messages and completions do not collectively exceed the limit. Note that some models count the `max_tokens` (output) against the total context window alongside the input.
+3. **Implement Token Counting**: Use a library like `tiktoken` or a model-specific tokenizer to count tokens on the client side before sending the request. This allows your application to handle overflows before reaching the API.
+4. **Apply Context Summarization**: If the conversation history is too long, summarize earlier parts of the interaction to retain context while drastically reducing the token count.
+5. **Switch to a Long-Context Model**: If your use case fundamentally requires more than 4,096 tokens, verify if Anyscale offers a model variant with a larger context window (e.g., 8k, 32k, or 128k).
+6. **Validate All Parameters**: Review and adjust any long messages or completion requests. Ensure all fields and parameters in your JSON request body comply with the Anyscale API's technical specifications.
+
+## Suggested Links
+- [https://docs.anyscale.com/endpoints/model-serving/](https://docs.anyscale.com/endpoints/model-serving/)
+- [https://docs.anyscale.com/endpoints/text-generation/query-a-model/](https://docs.anyscale.com/endpoints/text-generation/query-a-model/)
+- [https://github.com/ray-project/ray](https://github.com/ray-project/ray)

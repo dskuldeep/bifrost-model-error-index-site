@@ -1,0 +1,32 @@
+---
+title: "Invalid schema for function \"information_extraction\": \"object\" is not of type \"object\", \"boolean\""
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "schema-validation-error-9421"
+---
+
+## Reason
+
+The "Invalid schema" error in the Azure OpenAI API, particularly the error text stating `"object" is not of type "object", "boolean"`, typically indicates a structural mismatch in the JSON Schema definition provided for functions or tools. 
+
+Key reasons include:
+1. **Invalid Function Schema Definition**: When defining functions for the `information_extraction` tool, the `parameters` field must conform to a specific JSON Schema subset. This error often occurs if the top-level `type` property is missing, incorrectly nested, or if the API expects a boolean for a property but receives an object definition instead.
+2. **Incorrect or Invalid Request Parameters**: Using unrecognized parameters can trigger a schema validation failure. For instance, using `max_completion_tokens` with GPT-4 models that require `max_tokens` will result in a 400 error because the parameter is not supported by that specific model version.
+3. **Invalid Payload or Data Structure**: The payload might not conform to the expected structure. This includes the `messages` array, where incorrect formatting or unexpected types for roles and content can lead to validation errors.
+4. **Header or Content-Type Issues**: If the `Content-Type` header is set to something other than `application/json` (such as `application/x-www-form-urlencoded`), the API cannot parse the request body correctly, leading to a schema-related 400 error.
+5. **Authentication and Rate Limiting**: While usually resulting in distinct errors, invalid API keys, incorrect authentication headers, or hitting rate limits can sometimes manifest as general 400 Bad Request errors if the server cannot process the request context correctly.
+
+## Solution
+To resolve the 400 "Invalid schema type" error in Azure OpenAI, follow these remediation steps:
+1. **Correct the Function Schema**: Review the `parameters` object in your function definition. Ensure it starts with `"type": "object"` and that all nested properties follow the JSON Schema specification. Ensure that fields expecting a boolean value are not provided with an object, and vice versa.
+2. **Verify Request Parameters**: Check the documentation for the specific model version you are using. If you are using GPT-4, ensure you use `max_tokens` rather than `max_completion_tokens` if the latter is unsupported by your deployment.
+3. **Validate Payload Formatting**: Ensure the `messages` array is correctly structured. Each object in the array should have a valid `role` (system, user, assistant, or tool) and a string-based `content` field.
+4. **Validate Headers and Content-Type**: Ensure your request includes the header `Content-Type: application/json`. Remove any unnecessary or non-standard headers that might interfere with the request parsing.
+5. **Check API Key and Authentication**: Verify that the API key is valid and hasn't expired. For Azure OpenAI, ensure the key is passed correctly in the `api-key` header.
+6. **Review Rate Limiting**: Check your usage in the Azure AI Studio to ensure you are not hitting TPM (Tokens Per Minute) or RPM (Requests Per Minute) limits, which can occasionally trigger generic 400 errors.
+
+## Suggested Links
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)

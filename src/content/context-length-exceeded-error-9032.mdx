@@ -1,0 +1,30 @@
+---
+title: "This model\"s maximum context length is 128000 tokens. However, your messages resulted in 411525 tokens (411032 in the messages, 493 in the functions). Please reduce the length of the messages or functions."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "context-length-exceeded-error-9032"
+---
+
+## Reason
+
+The OpenAI API returns a `400 Bad Request` error with the code `context_length_exceeded` when the total token count of your request exceeds the model's maximum context window. Key factors include:
+1. **Model Limits**: Every OpenAI model has a fixed context limit (e.g., 128,000 tokens for GPT-4o and GPT-4 Turbo). In this specific instance, the request totaled 411,525 tokens, which significantly exceeded the 128,000-token threshold.
+2. **Cumulative Token Calculation**: The total token count includes the system message, user messages, assistant history, and any function/tool definitions provided in the request body.
+3. **Request Rejection**: Because the LLM architecture requires the entire context to fit within its attention mechanism, the server cannot process any part of the request and rejects it immediately with a status code 400.
+
+## Solution
+To resolve the `400` status error and ensure your requests fit within the model's context boundaries, follow these strategies:
+1. **Segment the Input (Chunking)**: Break large documents or datasets into smaller sections. Process these chunks individually and, if necessary, combine the results in a separate step.
+2. **Truncate Conversation History**: For chat-based applications, implement a sliding window or a 'last N messages' policy. Remove the oldest messages in a thread as new ones are added to keep the total count below the limit.
+3. **Optimize Prompts and Functions**: Streamline instructions and function descriptions to be more concise. Every character in a function definition contributes to the total token count.
+4. **Utilize Token Counting Tools**: Use the official OpenAI `tiktoken` library in your application code to count tokens before making the API call. This allows you to programmatically truncate or summarize data before a failure occurs.
+5. **Implement Retrieval-Augmented Generation (RAG)**: Instead of passing an entire document in the prompt, store your data in a vector database and retrieve only the most relevant snippets to include in the context.
+6. **Summarize Previous Context**: If historical context is required, use the model to summarize earlier parts of the conversation or large data blocks, then pass the summary instead of the raw text.
+7. **Manage Throughput and Quotas**: Ensure your application accounts for the `max_tokens` parameter (output length), as the context window is shared between the input prompt and the generated completion.
+
+## Suggested Links
+- [https://platform.openai.com/docs/guides/text-generation/common-issues-and-solutions](https://platform.openai.com/docs/guides/text-generation/common-issues-and-solutions)
+- [https://github.com/openai/tiktoken](https://github.com/openai/tiktoken)
+- [https://cookbook.openai.com/examples/how_to_count_tokens_with_tiktoken](https://cookbook.openai.com/examples/how_to_count_tokens_with_tiktoken)
+- [https://platform.openai.com/docs/models/gpt-4o](https://platform.openai.com/docs/models/gpt-4o)

@@ -1,0 +1,35 @@
+---
+title: "too many tokens: total number of tokens in the prompt cannot exceed 4081 - received 4796. Try using a shorter prompt, or enabling prompt truncating. See https://docs.cohere.com/reference/generate for more details."
+provider: "cohere"
+provider_icon: "/logos/cohere.png"
+solved: true
+slug: "input-limit-exceeded-error-9118"
+---
+
+## Reason
+
+The 400 Bad Request error occurs because the prompt sent to the Cohere API exceeds the maximum context length allowed for the specific model or endpoint. 
+
+In this instance, the error message indicates that the prompt contained **4796 tokens**, which surpassed the hard limit of **4081 tokens**. This limit is characteristic of specific Cohere models (such as `command-light` or legacy versions of the `generate` endpoint) where the total token count—often including both the input prompt and the anticipated output—must fit within the model's fixed context window.
+
+## Solution
+To resolve the "too many tokens" error, you must ensure your request stays within the 4081-token boundary. Follow these remediation steps:
+1. **Enable Prompt Truncation**: Use the API's built-in `truncate` parameter. By setting this to `START` or `END`, the Cohere API will automatically discard tokens from the beginning or end of your input to ensure it fits the model's limit without throwing an error.
+2. **Shorten the Prompt**: Manually review and edit the input text to remove unnecessary boilerplate, redundant instructions, or overly long context.
+3. **Implement Chunking (Split the Prompt)**: For long-form text analysis, split your content into smaller, logical segments. Process each segment as a separate API call and aggregate the results.
+4. **Pre-calculate Tokens**: Use Cohere's `/tokenize` endpoint in your application logic to count tokens before sending the request. This allows you to programmatically truncate or split text before hitting the API limit.
+5. **Adjust Model Parameters**: Review your `max_tokens` setting. In some configurations, the total of `prompt tokens + max_tokens` must be less than or equal to the model's limit. Reducing `max_tokens` (the reserved output space) may allow for a slightly larger input prompt.
+6. **Upgrade the Model**: If your workflow consistently requires more than 4081 tokens, consider switching to newer models like `command-r` or `command-r-plus`, which support significantly larger context windows (up to 128,000 tokens).
+
+## Suggested Links
+- [https://github.com/langchain-ai/langchainjs/issues/3894](https://github.com/langchain-ai/langchainjs/issues/3894)
+- [https://docs.cohere.com/v2/docs/rate-limits](https://docs.cohere.com/v2/docs/rate-limits)
+- [https://docs.cohere.com/v2/reference/errors](https://docs.cohere.com/v2/reference/errors)
+- [https://github.com/cohere-ai/cohere-go](https://github.com/cohere-ai/cohere-go)
+- [https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-cohere-command-r-plus.html](https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-cohere-command-r-plus.html)
+- [https://maartengr.github.io/BERTopic/api/representation/cohere.html](https://maartengr.github.io/BERTopic/api/representation/cohere.html)
+- [https://github.com/run-llama/llama_index/issues/12633](https://github.com/run-llama/llama_index/issues/12633)
+- [https://github.com/orgs/community/discussions/138672](https://github.com/orgs/community/discussions/138672)
+- [https://github.com/langchain-ai/langchain-cohere/blob/main/libs%2Fcohere%2Flangchain_cohere%2Fchat_models.py](https://github.com/langchain-ai/langchain-cohere/blob/main/libs%2Fcohere%2Flangchain_cohere%2Fchat_models.py)
+- [https://docs.cohere.com/docs/tokens-and-tokenizers](https://docs.cohere.com/docs/tokens-and-tokenizers)
+- [https://docs.cohere.com/reference/tokenize](https://docs.cohere.com/reference/tokenize)

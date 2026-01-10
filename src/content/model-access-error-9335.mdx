@@ -1,0 +1,36 @@
+---
+title: "The model `command-xl` does not exist or you do not have access to it."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "model-access-error-9335"
+---
+
+## Reason
+
+The 404 status error occurs when the OpenAI API cannot locate the requested model resource. Key reasons for this failure include:
+
+*   **Model Mismatch or Non-Existence**: The model identifier `command-xl` is not a valid OpenAI model name. This specific model is part of the Cohere model family. Attempting to call a Cohere model via an OpenAI-specific API endpoint will result in a "Resource Not Found" error.
+*   **Access Restrictions**: You may lack the necessary permissions to use the requested model. While API keys are generally broad, project-specific restrictions or organization-level limitations in the OpenAI platform settings can block access.
+*   **Endpoint or Parameter Issues**: The error can be triggered by using incorrect endpoint URLs or malformed parameters that prevent the server from correctly identifying the resource.
+*   **Resource Not Found**: A general failure where the requested model is not found on the server, indicating a discrepancy between the model requested in the code and the models available to your specific account tier.
+
+## Solution
+To resolve the 404 error and regain access to your desired models, follow these steps:
+1.  **Verify Model Existence and Provider**: Ensure that the model name is valid for the provider you are targeting. If you require `command-xl`, you must use the Cohere API. If you are using the OpenAI API, replace the model name with a supported identifier like `gpt-4o` or `gpt-3.5-turbo`.
+2.  **Check Permissions and Access**: Log in to the OpenAI Dashboard to confirm that your API key has the required permissions. Ensure there are no project-specific restrictions or usage limits that exclude certain models.
+3.  **Review Endpoint and Parameters**: Double-check the base URL and the construction of your API request. Ensure you are not pointing to a legacy or incorrect endpoint.
+4.  **Update API Version or Model Selection**: If a model has been deprecated or is unavailable for your subscription tier, update your integration to use the latest available models.
+5.  **Ensure Billing Details**: Verify that your account has an active billing method and a positive credit balance. Access to many high-performance models is restricted until the account moves beyond the free trial or initial usage tiers.
+
+## Suggested Links
+- [https://community.openai.com/t/gpt-3-5-turbo-model-gives-me-a-404-error/83297](https://community.openai.com/t/gpt-3-5-turbo-model-gives-me-a-404-error/83297)
+- [https://community.openai.com/t/how-to-set-billing-limits-and-restrict-model-usage-for-a-project-via-openai-api/1087771](https://community.openai.com/t/how-to-set-billing-limits-and-restrict-model-usage-for-a-project-via-openai-api/1087771)
+- [https://community.openai.com/t/error-that-model-does-not-exist-http-status-code-404-but-it-does-exist/25866](https://community.openai.com/t/error-that-model-does-not-exist-http-status-code-404-but-it-does-exist/25866)
+- [https://github.com/langchain-ai/langchain/issues/13284](https://github.com/langchain-ai/langchain/issues/13284)
+- [https://community.openai.com/t/can-i-enable-some-models-for-api-key/583110](https://community.openai.com/t/can-i-enable-some-models-for-api-key/583110)
+- [https://community.openai.com/t/getting-404-not-found-error-for-api-endpoint-in-postman/903181](https://community.openai.com/t/getting-404-not-found-error-for-api-endpoint-in-postman/903181)
+- [https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096](https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096)
+- [https://github.com/Pythagora-io/gpt-pilot/issues/416](https://github.com/Pythagora-io/gpt-pilot/issues/416)
+- [https://platform.openai.com/docs/models](https://platform.openai.com/docs/models)
+- [https://docs.cohere.com/docs/models](https://docs.cohere.com/docs/models)

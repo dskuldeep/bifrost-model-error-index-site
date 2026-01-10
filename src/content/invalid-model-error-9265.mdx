@@ -1,0 +1,34 @@
+---
+title: "Invalid model dalle3. The model argument should be left blank."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "invalid-model-error-9265"
+---
+
+## Reason
+
+The error "Invalid model dalle3. The model argument should be left blank" (HTTP 400 Bad Request) occurs because the OpenAI API or the specific integration middleware expects the `model` parameter to be omitted for certain DALL-E 3 requests. 
+
+Key reasons for this failure include:
+1. **Redundant Parameter Specification:** When using specific SDK wrappers, local gateways, or specialized endpoints, the model (DALL-E 3) may already be inferred or hardcoded. Including the `"model": "dall-e-3"` argument in the JSON body is interpreted as an invalid or conflicting parameter.
+2. **Endpoint Incompatibility:** This specific error is common when the request is sent to an endpoint that does not support the explicit model argument for image generation, or where the configuration expects a blank value to default to the intended model.
+3. **Client Configuration Issues:** Some API client libraries or legacy configurations may handle model selection internally, causing a "Bad Request" error if a developer manually specifies the model name in the request payload.
+
+## Solution
+To fix the "Invalid model dalle3" error and successfully generate images, adjust your API request with the following steps:
+1. **Remove the Model Name:** Locate the `model` key in your request payload (e.g., `"model": "dalle3"` or `"model": "dall-e-3"`) and remove it entirely.
+2. **Leave the Argument Blank:** Ensure that the model argument is not passed. If your specific environment or SDK requires the field to exist, set it to an empty value as indicated by the error message.
+3. **Verify API Client Configuration:** Check your API client or library settings. Ensure that the configuration aligns with the specific requirements for DALL-E 3, as some implementations handle the model versioning via the URL endpoint or environment variables rather than the request body.
+4. **Update SDKs:** If you are using a third-party wrapper, ensure it is updated to the latest version, as older versions may have different requirements for how DALL-E 3 is invoked.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/invalid-model-dall-e-3-the-model-argument-should-be-left-blank/890486](https://community.openai.com/t/invalid-model-dall-e-3-the-model-argument-should-be-left-blank/890486)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://community.openai.com/t/getting-400-error-trying-to-generate-image-with-dalle-3/508710](https://community.openai.com/t/getting-400-error-trying-to-generate-image-with-dalle-3/508710)
+- [https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c](https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c)
+- [https://github.com/vllm-project/vllm/issues/3906](https://github.com/vllm-project/vllm/issues/3906)
+- [https://community.openai.com/t/i-am-receiving-an-error-status-code-400/351121](https://community.openai.com/t/i-am-receiving-an-error-status-code-400/351121)
+- [https://community.openai.com/t/opena-ai-bad-request-error-400/666947](https://community.openai.com/t/opena-ai-bad-request-error-400/666947)
+- [https://platform.openai.com/docs/api-reference/images/create](https://platform.openai.com/docs/api-reference/images/create)

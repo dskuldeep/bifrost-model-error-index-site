@@ -1,0 +1,30 @@
+---
+title: "prompt is too long: 345320 tokens > 199999 maximum"
+provider: "anthropic"
+provider_icon: "/logos/anthropic.png"
+solved: true
+slug: "input-length-error-9111"
+---
+
+## Reason
+
+The **400 Bad Request** error, specifically the `invalid_request_error`, occurs because the request payload exceeds the maximum token limit allowed for the model. In this instance, the prompt contained **345,320 tokens**, which is significantly higher than the **199,999 maximum** allowed by the Anthropic API context window for standard Claude 3 models.
+
+Key factors contributing to this error include:
+1. **Context Window Overflow**: The combined total of the system prompt, all message history, and the current user input exceeded the hard limit.
+2. **Unstructured Data Ingestion**: Sending extremely large documents or raw datasets without prior preprocessing or extraction.
+3. **Linear History Growth**: In multi-turn conversations, failing to prune or summarize previous exchanges allows the token count to grow until it eventually breaks the API limit.
+
+## Solution
+To resolve the 400 status error, you must adjust the length of your request to stay below the 199,999-token threshold. Follow these remediation steps:
+1. **Truncate or Summarize Context**: Reduce the length of the prompt by removing non-essential information. Summarize long documents or previous turns in a conversation to preserve meaning while saving space.
+2. **Implement Chunking**: Break large requests into smaller, manageable parts. Process these segments sequentially and aggregate the results if necessary.
+3. **Prune Conversation History**: Use a "sliding window" approach for chat history, where only the most recent $N$ messages are included in the prompt context.
+4. **Client-Side Token Counting**: Use an official tokenizer (such as the `anthropic-sdk` counting utility) to estimate token counts locally before sending the request. This allows you to handle length issues gracefully in your code.
+5. **Optimize Prompt Content**: Remove redundant metadata, system instructions, or whitespace that contributes to token bloat without adding functional value.
+6. **Check Model Availability**: If your use case consistently requires more than 200,000 tokens, check if your organization has access to extended context models (like the 500k or 1M token beta windows) and update your `model` parameter accordingly.
+
+## Suggested Links
+- [https://docs.anthropic.com/en/api/errors](https://docs.anthropic.com/en/api/errors)
+- [https://docs.anthropic.com/en/docs/about-claude/models](https://docs.anthropic.com/en/docs/about-claude/models)
+- [https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/token-limits](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/token-limits)

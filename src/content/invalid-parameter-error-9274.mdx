@@ -1,0 +1,37 @@
+---
+title: "Invalid parameter: 'response_format' of type 'json_object' is not supported with this model."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "invalid-parameter-error-9274"
+---
+
+## Reason
+
+The error occurs because the `response_format` parameter with the value `{"type": "json_object"}` is being used in a request where the configuration is incompatible. This typically happens for the following reasons:
+
+**1. Model Compatibility**
+Not all models support JSON mode. Older model versions, such as `gpt-4` (0613) or `gpt-35-turbo` (0613), do not support the `json_object` format. Support is generally limited to newer versions like GPT-4o, GPT-4o mini, and GPT-4 Turbo (version `1106-preview` or later).
+
+**2. Tool Type Constraints**
+When `response_format` is set to `json_object` or `json_schema`, Azure OpenAI requires that all tools specified in the request are of the type `function`. Including tools such as `file_search` or `code_interpreter` (common in the Assistants API) will trigger this error as they are currently incompatible with constrained JSON output modes.
+
+**3. Missing Instruction in Prompt**
+When using JSON mode, the API requires that the system or user message explicitly instructs the model to produce JSON (e.g., including the word "JSON" in the prompt). Failure to do so may lead to an error or a refusal from the model.
+
+## Solution
+To resolve the `400` status error and ensure compatibility with the `response_format` parameter, follow these steps:
+1. **Verify and Change the Model**: Ensure you are using a model version that supports JSON mode. Recommended models include `gpt-4o`, `gpt-4o-mini`, or `gpt-4` version `1106-preview` and later. Switch to one of these if you are currently on an older version.
+2. **Update the Prompt**: When `json_object` is enabled, always include the word "JSON" in your system message or user prompt to guide the model's output format.
+3. **Ensure Tool Compatibility**: If your request includes tools, verify that they are all of the type `function`. Remove any `file_search` or `code_interpreter` tools if you must use the `json_object` response format.
+4. **Remove the Parameter**: If your specific model or workflow does not support JSON mode and you cannot upgrade, remove the `response_format` parameter. The API will default to standard text output, and you can then parse the response manually.
+
+## Suggested Links
+- [https://github.com/openai/openai-python/issues/887](https://github.com/openai/openai-python/issues/887)
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/assistants-api-why-is-json-mode-not-available-when-using-file-search-code-interpreter/743449](https://community.openai.com/t/assistants-api-why-is-json-mode-not-available-when-using-file-search-code-interpreter/743449)
+- [https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue](https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue)
+- [https://community.openai.com/t/how-do-i-use-the-new-json-mode/475890](https://community.openai.com/t/how-do-i-use-the-new-json-mode/475890)
+- [https://community.openai.com/t/using-response-format-in-chat-completion-throws-error/484377](https://community.openai.com/t/using-response-format-in-chat-completion-throws-error/484377)
+- [https://learn.microsoft.com/fi-fi/azure/ai-services/openai/reference](https://learn.microsoft.com/fi-fi/azure/ai-services/openai/reference)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/json-mode](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/json-mode)

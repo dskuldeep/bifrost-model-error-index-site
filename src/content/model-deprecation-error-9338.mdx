@@ -1,0 +1,36 @@
+---
+title: "The model `gpt-4-vision-preview` has been deprecated, learn more here: https://platform.openai.com/docs/deprecations"
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "model-deprecation-error-9338"
+---
+
+## Reason
+
+The 404 status error (Model Not Found) is caused by the deprecation of the `gpt-4-vision-preview` model. 
+
+Key reasons for this error include:
+1. **Deprecation Timeline**: On June 6, 2024, OpenAI announced that `gpt-4-vision-preview` and `gpt-4-32k` would be deprecated.
+2. **Access Restrictions**: Effective June 17, 2024, these models were restricted. New API users do not have access to these identifiers, and existing users are required to migrate to newer versions.
+3. **Model Non-Existence**: The error indicates that the model identifier `gpt-4-vision-preview` is no longer recognized as a valid endpoint or resource for your specific API key/organization context due to its retired status.
+4. **Tier-Based Access**: Access to certain legacy or preview models is often restricted based on the API usage tier (e.g., Tier 1 vs. Tier 5), and deprecated models are the first to be removed from lower-tier access.
+
+## Solution
+To resolve the 404 error and restore functionality, follow these remediation steps:
+1. **Migrate to a Supported Model**: Update your code to use a current model with vision capabilities. OpenAI recommends switching to `gpt-4o` (Omni) or `gpt-4-turbo`. `gpt-4o` is generally preferred as it is faster and more cost-effective while maintaining high performance for vision tasks.
+2. **Update API Parameters**: When switching to `gpt-4o` or `gpt-4-turbo`, ensure your payload follows the standard Chat Completions format. For vision tasks, ensure the image data is provided in the `messages` array using the `image_url` type.
+3. **Verify API Key Permissions**: Visit the OpenAI Dashboard and check your project settings to ensure the replacement model (e.g., `gpt-4o`) is enabled for your API key.
+4. **Check Billing Status**: Ensure your account has a positive credit balance. Access to newer, high-performance models may be restricted if the account is not in a paid tier or has reached its usage limit.
+5. **Update Client Libraries**: Run the appropriate update command (e.g., `pip install --upgrade openai` for Python or `npm install openai@latest` for Node.js) to ensure your environment supports the latest model definitions and endpoint configurations.
+
+## Suggested Links
+- [https://github.com/langchain-ai/langchain/issues/13284](https://github.com/langchain-ai/langchain/issues/13284)
+- [https://github.com/tldraw/make-real-starter/issues/30](https://github.com/tldraw/make-real-starter/issues/30)
+- [https://community.openai.com/t/the-model-gpt-4-does-not-exist-is-gpt-4-deprecated/679768](https://community.openai.com/t/the-model-gpt-4-does-not-exist-is-gpt-4-deprecated/679768)
+- [https://community.openai.com/t/getting-404-not-found-error-for-api-endpoint-in-postman/903181](https://community.openai.com/t/getting-404-not-found-error-for-api-endpoint-in-postman/903181)
+- [https://platform.openai.com/docs/deprecations](https://platform.openai.com/docs/deprecations)
+- [https://community.openai.com/t/how-to-set-billing-limits-and-restrict-model-usage-for-a-project-via-openai-api/1087771](https://community.openai.com/t/how-to-set-billing-limits-and-restrict-model-usage-for-a-project-via-openai-api/1087771)
+- [https://community.openai.com/t/getting-a-404-error-when-making-a-createchatcompletion-call-with-gpt-4/541052](https://community.openai.com/t/getting-a-404-error-when-making-a-createchatcompletion-call-with-gpt-4/541052)
+- [https://community.openai.com/t/can-i-enable-some-models-for-api-key/583110](https://community.openai.com/t/can-i-enable-some-models-for-api-key/583110)
+- [https://platform.openai.com/docs/guides/vision](https://platform.openai.com/docs/guides/vision)

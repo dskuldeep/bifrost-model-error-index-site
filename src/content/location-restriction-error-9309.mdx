@@ -1,0 +1,36 @@
+---
+title: "User location is not supported for the API use."
+provider: "google"
+provider_icon: "/logos/google.png"
+solved: true
+slug: "location-restriction-error-9309"
+---
+
+## Reason
+
+The `400 Bad Request` error with the message **"User location is not supported for the API use"** occurs when the Google API service detects that the incoming request originates from a geographic region or country that is not currently authorized to use that specific service. 
+
+Key points regarding this error include:
+1. **Regional Unavailability**: The API service (most commonly the Gemini API or Google AI Studio) may not be legally or commercially available in your specific region or country.
+2. **IP-Based Geofencing**: Google determines the user's location based on the IP address of the request origin. If the IP is associated with an unsupported territory, the request is rejected.
+3. **Policy Mismatch**: There is a direct mismatch between the physical location of the client (or the server making the request) and the list of supported locations defined in the API's usage policies.
+
+## Solution
+To resolve the location restriction error, consider the following remediation steps:
+1. **Verify Regional Availability**: Check the official Google documentation for the specific API you are using (e.g., Gemini API or PaLM API) to ensure your country or territory is on the list of supported regions.
+2. **Relocate Server Resources**: If you are running your application on a VPS or cloud provider, shift your server or compute resources to a data center located in a supported region.
+3. **Use Vertex AI as an Alternative**: If the standard Generative AI API is restricted in your area, consider using **Vertex AI** on Google Cloud Platform. Vertex AI often has different regional availability and may support locations not covered by Google AI Studio.
+4. **Audit Network and VPN Settings**: Ensure your server is not routing requests through a VPN, proxy, or transit provider that terminates in an unsupported region. Verify that the server's public IP address correctly reflects a supported location.
+5. **Contact Google Support**: If you believe your location is supported but you are incorrectly restricted, reach out to Google Cloud Support or the developer community for assistance.
+
+## Suggested Links
+- [https://www.hostinger.com/tutorials/how-to-fix-400-bad-request-error](https://www.hostinger.com/tutorials/how-to-fix-400-bad-request-error)
+- [https://developers.google.com/maps/api-security-best-practices](https://developers.google.com/maps/api-security-best-practices)
+- [https://discuss.ai.google.dev/t/does-anyone-know-why-i-receive-a-400-error/537](https://discuss.ai.google.dev/t/does-anyone-know-why-i-receive-a-400-error/537)
+- [https://cloud.google.com/resource-manager/docs/core_errors](https://cloud.google.com/resource-manager/docs/core_errors)
+- [https://forum.bubble.io/t/setting-up-google-api-keys-restrictions/43808](https://forum.bubble.io/t/setting-up-google-api-keys-restrictions/43808)
+- [https://www.googlecloudcommunity.com/gc/AI-ML/Gemini-API-suddenly-reporting-user-location-is-not-supported-for/m-p/797128](https://www.googlecloudcommunity.com/gc/AI-ML/Gemini-API-suddenly-reporting-user-location-is-not-supported-for/m-p/797128)
+- [https://developers.google.com/drive/api/guides/handle-errors](https://developers.google.com/drive/api/guides/handle-errors)
+- [https://www.googlecloudcommunity.com/gc/Workspace-Q-A/Seeing-400-error-while-trying-to-send-a-mail/m-p/536255](https://www.googlecloudcommunity.com/gc/Workspace-Q-A/Seeing-400-error-while-trying-to-send-a-mail/m-p/536255)
+- [https://ai.google.dev/gemini-api/docs/available-regions](https://ai.google.dev/gemini-api/docs/available-regions)
+- [https://cloud.google.com/vertex-ai/docs/general/locations](https://cloud.google.com/vertex-ai/docs/general/locations)

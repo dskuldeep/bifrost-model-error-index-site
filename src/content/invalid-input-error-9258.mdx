@@ -1,0 +1,34 @@
+---
+title: "Invalid type for 'max_tokens': expected an unsupported value, but got null instead."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "invalid-input-error-9258"
+---
+
+## Reason
+
+The error "Invalid type for 'max_tokens': expected an unsupported value, but got null instead" typically occurs when a request to the OpenAI API (or a compatible proxy) explicitly passes `null` for the `max_tokens` parameter or fails to provide a required value for a specific model class. Key causes include:
+1. **Parameter Deprecation for Reasoning Models**: In September 2024, OpenAI deprecated `max_tokens` in favor of `max_completion_tokens` for the **o1 and o3 series** models. While legacy models (like GPT-4o) may still accept `max_tokens: null`, newer reasoning models require the `max_completion_tokens` parameter and will throw a 400 error if `max_tokens` is provided as `null`.
+2. **Type Mismatch**: The API expects `max_tokens` (or `max_completion_tokens`) to be a positive integer. Passing any other type, including `null`, results in an `invalid_type` error.
+3. **SDK or Framework Defaults**: Some wrappers, such as GraphRAG or older versions of the OpenAI SDK, may default to passing `null` for `max_tokens` if no value is specified in the configuration, leading to a conflict with newer API validation rules.
+
+## Solution
+To resolve this error, ensure that your request uses the correct parameter for the target model and provides a valid integer value. Follow these steps:
+1. **Update the Parameter Name**: 
+   - Use `max_completion_tokens` if you are using reasoning models (e.g., `o1-preview`, `o1-mini`, `o3-mini`).
+   - Use `max_tokens` for standard models (e.g., `gpt-4o`, `gpt-4-turbo`, `gpt-3.5-turbo`).
+2. **Provide a Positive Integer**: Set the parameter to a specific positive integer (e.g., `4096`). Avoid using `null`, `0`, or omitting the parameter if your framework defaults it to an invalid type.
+3. **Review Framework Configuration**: If you are using tools like **GraphRAG**, ensure your `settings.yaml` or environment variables explicitly define the appropriate token limit for the model in use, rather than leaving them blank or set to `null`.
+4. **Check for Library Updates**: Ensure your OpenAI SDK or orchestration library (like LangChain or vLLM) is up to date, as many have been patched to handle the `max_tokens` to `max_completion_tokens` transition automatically.
+
+## Suggested Links
+- [https://github.com/vllm-project/vllm/issues/1351](https://github.com/vllm-project/vllm/issues/1351)
+- [https://github.com/vllm-project/vllm/issues/4667](https://github.com/vllm-project/vllm/issues/4667)
+- [https://github.com/ai-genie/chatgpt-vscode/issues/44](https://github.com/ai-genie/chatgpt-vscode/issues/44)
+- [https://community.openai.com/t/batch-api-errors-max-tokens-is-too-large/738029](https://community.openai.com/t/batch-api-errors-max-tokens-is-too-large/738029)
+- [https://community.openai.com/t/openai-parameter-max-tokens-minimum/613450](https://community.openai.com/t/openai-parameter-max-tokens-minimum/613450)
+- [https://docs.fireworks.ai/tools-sdks/openai-compatibility](https://docs.fireworks.ai/tools-sdks/openai-compatibility)
+- [https://github.com/ChatGPTNextWeb/NextChat/discussions/3208](https://github.com/ChatGPTNextWeb/NextChat/discussions/3208)
+- [https://github.com/microsoft/graphrag/issues/1976](https://github.com/microsoft/graphrag/issues/1976)
+- [https://community.openai.com/t/inconsistent-handling-of-max-tokens-parameter-in-chat-completions-api-bugs/955376](https://community.openai.com/t/inconsistent-handling-of-max-tokens-parameter-in-chat-completions-api-bugs/955376)

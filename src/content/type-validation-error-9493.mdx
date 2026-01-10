@@ -1,0 +1,37 @@
+---
+title: "Invalid type for 'messages': expected an array of objects, but got a string instead."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "type-validation-error-9493"
+---
+
+## Reason
+
+The error **"Invalid type for 'messages': expected an array of objects, but got a string instead"** occurs when the OpenAI Chat Completions API receives data that does not conform to its schema requirements for the `messages` parameter. 
+
+Key reasons for this error include:
+1. **Incorrect Data Type**: The Chat Completions endpoint (`/v1/chat/completions`) strictly requires the `messages` field to be a JSON array. Providing a single string (which was the format for legacy Completions models using the `prompt` parameter) will trigger this validation error.
+2. **JSON Parsing Failures**: If your application passes a JSON-stringified array directly to the API client instead of a native array/list object, the API may interpret the entire payload as a single string rather than a structured collection of objects.
+3. **Variable Misinterpretation**: Data retrieved from environment variables, database fields, or UI input components (like those in FlutterFlow or Retool) is often stored as a raw string. If this data is not explicitly parsed into an array before the API call, the type mismatch occurs.
+4. **Malformed Payload Structure**: This error can also manifest if the `messages` key is accidentally wrapped in quotes or if the request headers (specifically `Content-Type: application/json`) are missing or incorrectly handled, causing the body to be treated as plain text.
+
+## Solution
+To resolve this type validation error, ensure the `messages` parameter is correctly structured as an array of objects and properly parsed before transmission. Follow these steps:
+1. **Verify the Array Structure**: Ensure the `messages` field is an array where each element is an object containing the required `role` (e.g., "system", "user", "assistant") and `content` keys.
+2. **Explicitly Parse JSON Data**: If your messages are coming from a string source (like an environment variable or a web form), use a JSON parser before sending the request:
+   - In JavaScript: Use `JSON.parse(variable)`.
+   - In Python: Use `json.loads(variable)`.
+3. **Check API Client Implementation**: Ensure you are using the correct model and endpoint. If you are migrating from older models (like `text-davinci-003`), you must change your payload from a single `prompt` string to the `messages` array format.
+4. **Sanitize the Input**: Check for trailing or leading characters, such as accidental quotes or escape characters, that could cause the JSON object to be misinterpreted as a string literal.
+5. **Review Header Configuration**: Ensure your request includes the header `Content-Type: application/json` so the API correctly interprets the incoming data as a JSON structure.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.flutterflow.io/ask-the-community/post/openai-api-call---invalid-type-for-messages-expected-an-array-of-hcePsYztblsvMse](https://community.flutterflow.io/ask-the-community/post/openai-api-call---invalid-type-for-messages-expected-an-array-of-hcePsYztblsvMse)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://github.com/danny-avila/LibreChat/discussions/3115](https://github.com/danny-avila/LibreChat/discussions/3115)
+- [https://community.openai.com/t/request-failed-with-status-code-400/39242](https://community.openai.com/t/request-failed-with-status-code-400/39242)
+- [https://community.openai.com/t/api-error-message-mixes-up-object-and-string/827221](https://community.openai.com/t/api-error-message-mixes-up-object-and-string/827221)
+- [https://github.com/Nutlope/aicommits/issues/137](https://github.com/Nutlope/aicommits/issues/137)
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)

@@ -1,0 +1,47 @@
+---
+title: "messages.4: all messages must have non-empty content except for the optional final assistant message"
+provider: "anthropic"
+provider_icon: "/logos/anthropic.png"
+solved: true
+slug: "message-content-error-9311"
+---
+
+## Reason
+
+The `400 Bad Request` error with the message "all messages must have non-empty content except for the optional final assistant message" is an `invalid_request_error` returned by the Anthropic Messages API. This error occurs because the request payload contains one or more message objects where the `content` field is empty, null, or improperly initialized.
+
+Key underlying causes include:
+
+*   **Empty Content Blocks:** The API requires that every message in the conversation history must have a non-empty `content` value (either a non-empty string or a populated array of content blocks).
+*   **Validation Rules:** Unlike some other LLM providers, Anthropic enforces a strict policy where every turn in the conversation must contain data. Empty messages are not permitted as placeholders.
+*   **Exception for Prefilling:** The only exception to this rule is the final message in the `messages` array, which can be an `assistant` message. This is used for "prefilling" the model's response, but even in this case, many implementations require it to be the final element to avoid validation errors.
+*   **Index Specificity:** The error often points to a specific index (e.g., `messages.4`), indicating exactly which message in the array is violating the content requirement.
+
+## Solution
+To resolve this error and ensure your request payload is compliant with Anthropic's API specifications, follow these remediation steps:
+
+**1. Filter and Sanitize Message Content**
+Before dispatching the request, implement a filtering mechanism to identify and remove any messages where the `content` property is an empty string (`""`), an empty array (`[]`), or `null`.
+
+**2. Validate Role Alternation and Sequence**
+Ensure your payload adheres to the following structural requirements:
+
+*   **Alternating Roles:** Messages must strictly alternate between the `user` and `assistant` roles.
+*   **Starting Role:** The conversation must always begin with a message from the `user` role.
+*   **Terminal Message:** The last message should typically be from the `user`. If the last message is from the `assistant`, it must be intended for response prefilling.
+
+**3. Check for Empty Tool or Image Blocks**
+If you are using multi-modal inputs or tool use, ensure that the content blocks within the array (such as `image` or `tool_use` blocks) are fully formed and contain the required data. An empty content array at a specific index will trigger this validation error.
+
+**4. Review Initialization Logic**
+Audit the code responsible for building the message history. Ensure that placeholder messages—often created during UI initialization or state resets—are not inadvertently included in the final API call payload.
+
+## Suggested Links
+- [https://www.restack.io/p/anthropic-answer-http-400-bad-request-cat-ai](https://www.restack.io/p/anthropic-answer-http-400-bad-request-cat-ai)
+- [https://www.codalas.com/en/2407/how-to-build-a-compliant-payload-for-anthropic-api](https://www.codalas.com/en/2407/how-to-build-a-compliant-payload-for-anthropic-api)
+- [https://github.com/langgenius/dify/issues/10013](https://github.com/langgenius/dify/issues/10013)
+- [https://forum.cursor.com/t/unable-to-reach-anthropic/22766](https://forum.cursor.com/t/unable-to-reach-anthropic/22766)
+- [https://docs.anthropic.com/en/api/getting-started](https://docs.anthropic.com/en/api/getting-started)
+- [https://docs.anthropic.com/en/api/errors](https://docs.anthropic.com/en/api/errors)
+- [https://docs.anthropic.com/en/api/messages](https://docs.anthropic.com/en/api/messages)
+- [https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/prefill-claude-response](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/prefill-claude-response)

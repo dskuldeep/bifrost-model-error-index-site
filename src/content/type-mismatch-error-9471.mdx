@@ -1,0 +1,42 @@
+---
+title: "The input for 'tools' or 'functions' is expected to be an array, but a different data type was provided. Please ensure the input adheres to the required schema."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "type-mismatch-error-9471"
+---
+
+## Raw Error Text
+
+```text
+{'name': 'information_extraction', 'description': 'Extracts the relevant information from the passage.', 'parameters': {'type': 'object', 'properties': {'properties': {'Tech Sector Concerns': {'type': 'integer', 'enum': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'description': "Describes how much the message is related to the following topic: 'Tech Sector Concerns' - There appears to be some anxiety about the current state of the tech and gaming sectors with references to job cuts, financial downturn and a potential anticipation for government intervention. The higher the number the more related"}, 'Bot Development Work': {'type': 'integer', 'enum': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'description': "Describes how much the message is related to the following topic: 'Bot Development Work' - The team is actively working on a bot, requiring improvements and internal testing. There's mention of considerable changes that will impact bug reporting, feedback/suggestions and Hasura implementations. The higher the number the more related"}, 'Expense Question': {'type': 'integer', 'enum': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'description': "Describes how much the message is related to the following topic: 'Expense Question' - There's a humorous exchange around the proposal of expensing a purchase, implying some light-hearted camaraderie within the team. The higher the number the more related"}, 'API Configuration Progress': {'type': 'integer', 'enum': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'description': "Describes how much the message is related to the following topic: 'API Configuration Progress' - One of the team members managed to create Linear App ID/secret, Titan ID/secret and got OAuth2 user approval. Difficulties were encountered, but it's seen as overall good progress. The higher the number the more related"}}, 'required': ['Tech Sector Concerns', 'Bot Development Work', 'Expense Question', 'API Configuration Progress']}}} is not of type 'array' - 'tools'
+```
+
+## Reason
+
+The 400 Bad Request error in Azure OpenAI indicates that the request sent to the API is malformed or violates the expected schema. Based on the error log, the primary causes are:
+1. **Incorrect Parameter Type for 'tools'**: The error message `is not of type 'array' - 'tools'` explicitly identifies that the `tools` parameter was provided as an object (dictionary) instead of a JSON array (list). Azure OpenAI expects the `tools` field to be a collection of tool objects, even if only one tool is defined.
+2. **Parameter Mismatches**: Using arguments that are unrecognized by specific model versions or API versions can trigger 400 errors. For instance, using newer parameters like `max_completion_tokens` on older model versions that only support `max_tokens` will cause a failure.
+3. **Configuration and Authentication Issues**: Malformed resource IDs or incorrect configuration of managed identities (such as missing RBAC roles like 'Cognitive Services OpenAI User') can result in bad requests.
+4. **Content Filtering Policies**: If the request content or tool descriptions trigger Azure's automated safety filters, the API may reject the request with a 400 error to comply with content management policies.
+
+## Solution
+To resolve the 400 status error, address the following configuration and structural issues:
+1. **Fix 'tools' Array Structure**: Ensure the `tools` parameter is wrapped in square brackets `[]`. Even if you are defining a single function, it must be an item within an array.
+   - **Incorrect**: `"tools": { "type": "function", ... }`
+   - **Correct**: `"tools": [{ "type": "function", ... }]`
+2. **Verify Request Argument Types**: Check that all request arguments match the expected data types (e.g., integers vs. floats) and names required by your specific API version (e.g., `2023-12-01-preview` or later for tool calling).
+3. **Validate Authentication and Roles**: Confirm that your API key is valid. If using Managed Identity, verify that the resource ID is correct and that the identity has the necessary permissions assigned within the Azure Portal.
+4. **Comply with Content Policies**: Review and modify your prompts or function descriptions to ensure they do not violate Azure OpenAI's safety guidelines, which can trigger policy-related blocks.
+5. **Check Model Compatibility**: Ensure the model deployment you are calling supports the specific features you are using, such as function calling or specific token limit parameters.
+
+## Suggested Links
+- [https://learn.microsoft.com/en-us/answers/questions/1680345/issue-with-authenticating-api-management-with-azur](https://learn.microsoft.com/en-us/answers/questions/1680345/issue-with-authenticating-api-management-with-azur)
+- [https://luke.geek.nz/azure/troubleshooting-scenarios-azure-open-ai/](https://luke.geek.nz/azure/troubleshooting-scenarios-azure-open-ai/)
+- [https://github.com/explodinggradients/ragas/issues/649](https://github.com/explodinggradients/ragas/issues/649)
+- [https://community.openai.com/t/azure-open-ai-client-not-working-with-threads/520374](https://community.openai.com/t/azure-open-ai-client-not-working-with-threads/520374)
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md](https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md)
+- [https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue](https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)

@@ -1,0 +1,39 @@
+---
+title: "An unknown error occurred"
+provider: "palm"
+provider_icon: "/file.svg"
+solved: true
+slug: "generic-error-9070"
+---
+
+## Reason
+
+The HTTP 400 Bad Request error within the Google PaLM (Generative Language) API environment indicates that the server cannot process the request because of client-side issues. Key causes include:
+
+*   **Malformed Request Syntax**: The JSON payload may contain errors such as unescaped line breaks, missing commas, or incorrect URL encoding. A common specific error is the "Root element must be a message" or missing required fields like `contents.parts`.
+*   **Invalid Request Parameters**: The request might include unknown or unsupported parameters (e.g., passing `assistant_id` when not required or including a `default` field in tool declarations where it is not supported).
+*   **Model and Version Mismatches**: Using an invalid model identifier (e.g., a typo in `gemini-1.5-pro`) or calling a feature from a newer API version (like `/v1beta`) using an older endpoint (like `/v1`).
+*   **Request Header or Body Issues**: This occurs if the headers are incorrectly formatted or if the request body exceeds the model's input token limit or the server's maximum payload size.
+*   **Rate Limiting or Throttling**: While usually a 429 error, some gateway configurations may return a 400 if the server rejects requests due to extreme frequency.
+*   **Safety and Regional Restrictions**: Requests may fail if safety filter settings are invalid or if the API is accessed from a region where the service (or its free tier) is not supported.
+*   **Server-Side Issues**: Although rare for a 400 code, temporary glitches or configuration problems on the provider's side can occasionally trigger generic errors.
+
+## Solution
+To resolve the HTTP 400 Bad Request error, follow these troubleshooting and remediation steps:
+1.  **Check and Correct the Request**: Verify the URL and all request parameters for typos. Use a JSON validator to ensure the body is syntactically correct and includes all required fields for the specific endpoint.
+2.  **Validate Model and Version**: Confirm that you are using a valid model name (e.g., `models/chat-bison-001` or `gemini-1.5-flash`) and that your endpoint version (`/v1` or `/v1beta`) supports the features you are requesting.
+3.  **Audit Request Headers**: Ensure that headers like `Content-Type: application/json` are set correctly and that the API key is passed through the appropriate header or query parameter.
+4.  **Verify Account and Billing Status**: Ensure that the Google Cloud project associated with your API key has billing enabled if you are operating outside of the free tier or in a restricted region.
+5.  **Clear Browser Cache and Cookies**: Corrupted or outdated local files can interfere with API requests; clearing them can resolve session-related issues.
+6.  **Disable Browser Extensions**: Temporarily turn off extensions that may modify outgoing headers or block API traffic.
+7.  **Network Hygiene**: 
+    *   Verify that your internet connection is stable.
+    *   Clear your local DNS cache to ensure you are connecting to the correct server IP.
+    *   Temporarily disable VPNs or proxies that might be altering the request path.
+8.  **Test Environment Isolation**: Try making the same API call from a different device or network to rule out local configuration issues.
+9.  **Restart Hardware**: Restart your local machine and Wi-Fi router to clear temporary glitches and flush system-level caches.
+
+## Suggested Links
+- [https://ai.google.dev/gemini-api/docs/troubleshooting](https://ai.google.dev/gemini-api/docs/troubleshooting)
+- [https://ai.google.dev/api/rest/v1beta/models/generateContent](https://ai.google.dev/api/rest/v1beta/models/generateContent)
+- [https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/overview](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/overview)

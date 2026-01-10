@@ -1,0 +1,37 @@
+---
+title: "messages.0.content: Input should be a valid list"
+provider: "anthropic"
+provider_icon: "/logos/anthropic.png"
+solved: true
+slug: "input-validation-error-9191"
+---
+
+## Reason
+
+The HTTP 400 Bad Request error `messages.0.content: Input should be a valid list` occurs when the Anthropic Messages API receives a request where the `content` property of a message object does not conform to the expected schema. This error specifically targets the first message in the `messages` array (index 0).
+
+Key reasons for this failure include:
+1. **Incorrect Data Types**: The API expects the `content` field to be either a single string or, more formally, an array (list) of content blocks. If a single object is provided instead of a list of objects, the validation fails.
+2. **Invalid JSON Format**: The request body may contain syntax errors, such as missing braces or improper nesting, which leads the API to misinterpret the structure of the `messages` list.
+3. **Missing Required Fields**: The `content` field is mandatory for each message object. If it is omitted or null within the `messages` array, the API cannot process the request.
+4. **SDK or Tooling Mismatches**: This error is frequently observed in third-party integrations (such as IDE extensions like Continue or Cline) when there is a mismatch between how the tool constructs the message blocks and what the Anthropic API expects for the current version.
+
+## Solution
+To resolve this error, you must ensure your request body strictly follows the Anthropic Messages API specification. Follow these steps:
+1. **Verify the Content Structure**: Ensure the `content` field is properly formatted. While the API often accepts a simple string, the most robust method is to use a list of content block objects.
+   - Correct list format: `"content": [{"type": "text", "text": "Your prompt here"}]`
+2. **Check the Messages Array**: Confirm that the `messages` field is an array of objects, and that each object contains a valid `role` (e.g., "user" or "assistant") and a correctly typed `content` field.
+3. **Validate JSON Syntax**: Use a JSON linting tool to ensure the entire request body is valid and that there are no trailing commas or structural errors.
+4. **Update Dependencies**: If you are using an SDK or a third-party plugin, ensure it is updated to the latest version. Older versions may not correctly implement the content block list requirement introduced in the Messages API.
+5. **Consult Official Documentation**: Review the Anthropic Messages API documentation to confirm the specific requirements for the `messages` endpoint, especially if you are using multi-modal inputs like images.
+
+## Suggested Links
+- [https://github.com/continuedev/continue/issues/2006](https://github.com/continuedev/continue/issues/2006)
+- [https://github.com/cline/cline/issues/261](https://github.com/cline/cline/issues/261)
+- [https://www.restack.io/p/anthropic-answer-http-400-bad-request-cat-ai](https://www.restack.io/p/anthropic-answer-http-400-bad-request-cat-ai)
+- [https://community.openai.com/t/content-is-required-property-error-400/486260](https://community.openai.com/t/content-is-required-property-error-400/486260)
+- [https://forum.cursor.com/t/unable-to-reach-anthropic/22766](https://forum.cursor.com/t/unable-to-reach-anthropic/22766)
+- [https://www.chatgptguide.ai/2023/05/24/every-chatgpt-error-explained-and-how-you-can-fix-them-in-1-minute/](https://www.chatgptguide.ai/2023/05/24/every-chatgpt-error-explained-and-how-you-can-fix-them-in-1-minute/)
+- [https://docs.anthropic.com/en/api/errors](https://docs.anthropic.com/en/api/errors)
+- [https://www.lunar.dev/flows/anthropic-claude-api-retry-for-failed-requests](https://www.lunar.dev/flows/anthropic-claude-api-retry-for-failed-requests)
+- [https://docs.anthropic.com/en/api/messages](https://docs.anthropic.com/en/api/messages)

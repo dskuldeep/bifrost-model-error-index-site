@@ -1,0 +1,35 @@
+---
+title: "Additional properties are not allowed ('result', 'type' were unexpected) - 'messages.17'"
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "validation-error-9538"
+---
+
+## Reason
+
+The error "400 - Additional properties are not allowed" occurs when an OpenAI API request contains parameters or fields that are not recognized by the endpoint's schema. In this specific case, the error points to `'messages.17'`, indicating that the 18th object in your message history array contains illegal keys: `'result'` and `'type'`.
+
+Key reasons for this error include:
+1. **Invalid Request Structure**: The API enforces a strict schema for the `messages` array. Including any fields outside of the supported keys (such as `role`, `content`, `name`, `tool_calls`, or `tool_call_id`) will trigger a validation failure.
+2. **Incorrect Data Payload**: This often happens when developers pass an entire response object from a previous API call or an internal database record back into the `messages` array without stripping out metadata or auxiliary fields like `result`.
+3. **Non-Compliance with API Schema**: When using features like Structured Outputs or Tool Calling, the API performs rigorous validation. If the payload does not strictly adhere to the expected JSON format, the server rejects the request to prevent malformed processing.
+
+## Solution
+To resolve the "Additional properties are not allowed" error, you must ensure your payload is properly sanitized and formatted. Follow these steps:
+1. **Inspect the Targeted Index**: Locate the specific message causing the issue (e.g., index 17 in the `messages` array). Verify exactly what keys are present in that specific object.
+2. **Remove Unexpected Properties**: Manually or programmatically remove any fields that are not part of the official OpenAI message specification. Specifically, ensure that properties like `'result'` or `'type'` are deleted before the request is sent.
+3. **Review the API Documentation**: Match your request structure against the official OpenAI API Reference for Chat Completions to ensure all parameters are valid for the model version you are using.
+4. **Validate Against JSON Schema**: If you are using **Structured Outputs**, ensure your schema is correctly defined. If `strict: true` is enabled, the API is even less tolerant of extra fields. Ensure that `additionalProperties` is handled according to the Structured Outputs documentation.
+5. **Use Official SDKs**: Implement the official OpenAI Python or Node.js SDKs. These libraries include built-in type definitions (e.g., `ChatCompletionMessageParam`) that provide linting and validation errors in your IDE before you even hit the API endpoint.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/400-additional-properties-are-not-allowed-file-path-was-unexpected/933897](https://community.openai.com/t/400-additional-properties-are-not-allowed-file-path-was-unexpected/933897)
+- [https://github.com/Nutlope/aicommits/issues/137](https://github.com/Nutlope/aicommits/issues/137)
+- [https://community.openai.com/t/i-am-receiving-an-error-status-code-400/351121](https://community.openai.com/t/i-am-receiving-an-error-status-code-400/351121)
+- [https://community.openai.com/t/content-is-required-property-error-400/486260](https://community.openai.com/t/content-is-required-property-error-400/486260)
+- [https://openai.com/index/introducing-structured-outputs-in-the-api/](https://openai.com/index/introducing-structured-outputs-in-the-api/)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://platform.openai.com/docs/guides/structured-outputs](https://platform.openai.com/docs/guides/structured-outputs)
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)

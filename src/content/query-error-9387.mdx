@@ -1,0 +1,54 @@
+---
+title: "User query processing error: The provided input is not of the expected type or format. Please ensure the query adheres to the required structure and retry. Refer to the documentation for valid query formats."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "query-error-9387"
+---
+
+## Raw Error Text
+
+```text
+"customer has a query where is my order, I would like you to choose a question from list that best matches the intent and context and could be used to reply for same. I already have exact as.How do I check the status of my order?, What"s the process to track my order?, Where can I find updates on my order?, Can you help me track my recent order?, Is there a way to monitor my order progress?, How can I see the status of my recent purchase?, What"s the quickest way to check my order status?, I need to know how to check the progress of my order., Could you guide me on checking my order status?, What"s the procedure for tracking my order?, Can you assist me in finding out about my order status?, How do I return my product?, What are the steps to return a product?, How can I send back a product for a refund?, Can you guide me on how to initiate a return?, Is there an option to exchange my purchase?, What"s the process for returning an item?, Could you explain the return procedure?, How do I initiate a return for my recent order?, Can you help me with returning a product?, I want to return an item. What should I do?, What"s the return policy for my order?, How will I get my refund?, When will I receive my refund?, Can you tell me about the refund process?, How long does it take to get a refund?, What"s the timeline for receiving my refund?, Do you have information about refund processing?, Can you explain the refund procedure?, I"m curious about the refund timeline., How does the refund process work?, Can you provide details about the refund?, What"s the expected time frame for my refund?, Which products are not eligible for return?, Can I return any product?, Are there restrictions on product returns?, What items can"t be returned?, Which products are exempt from returns?, Do you accept returns on all purchases?, What are the non-returnable items?, Are there any restrictions on returning products?, Which products cannot be returned?, Can you list the items that can"t be returned?, What types of products are not eligible for return?, I wish exchange my product, How can I exchange my purchase?, Is there an option to swap my item?, Can I change my product for a different one?, What"s the process for exchanging an item?, Do you allow product exchanges?, Can I swap my order for another product?, Is exchange possible for my recent purchase?, How do I request an exchange?, Can you guide me through the exchange process?, I want to exchange an item. What should I do?, Return and Refund Policy, Can I get information about your Return and Refund Policy?, What"s your policy on returns and refunds?, Could you explain the Return and Refund Policy?, Where can I find details about your Return and Refund Policy?, Is there a policy for returns and refunds?, Do you have any guidelines for returns and refunds?, What"s your procedure for returns and refunds?, Can you outline the Return and Refund Policy?, What are the rules for returns and refunds?, How does your Return and Refund Policy work?, Self ship Policy, What"s your Self-ship Policy?, Can you explain how self-ship works?, Do you have any guidelines for self-shipping returns?, What"s the process for self-shipping returns?, How does the self-ship option work?, Can I self-ship my return?, What"s involved in the self-ship process?, Is there a policy for self-shipping returns?, How do I self-ship a return item?, Can you provide details about self-shipping returns?, What if I receive a damaged product?, What should I do if my product is damaged?, Can you help if I receive a damaged item?, What"s the process for damaged product?, How do I handle a damaged product?, Is there a procedure for dealing with damaged items?, What if my order arrives in poor condition?, What actions should I take for a damaged product?, How do you handle damaged items?, Do you assist with damaged product issues?, What"s the protocol for damaged product cases?, What if I receive the wrong product?, What should I do if I get the wrong item?, Can you assist if I receive an incorrect product?, How do I handle receiving the wrong item?, Is there a process for wrong product delivery?, What if I"m sent the incorrect item?, What"s the procedure for incorrect orders?, What actions should I take for a wrong product?, How do you address wrong item issues?, Do you help with wrong product situations?, What"s the protocol for wrong product deliveries?, How can I contact customer support?, What are the ways to contact customer support?, How do I get in touch with your support team?, Can you provide contact details for customer support?, Is there a way to reach your customer service?, What"s the best method to contact support?, How can I speak to a customer service representative?, Do you have a helpline number for support?, Can you share the customer support email?, When is customer support available?, What are the contact hours for customer service?" is not of type "array" - "messages"
+```
+
+## Reason
+
+The **400 Bad Request** error in the Azure OpenAI API typically indicates that the request sent by the client is malformed or violates the API's technical requirements. 
+
+In this specific instance, the error message `"messages" is not of type "array"` confirms that the API received a single string or an object instead of the required JSON array for the `messages` parameter. The Chat Completions API requires the `messages` field to be an array of objects, where each object contains a `role` and `content`.
+
+Other potential reasons for a 400 error include:
+1. **Incorrect API Key or Credentials**: The provided API key or subscription key may be invalid, expired, or incorrectly configured in the environment.
+2. **Middleware and Configuration Issues**: Problems with the API client configuration, such as incorrect base URLs or misplaced/incorrectly formatted headers (e.g., the `Authorization` or `api-key` fields).
+3. **Rate Limiting and Throttling**: The request volume may be exceeding the tier-specific rate limits (RPM/TPM) assigned to your Azure OpenAI resource.
+4. **Data Payload Size**: The total size of the request body might exceed the maximum allowed payload size for the specific model or endpoint.
+5. **Invalid Request Arguments**: Including unrecognized parameters or incorrectly structured arguments in the request body.
+6. **Input Validation Errors**: Sending malformed data or data that does not conform to the expected JSON schema.
+7. **Network and Firewall Issues**: Corporate firewalls or proxy settings blocking outbound traffic to the Azure OpenAI service endpoints.
+8. **Incorrect API Endpoint or Request Format**: Using an endpoint URL that does not match the model deployment or failing to provide the correct `api-version` query parameter.
+
+## Solution
+To resolve the 400 status error and fix the `messages` type mismatch, follow these steps:
+1. **Format the `messages` Field Correctly**: Ensure that the `messages` parameter is a JSON array containing message objects. Each object must have a `role` (e.g., "system", "user", or "assistant") and `content` string.
+   
+   **Correct Example:**
+   ```json
+   {
+     "messages": [
+       {"role": "user", "content": "Where is my order?"}
+     ]
+   }
+   ```
+2. **Verify API Keys and Credentials**: Double-check that your Azure OpenAI API key is active and correctly passed in the `api-key` header (or as a Bearer token if using Microsoft Entra ID).
+3. **Check Middleware and Configuration**: Audit your API client settings to ensure the base URL and headers are correctly structured. Ensure the `Content-Type` is set to `application/json`.
+4. **Adhere to Rate Limits**: Monitor your usage in the Azure Portal to ensure you are not hitting rate limits. Implement exponential backoff for retries if necessary.
+5. **Validate Data Payload Size**: If your prompt is very long, ensure it stays within the model's maximum context window and the API's payload limit.
+6. **Correct Request Arguments**: Remove any deprecated or unsupported parameters from your request body. Check the latest API reference for supported arguments like `temperature`, `max_tokens`, etc.
+7. **Validate Input Data**: Use a JSON validator to ensure the request body is a valid JSON object before sending it.
+8. **Inspect Network and Firewall Settings**: Ensure that the endpoint (e.g., `https://{resource-name}.openai.azure.com/`) is allow-listed in your network firewall or proxy configuration.
+9. **Use Correct API Endpoint and Version**: Confirm the deployment name and `api-version` (e.g., `2024-02-01`) in your request URL match your Azure OpenAI deployment settings.
+
+## Suggested Links
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/chatgpt](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/chatgpt)

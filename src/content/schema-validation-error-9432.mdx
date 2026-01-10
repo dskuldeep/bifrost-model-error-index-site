@@ -1,0 +1,35 @@
+---
+title: "Invalid schema for function 'information_extraction': 'object' is not of type 'object', 'boolean'"
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "schema-validation-error-9432"
+---
+
+## Reason
+
+The error `Invalid schema for function 'information_extraction': 'object' is not of type 'object', 'boolean'` occurs when the JSON schema defining the function does not conform to the expected meta-schema required by the Azure OpenAI API. This typically happens during the validation of the function's `parameters` object.
+
+Key reasons include:
+1. **Incorrect Type Definitions**: The error message indicates a type mismatch within the schema definition itself. For instance, the validator may encounter a field where it expects a specific type keyword (like `"object"` or `"boolean"`), but finds a value or structure it cannot parse.
+2. **Payload Structure Mismatch**: The request payload may not align with the strict JSON schema requirements for Azure OpenAI Tool or Function calling. This includes issues like missing the `type: "object"` declaration at the root of the `parameters` object.
+3. **Invalid Syntax or Configuration**: This can involve malformed JSON, incorrect nesting of properties, or using JSON Schema keywords that are not supported by the specific version of the Azure OpenAI model (e.g., attempting to use `additionalProperties: false` on models that do not support Structured Outputs).
+4. **Non-Conformance to API Requirements**: The API expects a specific structure for the `functions` or `tools` array. If the `parameters` field is missing required keys or contains unexpected types, the request is rejected with a 400 Bad Request error.
+
+## Solution
+To resolve this schema validation error, follow these steps to ensure your function definition is compliant:
+1. **Verify Root Data Types**: Ensure that the `parameters` object in your function definition starts with `"type": "object"`. The API requires the top-level parameters to be defined as an object.
+2. **Correct the Payload Structure**: Review the nesting of your JSON schema. Ensure that all properties are defined within a `properties` object and that required fields are listed in a `required` array at the correct level.
+3. **Validate Type Keywords**: Ensure that all `type` values in your schema are valid JSON Schema types (e.g., `"string"`, `"number"`, `"integer"`, `"boolean"`, `"object"`, `"array"`). Ensure they are strings and not accidentally passed as unquoted objects or complex types.
+4. **Check Headers and Content-Type**: Verify that your request includes the header `Content-Type: application/json` and that the body is a properly stringified JSON object.
+5. **Review Model-Specific Requirements**: Different models (e.g., `gpt-4-0613` vs `gpt-4o`) and API versions (e.g., `2023-07-01-preview`) have varying levels of support for schema features. If using Structured Outputs, ensure you are following the specific syntax for the `json_schema` response format.
+6. **Test with a Minimal Schema**: Simplify the `information_extraction` function to a single string parameter to verify that the connection and basic structure are correct, then incrementally add complex types (objects/arrays) to identify the specific field causing the validation failure.
+
+## Suggested Links
+- [https://community.openai.com/t/invalid-schema-error-in-function-using-arrays/426257](https://community.openai.com/t/invalid-schema-error-in-function-using-arrays/426257)
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue](https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue)
+- [https://community.openai.com/t/how-can-i-write-a-post-request-for-azure-openai-that-uses-structured-output/898569](https://community.openai.com/t/how-can-i-write-a-post-request-for-azure-openai-that-uses-structured-output/898569)
+- [https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md](https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)
+- [https://platform.openai.com/docs/guides/structured-outputs](https://platform.openai.com/docs/guides/structured-outputs)

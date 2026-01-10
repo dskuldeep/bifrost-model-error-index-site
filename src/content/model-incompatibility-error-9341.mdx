@@ -1,0 +1,39 @@
+---
+title: "The embeddings operation does not work with the specified model. Please choose a different model and try again. You can learn more about compatible models for each operation here: https://go.microsoft.com/fwlink/?linkid=2197993."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "model-incompatibility-error-9341"
+---
+
+## Raw Error Text
+
+```text
+The embeddings operation does not work with the specified model, gpt-35-turbo-16k. Please choose different model and try again. You can learn more about which models can be used with each operation here: https://go.microsoft.com/fwlink/?linkid=2197993.
+```
+
+## Reason
+
+This error occurs because the `embeddings` operation is being attempted with a model that does not support it, specifically `gpt-35-turbo-16k`. In the Azure OpenAI Service, models are categorized by their specific capabilities; generative models like GPT-3.5 or GPT-4 are designed for Chat and Completions, whereas the `/embeddings` endpoint requires specialized embedding models.
+
+Key reasons for this 400 status code include:
+1. **Incompatible Model**: The specified model, `gpt-35-turbo-16k`, is not supported for embedding tasks. You must use a model specifically trained for vector representation.
+2. **Incorrect Request Configuration**: The API request may be improperly structured. This includes using a deployment name that does not match the operation, invalid API keys, or incorrect request headers.
+3. **Rate Limiting**: Exceeding the rate limits (TPM/RPM) for your assigned pricing tier can sometimes trigger a generic 400 error if the request cannot be processed.
+
+## Solution
+To resolve the 400 status error, you must ensure your request targets a model compatible with the embeddings operation and verify your deployment configuration.
+
+Follow these steps:
+1. **Choose a Compatible Model**: Replace `gpt-35-turbo-16k` with a model designed for embeddings. Recommended models include:
+    * `text-embedding-3-large`
+    * `text-embedding-3-small`
+    * `text-embedding-ada-002`
+2. **Verify Deployment and Endpoint**: Ensure that you have created a deployment for an embedding model in the Azure OpenAI Studio. Verify that your API request is targeting the correct `deployment-id` associated with that embedding model.
+3. **Validate API Keys and Headers**: Double-check that your API key is active and correctly included in the headers. Ensure the `api-version` parameter in your request URL is current and supports the embeddings operation.
+4. **Monitor Rate Limits**: Check the Quota section in the Azure portal to ensure your usage is within the limits set for your resource. Implement exponential backoff in your code to handle potential throttling.
+
+## Suggested Links
+- [https://go.microsoft.com/fwlink/?linkid=2197993](https://go.microsoft.com/fwlink/?linkid=2197993)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models#embeddings](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models#embeddings)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/embeddings](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/embeddings)

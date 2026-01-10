@@ -1,0 +1,35 @@
+---
+title: "You requested a model that is not compatible with this engine. Please contact us through our help center at help.openai.com for further questions."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "incompatibility-error-9080"
+---
+
+## Reason
+
+The error **"You requested a model that is not compatible with this engine"** (typically accompanied by a 400 status code) indicates a structural mismatch between the requested model and the API endpoint or "engine" being used to process the request.
+
+Key reasons for this failure include:
+
+*   **Endpoint-Model Mismatch**: This is the most common cause. It occurs when trying to use a newer model (like `gpt-4` or `gpt-3.5-turbo`) with legacy `/v1/engines` endpoints. Newer models are designed to work with specific endpoints such as `/v1/chat/completions`.
+*   **Model Deprecation**: The model being requested may have been deprecated or officially retired by OpenAI, making it no longer compatible with active processing engines.
+*   **API Configuration Changes**: Updates to OpenAI's infrastructure may have changed how models are routed, rendering previously valid model-engine combinations invalid.
+*   **Invalid API Specifications**: The combination of model and engine parameters in the request does not align with OpenAI's current technical specifications.
+
+## Solution
+To resolve the incompatibility error, you must align your API request with OpenAI's current endpoint and model architecture. Follow these steps:
+1.  **Verify Model Support and Availability**: Check the OpenAI official documentation to ensure the model name (e.g., `gpt-4o`) is correct and that the model is still active and supported.
+2.  **Update the API Endpoint**: Ensure you are using the correct endpoint for the specific model type:
+    *   Use `/v1/chat/completions` for Chat-based models (e.g., `gpt-4`, `gpt-3.5-turbo`).
+    *   Use `/v1/completions` only for models that support legacy completion logic.
+    *   Avoid the `/v1/engines/` path unless specifically required for legacy systems and confirmed to be compatible.
+3.  **Check Deprecation Schedules**: If you are using older models like `text-davinci-003` or `code-davinci-002`, consult the OpenAI Deprecation guide to identify the recommended replacement model.
+4.  **Update SDKs and Libraries**: If you are using a client library (like the OpenAI Python or Node.js packages), ensure it is updated to the latest version. Older library versions may default to outdated engine paths.
+5.  **Review API Documentation**: Ensure your request structure follows the latest API reference for model and engine combinations.
+6.  **Contact OpenAI Support**: If the model and endpoint are confirmed to be correct but the error persists, contact the OpenAI Help Center at help.openai.com for further assistance.
+
+## Suggested Links
+- [https://platform.openai.com/docs/models](https://platform.openai.com/docs/models)
+- [https://platform.openai.com/docs/deprecations](https://platform.openai.com/docs/deprecations)
+- [https://help.openai.com/en/](https://help.openai.com/en/)

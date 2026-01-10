@@ -1,0 +1,35 @@
+---
+title: "1 validation error for Request body -> additional_instructions ensure this value has at most 32768 characters (type=value_error.any_str.max_length; limit_value=32768)"
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-validation-error-9216"
+---
+
+## Reason
+
+The HTTP 400 error occurs due to a schema validation failure in the OpenAI API request body. Specifically, the `additional_instructions` parameter—which is used when creating or modifying a Run within the Assistants API—has a hard limit of **32,768 characters**.
+
+When the length of the string passed to this field exceeds the `limit_value=32768`, the API rejects the request with a `value_error.any_str.max_length` exception. This constraint is a character-count limit imposed at the validation layer of the API, which is separate from the model's token context window. This ensure that request bodies remain within manageable sizes for processing.
+
+## Solution
+To resolve the 400 status error, you must ensure that the string passed to the `additional_instructions` field complies with the 32,768 character limit. 
+
+**Remediation Steps:**
+1. **Trim the Instructions:** Reduce the length of the string in the `additional_instructions` field. Identify and remove redundant text, unnecessary formatting, or excessive whitespace.
+2. **Optimize Content:** Rephrase instructions to be more concise. Use bullet points and clear directives to convey the same logic using fewer characters.
+3. **Use Persistent Instructions:** If the instructions are meant to be a permanent part of the Assistant's behavior, move them to the Assistant's primary `instructions` field. The primary `instructions` field has a much higher limit of **256,000 characters**, compared to the run-specific override limit.
+4. **Break Instructions into Chunks:** If the instructions are highly complex, consider breaking the task into multiple API calls or separate Runs that handle smaller, manageable logic chunks.
+5. **Utilize File Search:** If the large instruction set contains reference data or knowledge, upload that content as a file and use the **File Search** (Retrieval) tool instead of passing the raw text in the request body.
+6. **Implement Client-Side Validation:** Add a pre-check in your application code to count the character length of the instructions before making the API call to prevent validation errors in production.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://github.com/openai/openai-node/issues/1140](https://github.com/openai/openai-node/issues/1140)
+- [https://community.openai.com/t/problem-with-assistant-max-length-32k-even-with-the-gpt-4-1106-preview-and-trying-to-get-the-status-i-get-a-passed-three-arguments-error-even-though-i-only-passed-two/479690](https://community.openai.com/t/problem-with-assistant-max-length-32k-even-with-the-gpt-4-1106-preview-and-trying-to-get-the-status-i-get-a-passed-three-arguments-error-even-though-i-only-passed-two/479690)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://swagger.io/docs/specification/v3_0/describing-request-body/describing-request-body/](https://swagger.io/docs/specification/v3_0/describing-request-body/describing-request-body/)
+- [https://community.openai.com/t/token-character-restrictions-for-assistants-api/511174](https://community.openai.com/t/token-character-restrictions-for-assistants-api/511174)
+- [https://community.openai.com/t/function-call-description-max-length/529902](https://community.openai.com/t/function-call-description-max-length/529902)
+- [https://platform.openai.com/docs/api-reference/runs/createRun](https://platform.openai.com/docs/api-reference/runs/createRun)
+- [https://platform.openai.com/docs/api-reference/assistants/createAssistant](https://platform.openai.com/docs/api-reference/assistants/createAssistant)

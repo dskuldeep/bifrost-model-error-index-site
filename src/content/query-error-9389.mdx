@@ -1,0 +1,54 @@
+---
+title: "User query processing error: The provided input is not of the expected type or format. Please ensure the query adheres to the required structure and retry. Refer to the documentation for valid query formats."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "query-error-9389"
+---
+
+## Raw Error Text
+
+```text
+"How do I check the status of my order?, What's the process to track my order?, Where can I find updates on my order?, Can you help me track my recent order?, Is there a way to monitor my order progress?, How can I see the status of my recent purchase?, What's the quickest way to check my order status?, I need to know how to check the progress of my order., Could you guide me on checking my order status?, What's the procedure for tracking my order?, Can you assist me in finding out about my order status?, How do I return my product?, What are the steps to return a product?, How can I send back a product for a refund?, Can you guide me on how to initiate a return?, Is there an option to exchange my purchase?, What's the process for returning an item?, Could you explain the return procedure?, How do I initiate a return for my recent order?, Can you help me with returning a product?, I want to return an item. What should I do?, What's the return policy for my order?, How will I get my refund?, When will I receive my refund?, Can you tell me about the refund process?, How long does it take to get a refund?, What's the timeline for receiving my refund?, Do you have information about refund processing?, Can you explain the refund procedure?, I'm curious about the refund timeline., How does the refund process work?, Can you provide details about the refund?, What's the expected time frame for my refund?, Which products are not eligible for return?, Can I return any product?, Are there restrictions on product returns?, What items can't be returned?, Which products are exempt from returns?, Do you accept returns on all purchases?, What are the non-returnable items?, Are there any restrictions on returning products?, Which products cannot be returned?, Can you list the items that can't be returned?, What types of products are not eligible for return?, I wish exchange my product, How can I exchange my purchase?, Is there an option to swap my item?, Can I change my product for a different one?, What's the process for exchanging an item?, Do you allow product exchanges?, Can I swap my order for another product?, Is exchange possible for my recent purchase?, How do I request an exchange?, Can you guide me through the exchange process?, I want to exchange an item. What should I do?, Return and Refund Policy, Can I get information about your Return and Refund Policy?, What's your policy on returns and refunds?, Could you explain the Return and Refund Policy?, Where can I find details about your Return and Refund Policy?, Is there a policy for returns and refunds?, Do you have any guidelines for returns and refunds?, What's your procedure for returns and refunds?, Can you outline the Return and Refund Policy?, What are the rules for returns and refunds?, How does your Return and Refund Policy work?, Self ship Policy, What's your Self-ship Policy?, Can you explain how self-ship works?, Do you have any guidelines for self-shipping returns?, What's the process for self-shipping returns?, How does the self-ship option work?, Can I self-ship my return?, What's involved in the self-ship process?, Is there a policy for self-shipping returns?, How do I self-ship a return item?, Can you provide details about self-shipping returns?, What if I receive a damaged product?, What should I do if my product is damaged?, Can you help if I receive a damaged item?, What's the process for damaged product?, How do I handle a damaged product?, Is there a procedure for dealing with damaged items?, What if my order arrives in poor condition?, What actions should I take for a damaged product?, How do you handle damaged items?, Do you assist with damaged product issues?, What's the protocol for damaged product cases?, What if I receive the wrong product?, What should I do if I get the wrong item?, Can you assist if I receive an incorrect product?, How do I handle receiving the wrong item?, Is there a process for wrong product delivery?, What if I'm sent the incorrect item?, What's the procedure for incorrect orders?, What actions should I take for a wrong product?, How do you address wrong item issues?, Do you help with wrong product situations?, What's the protocol for wrong product deliveries?, How can I contact customer support?, What are the ways to contact customer support?, How do I get in touch with your support team?, Can you provide contact details for customer support?, Is there a way to reach your customer service?, What's the best method to contact support?, How can I speak to a customer service representative?, Do you have a helpline number for support?, Can you share the customer support email?, When is customer support available?, What are the contact hours for customer service?" is not of type 'array' - 'messages'
+```
+
+## Reason
+
+The HTTP 400 error occurs because the request sent to the Azure OpenAI Service failed schema validation. Specifically, the `messages` field in the request body was provided as a single scalar string rather than the required JSON array.
+
+Key reasons for this failure include:
+1. **Invalid Data Type for 'messages'**: The Azure OpenAI Chat Completions API requires the `messages` parameter to be a JSON array of objects (e.g., `[{"role": "user", "content": "..."}]`). In this instance, the input was a long comma-separated string of text, which the API does not support as a direct input for the `messages` field.
+2. **Malformed JSON Payload**: If the JSON structure is not properly formatted—such as missing square brackets `[]` for arrays or using incorrect nesting—the API gateway will reject the request as a Bad Request.
+3. **Schema Mismatch**: There is a discrepancy between the data being sent and the API's expected structure. This often happens when developers attempt to pass a raw prompt string (standard for the Completions API) to the Chat Completions endpoint, which strictly requires the structured message format.
+
+## Solution
+To resolve the HTTP 400 error and ensure your request conforms to the Azure OpenAI API specifications, follow these steps:
+1. **Correct the 'messages' Field Format**: Ensure that the `messages` field is a JSON array containing message objects. Each object must have a `role` (e.g., "system", "user", or "assistant") and `content` (the text of the message).
+
+**Incorrect Format:**
+`"messages": "How do I check the status of my order?..."`
+
+**Correct Format:**
+```json
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "How do I check the status of my order?"
+    }
+  ]
+} 
+```
+2. **Validate the JSON Body**: Before sending the request, use a JSON validator to ensure the payload is correctly formatted and free of syntax errors such as missing commas or mismatched braces.
+3. **Verify Request Structure and Parameters**: Confirm that all required parameters for the specific model and API version are present. Ensure you are not mixing parameters from the Legacy Completions API (like `prompt`) with the Chat Completions API (which uses `messages`).
+4. **Review Endpoint and Authentication**: Verify that the endpoint URL matches your resource deployment (e.g., `https://{resource-name}.openai.azure.com/openai/deployments/{deployment-id}/chat/completions?api-version={version}`). Ensure the `api-key` or Bearer token is valid and correctly placed in the request headers.
+5. **Enable Detailed Logging**: Activate diagnostic logging within your application or Azure Monitor to capture the exact payload being sent. This will help identify if your client-side library is unintentionally transforming the array into a string before transmission.
+
+## Suggested Links
+- [https://learn.microsoft.com/en-us/answers/questions/2117771/unable-to-perform-http-communication-with-azure-op](https://learn.microsoft.com/en-us/answers/questions/2117771/unable-to-perform-http-communication-with-azure-op)
+- [https://forum.bubble.io/t/openai-api-error-http-400/263917](https://forum.bubble.io/t/openai-api-error-http-400/263917)
+- [https://luke.geek.nz/azure/troubleshooting-scenarios-azure-open-ai/](https://luke.geek.nz/azure/troubleshooting-scenarios-azure-open-ai/)
+- [https://github.com/danny-avila/LibreChat/discussions/3027](https://github.com/danny-avila/LibreChat/discussions/3027)
+- [https://community.openai.com/t/azure-open-ai-client-not-working-with-threads/520374](https://community.openai.com/t/azure-open-ai-client-not-working-with-threads/520374)
+- [https://learn.microsoft.com/en-us/answers/questions/1680345/issue-with-authenticating-api-management-with-azur](https://learn.microsoft.com/en-us/answers/questions/1680345/issue-with-authenticating-api-management-with-azur)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#chat-completions](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#chat-completions)

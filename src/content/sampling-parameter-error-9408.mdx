@@ -1,0 +1,50 @@
+---
+title: "top_p must be 1 when using greedy sampling."
+provider: "mistral-ai"
+provider_icon: "/file.svg"
+solved: true
+slug: "sampling-parameter-error-9408"
+---
+
+## Reason
+
+The `400 Bad Request` error from the Mistral AI API occurs when there is a logical conflict between sampling parameters in your request payload. Specifically, the error `top_p must be 1 when using greedy sampling` is triggered by the following conditions:
+
+**Incompatible Sampling Parameters**
+Greedy sampling is activated when the `temperature` parameter is set to `0`. In this mode, the model deterministically selects the token with the highest probability. The `top_p` (nucleus sampling) parameter is intended to subset the vocabulary based on cumulative probability. If `top_p` is set to any value other than `1.0` while `temperature` is `0`, the API identifies a conflict because greedy sampling cannot be constrained by nucleus sampling boundaries.
+
+**Incorrect Sampling Method Configuration**
+The API expects a consistent choice between deterministic (greedy) and stochastic (nucleus/top-p) sampling. Mixing these methods—by lowering `top_p` while requesting greedy output—violates the validation logic of the Mistral inference engine.
+
+**Request Syntax and Model Constraints**
+This error may also arise if the request includes unexpected parameters or if the specific model version being invoked has strict validation rules regarding the interaction of `temperature`, `top_p`, and `top_k` values.
+
+## Solution
+To resolve this error, you must align your sampling parameters to ensure they are logically consistent. Follow these steps to remediate the configuration:
+
+**1. Adjust Parameters for Greedy Sampling**
+If you require deterministic output (greedy sampling):
+- Set `temperature` to `0`.
+- Ensure `top_p` is explicitly set to `1` or removed from the request (as it defaults to 1).
+
+**2. Adjust Parameters for Nucleus Sampling**
+If you prefer to use `top_p` to control diversity:
+- Set `temperature` to a value greater than `0` (e.g., `0.7`).
+- You may then set `top_p` to a value between `0` and `1` (e.g., `0.9`).
+
+**3. Validate Request Logic**
+- Review your API call to ensure that no automated libraries or wrappers are injecting a default `top_p` value that conflicts with your `temperature=0` setting.
+- Check the specific requirements for the Mistral model you are using, as some newer models may have stricter enforcement of these parameter combinations.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://github.com/langchain-ai/langchain/issues/22928](https://github.com/langchain-ai/langchain/issues/22928)
+- [https://learn.microsoft.com/en-us/answers/questions/2117664/my-mistral-large-2407-serverless-deployment-api-is](https://learn.microsoft.com/en-us/answers/questions/2117664/my-mistral-large-2407-serverless-deployment-api-is)
+- [https://community.openai.com/t/content-is-required-property-error-400/486260](https://community.openai.com/t/content-is-required-property-error-400/486260)
+- [https://community.openai.com/t/request-failed-with-status-code-400/39242](https://community.openai.com/t/request-failed-with-status-code-400/39242)
+- [https://www.datacamp.com/tutorial/codestral-api-tutorial](https://www.datacamp.com/tutorial/codestral-api-tutorial)
+- [https://github.com/Nutlope/aicommits/issues/137](https://github.com/Nutlope/aicommits/issues/137)
+- [https://forum.cloudron.io/topic/11826/using-mistral-api-seems-broken-on-cloudron](https://forum.cloudron.io/topic/11826/using-mistral-api-seems-broken-on-cloudron)
+- [https://jan.ai/docs/remote-models/mistralai](https://jan.ai/docs/remote-models/mistralai)
+- [https://docs.mistral.ai/api/](https://docs.mistral.ai/api/)
+- [https://docs.mistral.ai/capabilities/completion/](https://docs.mistral.ai/capabilities/completion/)

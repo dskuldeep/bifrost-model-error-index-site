@@ -1,0 +1,30 @@
+---
+title: "Invalid key in \"logit_bias\": additionalProp1. You should only be submitting non-negative integers."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-validation-error-9170"
+---
+
+## Reason
+
+The 400 Bad Request error specifically referencing `Invalid key in "logit_bias": additionalProp1` indicates that the API request contains malformed parameters that violate the expected schema. 
+
+Key reasons for this error include:
+
+- **Invalid Syntax or Configuration**: The `logit_bias` field is an object that maps specific token IDs to bias values. The error occurs when the request includes unrecognized keys. In this instance, `additionalProp1`—often a placeholder used in API documentation or generated SDK code—was passed as a literal key instead of a valid token ID.
+- **Data Type Mismatch**: The OpenAI API requires the keys within the `logit_bias` object to be strings representing non-negative integers (the token IDs). Providing arbitrary strings or placeholder property names causes a validation failure.
+- **Schema Validation**: The server rejects the request because it cannot map the provided key to a known token in the model's vocabulary.
+
+## Solution
+To resolve the `logit_bias` validation error, ensure the parameter is correctly formatted and supported by your chosen model. Follow these steps:
+1. **Verify Token IDs**: Ensure that the keys in the `logit_bias` object are valid integer token IDs (represented as strings) and not placeholder text like `additionalProp1` or raw words. You should use a tokenizer library, such as `tiktoken`, to identify the correct IDs for the tokens you wish to influence.
+2. **Validate Value Range**: Ensure that the values associated with these token keys are integers between -100 and 100. The error message specifically notes that the keys themselves must represent non-negative integers.
+3. **Check Model Compatibility**: Confirm that the model you are using supports `logit_bias`. Some newer models, such as the `o1` series (including `o1-preview` and `o1-mini`), do not support this parameter.
+4. **Switch Models if Necessary**: If your application logic requires the use of `logit_bias` and your current model does not support it, switch to a compatible model like `gpt-4o` or `gpt-3.5-turbo`.
+5. **Cleanse Request Payloads**: If you are using an automated tool or SDK to generate your request, check for default placeholder values and remove any property named `additionalProp1` before sending the request.
+
+## Suggested Links
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-logit_bias](https://platform.openai.com/docs/api-reference/chat/create#chat-create-logit_bias)
+- [https://platform.openai.com/tokenizer](https://platform.openai.com/tokenizer)
+- [https://platform.openai.com/docs/guides/reasoning/beta-limitations](https://platform.openai.com/docs/guides/reasoning/beta-limitations)

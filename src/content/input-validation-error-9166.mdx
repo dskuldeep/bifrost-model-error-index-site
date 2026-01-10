@@ -1,0 +1,34 @@
+---
+title: "[] is too short - \"tools\""
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-validation-error-9166"
+---
+
+## Reason
+
+The error message `[] is too short - "tools"` (HTTP 400 Bad Request) occurs when the `tools` parameter is included in an OpenAI Chat Completions request but is passed as an empty array. OpenAI requires that if the `tools` key is present, it must contain at least one valid tool or function definition. 
+
+General factors contributing to 400 errors include:
+1. **Invalid or Expired API Key**: The key may be incorrect, expired, or not properly configured in your environment variables.
+2. **Incorrect Request Syntax**: Syntax errors in headers (specifically the `Authorization` field) or an incorrect base URL in your library configuration (e.g., Axios or the OpenAI SDK).
+3. **Middleware Misconfiguration**: Libraries or custom middleware may be unintentionally stripping tool data or misformatting the JSON payload.
+4. **Rate Limiting**: Exceeding OpenAI’s predefined rate limits can cause the server to reject requests.
+5. **Unsupported Parameters**: Using parameters that are invalid for the specific model being called (e.g., using `tools` with a legacy model that does not support function calling).
+6. **Network Issues**: Intermittent network failures or issues with how tokens are being counted server-side can occasionally manifest as validation errors.
+
+## Solution
+To resolve the `[] is too short - "tools"` error and other 400 status issues, follow these steps:
+1. **Fix the Tools Array**: If you are not using tools, remove the `tools` key from your request payload entirely. If you are using tools, ensure the array contains at least one tool object (e.g., a function definition) and is not empty.
+2. **Verify the API Key**: Confirm that the API key is active and correctly implemented in your `Authorization` header as `Bearer YOUR_API_KEY`.
+3. **Validate Request Structure**: Ensure the request uses the correct JSON syntax and that the base URL for the API endpoint is correct.
+4. **Inspect Input Parameters**: Confirm that all input fields meet the minimum required length and do not contain illegal characters or formatting (like excessive new lines in headers).
+5. **Implement Rate Limiting**: If you are hitting usage limits, implement an exponential backoff strategy to manage request frequency.
+6. **Inspect Network Traffic**: Use debugging tools or logging middleware to inspect the raw JSON payload being sent to OpenAI to ensure the `tools` array is populated as expected before it leaves your application.
+7. **Consult Documentation**: Review the OpenAI API reference for the specific model you are using to confirm that all provided parameters are supported.
+
+## Suggested Links
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)
+- [https://community.openai.com/t/expects-tool-calls-when-none-are-specified/996347](https://community.openai.com/t/expects-tool-calls-when-none-are-specified/996347)
+- [https://help.openai.com/en/articles/4936856-rate-limits](https://help.openai.com/en/articles/4936856-rate-limits)

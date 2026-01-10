@@ -1,0 +1,48 @@
+---
+title: "Invalid 'messages': empty array. Expected an array with minimum length 1, but got an empty array instead."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-validation-error-9187"
+---
+
+## Reason
+
+The **400 Bad Request** error in the OpenAI API, particularly the message "Invalid 'messages': empty array," indicates that the server received a request that does not meet the structural requirements for the `messages` parameter. The Chat Completions API strictly requires a non-empty list of message objects to process a completion.
+
+Key causes include:
+1.  **Empty Messages Array**: The `messages` parameter must be an array with a minimum length of
+1. Passing `[]` results in a validation failure.
+2.  **Incorrect Request Syntax**: Objects within the `messages` array must contain required fields such as `role` (e.g., "system", "user", "assistant") and `content`. If the `content` field is missing, null, or improperly structured (e.g., an empty nested array where one is expected), the API will reject the request.
+3.  **Invalid or Expired API Keys**: Issues with the `Authorization` header, such as using an expired key or missing the `Bearer` prefix, can lead to 400 or 401 errors. Authentication is required before the API can validate the body syntax.
+4.  **Middleware and Library Configuration**: When using libraries like Axios, incorrect base URLs, missing `'Content-Type': 'application/json'` headers, or automatic request interceptors that strip the request body can cause the payload to arrive empty or malformed.
+5.  **Model-Specific Constraints**: Certain parameters, such as `dimensions`, are only supported by specific models (e.g., `text-embedding-3-small/large`). Using these with unsupported models (e.g., `text-embedding-ada-002`) or passing empty values to `tool_calls` for models expecting populated tool data will trigger a 400 error.
+6.  **Token Limit Overages**: If the sum of the input prompt tokens and the `max_tokens` parameter exceeds the model's maximum context length, the API may return a 400 error indicating the request is too large.
+7.  **Data Type Mismatch**: Passing a string where an array is expected (or vice-versa) for parameters like `messages` or `stop` sequences will result in a validation error.
+
+## Solution
+To resolve the "400 Bad Request" error due to an invalid or empty `messages` array, ensure your request adheres to the OpenAI API schema by following these steps:
+1.  **Ensure the `messages` Array is Populated**: Verify that the `messages` array contains at least one object. Each object should follow the standard format:
+    `{"role": "user", "content": "Your message here"}`.
+2.  **Validate Message Content**: Ensure that the `content` field is not an empty string or null. If you are programmatically generating messages, add a check to ensure the array is not empty before making the API call.
+3.  **Verify API Key and Headers**: Confirm your API key is active in the OpenAI Dashboard. Ensure your request includes the correct header: `Authorization: Bearer YOUR_API_KEY`.
+4.  **Correct Library Configuration**: If using Axios or a similar client:
+    *   Set the `Content-Type` header to `application/json`.
+    *   Ensure the request body is being correctly serialized to a JSON string.
+5.  **Check Model-Specific Parameters**: 
+    *   If using embeddings, only include the `dimensions` parameter for supported models like `text-embedding-3-small` or `text-embedding-3-large`.
+    *   If using function calling or tools, ensure the `tool_calls` array is either omitted, null, or contains at least one valid tool object; do not pass an empty array `[]`.
+6.  **Avoid Exceeding Context Windows**: Calculate the token count of your prompt and reduce the `max_tokens` value if the total exceeds the model's limit (e.g., 8,192 for GPT-4 or 128k for GPT-4o).
+7.  **Monitor Rate Limits**: Stay within the RPM (Requests Per Minute) and TPM (Tokens Per Minute) limits for your account tier to prevent secondary validation issues during high-volume traffic.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/api-error-message-mixes-up-object-and-string/827221](https://community.openai.com/t/api-error-message-mixes-up-object-and-string/827221)
+- [https://github.com/microsoft/autogen/issues/1521](https://github.com/microsoft/autogen/issues/1521)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://community.openai.com/t/messages-1-content-is-invalid/700063](https://community.openai.com/t/messages-1-content-is-invalid/700063)
+- [https://community.openai.com/t/undefined-array-key-0-when-get-messages-list-empty-response/754208](https://community.openai.com/t/undefined-array-key-0-when-get-messages-list-empty-response/754208)
+- [https://learn.microsoft.com/fi-fi/azure/ai-services/openai/reference](https://learn.microsoft.com/fi-fi/azure/ai-services/openai/reference)
+- [https://community.openai.com/t/the-submit-output-tools-returns-an-error-where-the-type-is-server-error-but-the-message-is/581261](https://community.openai.com/t/the-submit-output-tools-returns-an-error-where-the-type-is-server-error-but-the-message-is/581261)
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)
+- [https://platform.openai.com/docs/guides/error-codes/api-errors](https://platform.openai.com/docs/guides/error-codes/api-errors)

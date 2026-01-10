@@ -1,0 +1,42 @@
+---
+title: "The provided input does not match the required type. Expected a 'string' but received a different type. Please adjust the input format to meet the specified constraints."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-validation-error-9172"
+---
+
+## Raw Error Text
+
+```text
+{'input_variables': ['human_input'], 'template': 'generate an image for little children stroyes that brings the scene to life  of three little pigs. Describe the characters, setting, and actions in a way that would captivate a young audience the story \n            \n            Human: {human_input}\n            Chatbot:', '_type': 'prompt'} is not of type 'string' - 'prompt'
+```
+
+## Reason
+
+The OpenAI API returned a 400 Bad Request error because the input provided to the `prompt` or `content` field was a structured object instead of the required string. 
+
+Key reasons for this failure include:
+1. **Invalid Request Format**: The error log reveals that a dictionary-like structure containing `input_variables`, `template`, and `_type` was sent to the API. This typically occurs when a framework-specific object, such as a **LangChain PromptTemplate**, is passed directly into an API call rather than being rendered into a final string first.
+2. **Incorrect API Request Configuration**: The API endpoint expects a clear string literal. When it receives a complex data structure (like the one in the raw log), the request is considered malformed because it does not match the schema defined in the API documentation.
+3. **Input Validation Errors**: OpenAI enforces strict data typing. If a parameter is defined as a string but receives an object or array, the server rejects the request immediately with a validation error.
+4. **Excessive Headers**: While the primary cause is a payload mismatch, 400 errors can occasionally be triggered by an excessive number of request headers or oversized header values.
+
+## Solution
+To resolve the 400 status error, you must ensure the payload matches the expected OpenAI API schema exactly. Follow these remediation steps:
+1. **Validate the input format**: Convert your prompt object into a literal string before making the request. If you are using LangChain or a similar library, use the appropriate formatting method (e.g., `prompt_template.format(human_input="your_text")`) to generate the string content.
+2. **Correct API request configuration**: Verify that the request payload is properly formatted. For Chat Completion models (like `gpt-4o`), ensure the content is a string within the `messages` array. For Completion models, ensure the `prompt` field is a single string.
+3. **Check API keys and permissions**: Confirm that your API key is correct, not expired, and has the necessary permissions to access the specific model you are targeting.
+4. **Inspect network traffic and headers**: Use a debugger or network proxy to verify that the `Authorization` header is correctly formatted (e.g., `Bearer YOUR_API_KEY`) and that the base URL is correct.
+5. **Adhere to rate limits and payload sizes**: Ensure that the final formatted string does not exceed the model's maximum context window (token limit) and that you are staying within your organization's rate limits.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/openai-create-return-error-400-after-following-the-template-in-the-documentation/305508](https://community.openai.com/t/openai-create-return-error-400-after-following-the-template-in-the-documentation/305508)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://github.com/vllm-project/vllm/issues/3906](https://github.com/vllm-project/vllm/issues/3906)
+- [https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c](https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c)
+- [https://www.restack.io/p/openai-python-answer-fix-bad-request-error-cat-ai](https://www.restack.io/p/openai-python-answer-fix-bad-request-error-cat-ai)
+- [https://community.openai.com/t/solved-whats-wrong-with-the-api-request-syntax/36611](https://community.openai.com/t/solved-whats-wrong-with-the-api-request-syntax/36611)
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)
+- [https://python.langchain.com/v0.2/docs/concepts/#prompts](https://python.langchain.com/v0.2/docs/concepts/#prompts)

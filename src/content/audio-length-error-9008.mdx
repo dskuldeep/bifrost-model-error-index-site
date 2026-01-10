@@ -1,0 +1,37 @@
+---
+title: "Audio file is too short. Minimum audio length is 0.1 seconds."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "audio-length-error-9008"
+---
+
+## Reason
+
+The `400 Bad Request` error occurs when an audio file submitted to OpenAI's transcription or translation endpoints (Whisper) fails to meet the minimum duration threshold of **0.1 seconds** (100 milliseconds).
+
+Key reasons for this failure include:
+1. **Invalid Request Duration**: The most direct cause is providing a file where the actual audio content is shorter than the API's hard limit. OpenAI requires at least 0.1 seconds of data to perform feature extraction.
+2. **Empty or Corrupt Buffers**: If the audio is captured via a stream or a temporary buffer that fails to initialize or terminate correctly, the resulting file may have a header but contain zero or near-zero duration data.
+3. **Syntax or Configuration Issues**: The API server interprets the insufficient file length as a malformed request, as it cannot process the payload using the specified audio parameters or model configurations.
+
+## Solution
+To resolve the "Audio file is too short" error, follow these remediation steps:
+1. **Verify Audio Length**: Use a tool like FFmpeg or an audio library (such as `pydub` or `wave`) to inspect the file metadata. Ensure the duration is strictly greater than 0.1 seconds before sending the request.
+2. **Handle Short Files in Code**: Implement a client-side check to skip or pad audio segments that do not meet the 100ms requirement. This prevents unnecessary API calls and 400-level errors.
+3. **Concatenate Audio Files**: If you are processing a stream of short clips, concatenate multiple segments into a single file that exceeds the minimum length.
+4. **Check File Format and Integrity**: Ensure the file is not corrupted and is in a supported format. OpenAI's Whisper API supports: `mp3`, `mp4`, `mpeg`, `mpga`, `m4a`, `wav`, and `webm`.
+5. **Review API Request Structure**: Ensure the request is formatted as `multipart/form-data` and that the file parameter is correctly populated with the binary data of the audio file.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://github.com/googleapis/python-speech/issues/18](https://github.com/googleapis/python-speech/issues/18)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://pipedream.com/community/t/openai-whisper-transcribe-audio-files-gives-error-request-failed-with-status-code-400/7248](https://pipedream.com/community/t/openai-whisper-transcribe-audio-files-gives-error-request-failed-with-status-code-400/7248)
+- [https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c](https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c)
+- [https://community.openai.com/t/transcriptions-api-endpoint-returning-400-error-node-js/308712](https://community.openai.com/t/transcriptions-api-endpoint-returning-400-error-node-js/308712)
+- [https://github.com/langchain-ai/langchain/issues/11449](https://github.com/langchain-ai/langchain/issues/11449)
+- [https://community.openai.com/t/whisper-error-400-unrecognized-file-format/563474](https://community.openai.com/t/whisper-error-400-unrecognized-file-format/563474)
+- [https://github.com/Nutlope/aicommits/issues/137](https://github.com/Nutlope/aicommits/issues/137)
+- [https://github.com/openai/openai-python/issues/734](https://github.com/openai/openai-python/issues/734)
+- [https://platform.openai.com/docs/guides/speech-to-text](https://platform.openai.com/docs/guides/speech-to-text)

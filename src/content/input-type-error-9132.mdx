@@ -1,0 +1,45 @@
+---
+title: "Input content is not of the expected type 'object'."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-type-error-9132"
+---
+
+## Raw Error Text
+
+```text
+'{"role":"user","content":"What\'s a Fractal?"}' is not of type 'object' - 'messages.0'
+```
+
+## Reason
+
+The OpenAI API returns a 400 Bad Request error with the message `'...' is not of type 'object' - 'messages.0'` when the data structure provided in the `messages` array does not match the expected API schema. 
+
+Specifically, this error indicates that the first element in the array (index 0) was received as a string instead of a JSON object. This commonly occurs due to:
+1. **Incorrect Serialization**: Passing a JSON-formatted string (e.g., `'{"role": "user", ...}'`) into the `messages` list instead of a native dictionary or object. Some developers accidentally double-serialize their data or pass raw strings to SDKs that expect parsed objects.
+2. **Invalid Data Type**: The OpenAI API enforces strict validation. The `messages` parameter must be an array, and every item within that array must be a JSON object containing valid `role` and `content` keys.
+3. **Syntax or Configuration Errors**: The request may contain missing fields, extra brackets, or incorrect quoting that prevents the server from parsing the individual message as an object.
+
+## Solution
+To resolve this error, you must ensure that the `messages` field is formatted as a true array of objects rather than an array of strings. Follow these steps:
+1. **Verify Object Structure**: Ensure that each item in the `messages` array is a complete JSON object. For example, in Python, use a dictionary: `{"role": "user", "content": "What's a Fractal?"}`.
+2. **Avoid Double-Stringifying**: If you are using an SDK (like the official OpenAI Python or Node.js library), do not call `json.dumps()` or `JSON.stringify()` on the message objects before adding them to the list. Pass the objects directly.
+3. **Confirm Array Type**: Ensure the `messages` field itself is a list/array and not a single object or a raw string.
+4. **Check SDK Implementation**: 
+    - **Python**: `messages=[{"role": "user", "content": "..."}]` 
+    - **Node.js**: `messages: [{ role: 'user', content: '...' }]` 
+    - **cURL**: Ensure the `-d` payload is valid JSON and the `Content-Type: application/json` header is present.
+5. **Validate Required Keys**: Ensure every message object contains the `role` (e.g., `system`, `user`, `assistant`, or `developer`) and the `content` string.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c](https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c)
+- [https://community.openai.com/t/request-failed-with-status-code-400/39242](https://community.openai.com/t/request-failed-with-status-code-400/39242)
+- [https://community.openai.com/t/opena-ai-bad-request-error-400/666947](https://community.openai.com/t/opena-ai-bad-request-error-400/666947)
+- [https://community.openai.com/t/sorry-i-couldnt-process-the-response-correctly/513153](https://community.openai.com/t/sorry-i-couldnt-process-the-response-correctly/513153)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096](https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096)
+- [https://help.promptitude.io/en/articles/9311026-error-400-using-openai-how-to-fix-it](https://help.promptitude.io/en/articles/9311026-error-400-using-openai-how-to-fix-it)
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)

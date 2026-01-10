@@ -1,0 +1,50 @@
+---
+title: "* GenerateContentRequest.contents: contents is not specified"
+provider: "google"
+provider_icon: "/logos/google.png"
+solved: true
+slug: "input-validation-error-9200"
+---
+
+## Reason
+
+The `400 Bad Request` error with the message `GenerateContentRequest.contents: contents is not specified` indicates that the request sent to the Google Gemini API (or Vertex AI) is unacceptable due to a missing or empty mandatory field. 
+
+Key reasons include:
+1. **Missing Mandatory Field**: The `contents` parameter is a non-optional root-level field in the `GenerateContentRequest` schema. If this key is absent from the JSON body, the API cannot process the request.
+2. **Empty or Invalid Payload**: The error occurs if the request payload is provided but the `contents` field is set to an empty array (e.g., `"contents": []`) or a null value.
+3. **Improper Formatting**: The request may be improperly structured or nested, preventing the API from correctly identifying the necessary information for content generation.
+
+## Solution
+To resolve the `400 Bad Request` error, ensure that the `contents` field is correctly specified, formatted, and populated in your API request body.
+
+Follow these steps to remediate the issue:
+1. **Specify the contents Field**: Ensure your JSON request body includes a root-level key named `contents`.
+2. **Verify Field Structure**: The `contents` field must be an array containing at least one `Content` object. Each object should include a `parts` array with the prompt data.
+   
+   Example of a valid structure:
+   ```json
+   {
+     "contents": [
+       {
+         "role": "user",
+         "parts": [
+           {
+             "text": "Your prompt goes here."
+           }
+         ]
+       }
+     ]
+   }
+   ```
+3. **Check for Empty Data**: Confirm that your application logic is not sending an empty list to the API. Every request must contain the actual content intended for processing.
+4. **Review API Guidelines**: Refer to the official Google AI or Vertex AI documentation for the specific formatting requirements of the model version you are targeting.
+
+Key actions:
+1. Include the properly structured `contents` field in your request.
+2. Ensure the request payload is valid JSON and not empty.
+3. Consult the API documentation for specific schema requirements.
+
+## Suggested Links
+- [https://ai.google.dev/api/rest/v1beta/models/generateContent](https://ai.google.dev/api/rest/v1beta/models/generateContent)
+- [https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini)

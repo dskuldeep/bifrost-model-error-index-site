@@ -1,0 +1,41 @@
+---
+title: "Invalid value: 'Tel...st.'. Supported values are: 'system', 'assistant', 'user', 'function', and 'tool'."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "invalid-value-error-9294"
+---
+
+## Reason
+
+The 400 Bad Request error in the Azure OpenAI API occurs because the `role` attribute in one or more objects within the `messages` array contains an unsupported string. The Chat Completion API strictly enforces allowed values for identifying the sender of a message.
+
+Key reasons for this error include:
+
+- **Incorrect Role in Messages**: The API encountered a value (such as the 'Tel...st.' string mentioned in the error log) that does not match the supported schema. The `role` field must be one of the pre-defined constants.
+- **Invalid Request Configuration**: The request payload may have mismatched values, such as passing message content into the `role` property or using custom strings.
+- **Schema Non-Conformance**: The payload does not conform to the expected structure for the `messages` array, where each object requires a valid `role` and `content` (or `tool_calls`).
+- **Case Sensitivity**: Role names are case-sensitive and must be provided in lowercase (e.g., 'user' instead of 'User').
+
+## Solution
+To resolve the "Invalid value" error in the Azure OpenAI API, ensure that the roles used in your message payload are valid and correctly formatted. Follow these steps:
+1. **Verify Role Values**: Inspect the `messages` array in your request. Ensure every `role` field is set to exactly one of the following supported values:
+   - `system` (used to set assistant behavior)
+   - `user` (used for user prompts)
+   - `assistant` (used for AI responses)
+   - `tool` (used for tool outputs)
+   - `function` (used for legacy function calling outputs)
+2. **Check for Typos and Whitespace**: Look for spelling errors or accidental leading/trailing spaces in the string values assigned to the `role` field.
+3. **Audit Variable Mapping**: If your application dynamically generates messages, ensure that message content is not accidentally being mapped to the `role` key. The error 'Tel...st.' suggests that actual text content was likely passed where the role was expected.
+4. **Validate API Version Compatibility**: Ensure the roles you are using (especially `tool` or `function`) are supported by the specific API version used in your endpoint URL.
+5. **Confirm JSON Structure**: Ensure the request payload is a valid JSON object and that the `messages` field is a properly formatted array of objects.
+
+## Suggested Links
+- [https://github.com/danny-avila/LibreChat/discussions/3115](https://github.com/danny-avila/LibreChat/discussions/3115)
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue](https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference-preview](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference-preview)
+- [https://github.com/langgenius/dify/issues/4686](https://github.com/langgenius/dify/issues/4686)
+- [https://learn.microsoft.com/en-us/answers/questions/1721425/azure-openai-cant-add-assistants-message-content-a](https://learn.microsoft.com/en-us/answers/questions/1721425/azure-openai-cant-add-assistants-message-content-a)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#chat-completions](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#chat-completions)

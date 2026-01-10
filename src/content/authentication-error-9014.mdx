@@ -1,0 +1,60 @@
+---
+title: "Invalid or incorrect API key. Please check your API key at https://platform.openai.com/account/api-keys and ensure it is correctly configured."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "authentication-error-9014"
+---
+
+## Raw Error Text
+
+```text
+Incorrect API key provided: sk-proj-************************************************************************************************************************************************************0wVh. You can find your API key at https://platform.openai.com/account/api-keys.
+```
+
+## Reason
+
+The 401 Unauthorized error with the message "Incorrect API key provided" occurs when the OpenAI API cannot validate the credentials sent in the request header. This failure is typically caused by one of the following factors:
+
+**Incorrect or Outdated API Key**
+The API key may be invalid, expired, or revoked. If a key was deleted in the OpenAI dashboard but remains in the application code, the API will reject all subsequent requests.
+
+**Project-Specific Key Issues**
+OpenAI now utilizes project-level API keys (prefixed with `sk-proj-`). Authentication will fail if you are using a key scoped to a specific project that has been deleted, or if the key lacks the necessary permissions for the resource you are attempting to access.
+
+**Multiple API Keys and Conflicts**
+Conflicts often arise when an application pulls keys from different sources, such as a `.env` file, hardcoded strings, or system-wide environment variables. If multiple keys exist, the application may be defaulting to an incorrect or legacy key.
+
+**Organization ID Mismatch**
+If your request explicitly includes an `OpenAI-Organization` header, it must match the organization associated with the API key. Using an incorrect ID, or belonging to multiple organizations without specifying the correct one, can trigger authentication errors.
+
+**Code and Environment Configuration**
+The `OPENAI_API_KEY` environment variable might not be exported correctly in the current shell session, or the application code may be failing to read the variable, resulting in an empty or literal string being sent as the key.
+
+**Formatting and Typos**
+Small errors, such as leading or trailing whitespace, extra quotation marks in environment files, or truncated strings during copy-paste operations, will invalidate the key.
+
+## Solution
+To resolve the "Incorrect API key provided" error, follow these troubleshooting steps:
+1. **Verify the API Key Status**
+Log in to the [OpenAI API Keys dashboard](https://platform.openai.com/account/api-keys) and confirm that the key you are using is active. Ensure you have copied the entire string, including the `sk-proj-` prefix.
+2. **Check for Formatting and Typos**
+Review your code and configuration files for hidden spaces or unintended quotation marks around the API key string. These formatting errors are a frequent cause of authentication failure.
+3. **Inspect Environment Variables**
+Confirm the `OPENAI_API_KEY` is properly set in your environment. You can check this by running `echo $OPENAI_API_KEY` (Linux/macOS) or `echo %OPENAI_API_KEY%` (Windows) in your terminal. Restart your IDE or terminal session after making changes to ensure the new values are loaded.
+4. **Validate Organization and Project IDs**
+Check your [Organization Settings](https://platform.openai.com/account/organization) to find your Organization ID. If your code specifies an organization or project parameter, verify that they match the settings associated with the API key being used.
+5. **Check for Hardcoded Overrides**
+Audit your script to ensure that a hardcoded key is not overriding your environment variables or intended configuration files.
+6. **Regenerate the API Key**
+If the issue persists, generate a new secret key from the OpenAI dashboard. Immediately update your environment configuration with the new key and delete the old one to prevent future confusion.
+
+## Suggested Links
+- [https://community.openai.com/t/authenticationerror-error-code-401/766947](https://community.openai.com/t/authenticationerror-error-code-401/766947)
+- [https://help.openai.com/en/articles/6882433-incorrect-api-key-provided](https://help.openai.com/en/articles/6882433-incorrect-api-key-provided)
+- [https://community.openai.com/t/api-authentication-issue-cant-find-out-why/263803](https://community.openai.com/t/api-authentication-issue-cant-find-out-why/263803)
+- [https://community.openai.com/t/401-incorrect-api-key-provided/603609](https://community.openai.com/t/401-incorrect-api-key-provided/603609)
+- [https://community.openai.com/t/receiving-a-401-unauthorized/42787](https://community.openai.com/t/receiving-a-401-unauthorized/42787)
+- [https://community.openai.com/t/issue-whilst-using-api-key-on-aider-ai/953662](https://community.openai.com/t/issue-whilst-using-api-key-on-aider-ai/953662)
+- [https://platform.openai.com/docs/guides/production-best-practices/api-keys](https://platform.openai.com/docs/guides/production-best-practices/api-keys)
+- [https://help.openai.com/en/articles/4936850-where-do-i-find-my-organization-id](https://help.openai.com/en/articles/4936850-where-do-i-find-my-organization-id)

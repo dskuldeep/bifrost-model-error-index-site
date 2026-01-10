@@ -1,0 +1,38 @@
+---
+title: "Unrecognized request argument supplied: response_format"
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "invalid-argument-error-9229"
+---
+
+## Reason
+
+The error **"Unrecognized request argument supplied: response_format"** in the Azure OpenAI API (indicated by a **400 status code**) occurs when the API receives a parameter it does not recognize in the context of the specific request. This mismatch highlights a configuration issue where the provided parameters are not supported by the current API version, model, or endpoint.
+
+Key reasons include:
+
+* **API Version Incompatibility**: The `response_format` parameter (used to enable JSON mode) was introduced in newer API versions. Using an older `api-version` in the request URL (such as versions prior to `2023-12-01-preview`) will cause the server to reject the argument.
+* **Unsupported Model Deployment**: The API expects a specific set of parameters based on the model. Certain older models or specific model snapshots do not support the `response_format` argument.
+* **Parameter Mismatch**: The server cannot process the request because it includes a request body argument that is invalid for the targeted inference endpoint.
+
+## Solution
+To resolve the "Unrecognized request argument supplied" error, ensure your request parameters align with the specific requirements of the Azure OpenAI API version and model you are utilizing. Follow these steps:
+1. **Update the API Version**: Verify that the `api-version` query parameter in your endpoint URL is set to a version that supports the `response_format` argument, such as `2023-12-01-preview`, `2024-02-01`, or later.
+2. **Review API Documentation**: Consult the latest Azure OpenAI documentation to confirm the supported parameters for your specific endpoint and model deployment.
+3. **Remove Unsupported Parameters**: Strip any parameters from the request body that are not recognized by the API. If `response_format` or `max_completion_tokens` are not supported for your specific model version, they must be removed.
+4. **Use Correct Parameter Names**: Ensure all parameter names match the API specification exactly. For example, verify whether the model requires `max_tokens` or the newer `max_completion_tokens` parameter.
+5. **Check Model Compatibility**: Confirm that the model you have deployed (e.g., GPT-4o, GPT-4 Turbo, or GPT-3.5 Turbo) is a version that supports JSON mode. Note that models like the `o1` series have different parameter requirements than earlier GPT-4 models.
+6. **Verify Deployment Configuration**: Ensure you are targeting the correct deployment, as older model deployments within the same resource may not support newer API features.
+
+## Suggested Links
+- [https://learn.microsoft.com/en-us/answers/questions/1441586/openai-error-invalidrequesterror-unrecognized-requ](https://learn.microsoft.com/en-us/answers/questions/1441586/openai-error-invalidrequesterror-unrecognized-requ)
+- [https://forum.bubble.io/t/openai-error-400-unrecognized-request-argument-supplied-messages/285584](https://forum.bubble.io/t/openai-error-400-unrecognized-request-argument-supplied-messages/285584)
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/unrecognized-request-argument-supplied-messages/81459](https://community.openai.com/t/unrecognized-request-argument-supplied-messages/81459)
+- [https://community.openai.com/t/azure-openai-gpt-4o-mini-2024-07-18-structured-outputs-response-format-not-working/908217](https://community.openai.com/t/azure-openai-gpt-4o-mini-2024-07-18-structured-outputs-response-format-not-working/908217)
+- [https://community.openai.com/t/how-do-i-use-the-new-json-mode/475890](https://community.openai.com/t/how-do-i-use-the-new-json-mode/475890)
+- [https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md](https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md)
+- [https://github.com/openai/openai-python/issues/887](https://github.com/openai/openai-python/issues/887)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/json-mode](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/json-mode)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)

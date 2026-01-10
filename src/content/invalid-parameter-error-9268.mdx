@@ -1,0 +1,30 @@
+---
+title: "Invalid parameter: \"response_format\" of type \"json_object\" is not supported with this model."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "invalid-parameter-error-9268"
+---
+
+## Reason
+
+The error `Invalid parameter: "response_format" of type "json_object" is not supported with this model` occurs because the **JSON Mode** feature in the OpenAI API is restricted to specific model versions. Not all models or legacy snapshots support the `response_format` parameter. 
+
+Key reasons for this error include:
+1. **Model Incompatibility**: You are using a model that does not support JSON Mode. This feature was introduced with specific models like `gpt-4-1106-preview` and `gpt-3.5-turbo-1106`. Legacy models (e.g., the original `gpt-4` or `gpt-3.5-turbo-0613`) will reject this parameter.
+2. **Parameter Mismatch**: The API strictly validates parameters based on the specific model requested in the endpoint call. If the model's manifest does not explicitly allow `response_format`, the request is rejected with a 400 status error.
+
+## Solution
+To resolve the `400 Invalid Parameter` error, follow these steps:
+1. **Switch to a Supported Model**: Update your request to use a model that explicitly supports JSON Mode. Compatible models include:
+   - `gpt-4o` and `gpt-4o-mini`
+   - `gpt-4-turbo` (including `gpt-4-1106-preview` and `gpt-4-0125-preview`)
+   - `gpt-3.5-turbo-1106` or `gpt-3.5-turbo-0125`
+2. **Update the System Prompt**: When using `"type": "json_object"`, OpenAI requires that the word "JSON" be included in the system or user instructions (e.g., "You are a helpful assistant that outputs JSON."). Failing to do this may lead to a different error even after switching models.
+3. **Remove the Parameter**: If you must use a model that does not support JSON Mode, remove the `"response_format": {"type": "json_object"}` line from your request. The API will default to standard text format.
+4. **Use Structured Outputs (Alternative)**: For newer models like `gpt-4o-2024-08-06`, consider using Structured Outputs with `response_format: { "type": "json_schema", ... }` for stricter schema adherence, as this is the evolved version of JSON Mode.
+
+## Suggested Links
+- [https://platform.openai.com/docs/guides/text-generation/json-mode](https://platform.openai.com/docs/guides/text-generation/json-mode)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-response_format](https://platform.openai.com/docs/api-reference/chat/create#chat-create-response_format)
+- [https://platform.openai.com/docs/guides/structured-outputs](https://platform.openai.com/docs/guides/structured-outputs)

@@ -1,0 +1,47 @@
+---
+title: "Error while downloading http://www.johnmh.com/advreadings/turtle-rabbit.jpg."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "download-error-9050"
+---
+
+## Reason
+
+This error occurs when the OpenAI API fails to retrieve an image file from a provided URL during a vision-related request (e.g., using GPT-4o). While the error is surfaced as a **400 Bad Request**, the specific cause is often related to the external hosting of the asset rather than the API request itself. Key causes include:
+1.  **Image URL Accessibility**: The hosting server may be blocking OpenAI's downloader via a firewall, VPN, or geographic restrictions. It might also return a 403 Forbidden or 404 Not Found error that OpenAI interprets as a download failure.
+2.  **Robots.txt Restrictions**: OpenAI respects `robots.txt` directives. If the hosting site explicitly blocks OpenAI's crawlers (e.g., User-agent: `GPTBot`), the download will be denied.
+3.  **Unsupported Formats or Size**: OpenAI supports PNG, JPEG, WEBP, and non-animated GIF. If the URL points to a different format or a file larger than 20MB, the request will fail.
+4.  **Malformed URL Syntax**: The URL may contain incorrectly encoded characters, missing protocols (e.g., starting with `//` instead of `https://`), or invalid data types when dynamically generated.
+5.  **General API Errors**: As noted in general 400 errors, issues can also stem from:
+    *   **Invalid/Expired API Keys**: Failure to authenticate the request.
+    *   **Rate Limiting**: Exceeding the allowed requests per minute (RPM) or tokens per minute (TPM).
+    *   **Large Input Data**: Sending massive text payloads alongside the image.
+    *   **Active Threads**: Attempting to run an Assistant thread that already has an active run.
+
+## Solution
+To resolve image download and 400 status errors, follow these remediation steps:
+1.  **Switch to Base64 Encoding**: Instead of providing a URL, encode the image as a Base64 string and send it directly in the payload. This is the most reliable way to bypass hosting and network restrictions.
+2.  **Verify Public Accessibility**: Ensure the image URL can be accessed from a public, stateless browser window. If the image requires a login or is hosted on a local network, the API will not be able to fetch it.
+3.  **Check Robots.txt**: Verify that the domain hosting the image allows the `GPTBot` or OpenAI user-agents to access the directory containing the image.
+4.  **Standardize Image Format and Size**: 
+    *   Ensure the file is one of the supported formats: **PNG, JPEG, WEBP, or non-animated GIF**.
+    *   Keep the file size under **20MB**.
+    *   Resize large images (e.g., to 1152x768) before sending to reduce latency and token costs.
+5.  **Audit Request Configuration**:
+    *   **Validate API Keys**: Confirm the key is active in the OpenAI dashboard.
+    *   **Fix Syntax**: Ensure the `image_url` object is correctly structured and the URL is absolute (includes `https://`).
+    *   **Handle Rate Limits**: Implement exponential backoff or throttling to stay within quota.
+    *   **Optimize Payload**: Break down large requests into smaller chunks if you hit token limits.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://github.com/Nutlope/aicommits/issues/137](https://github.com/Nutlope/aicommits/issues/137)
+- [https://community.openai.com/t/error-400-already-has-an-active-run/930753](https://community.openai.com/t/error-400-already-has-an-active-run/930753)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
+- [https://cookbook.openai.com/examples/how_to_handle_rate_limits](https://cookbook.openai.com/examples/how_to_handle_rate_limits)
+- [https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c](https://learn.microsoft.com/en-us/answers/questions/1532521/run-failed-openai-api-hits-badrequesterror-error-c)
+- [https://www.youtube.com/watch?v=no8XKpySbEU](https://www.youtube.com/watch?v=no8XKpySbEU)
+- [https://platform.openai.com/docs/guides/vision](https://platform.openai.com/docs/guides/vision)
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)

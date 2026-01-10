@@ -1,0 +1,48 @@
+---
+title: "Invalid JSON payload received. Unknown field name identified within 'tools[0].google_search_retrieval.dynamic_retrieval_config'. Please verify the field names in your JSON structure."
+provider: "google"
+provider_icon: "/logos/google.png"
+solved: true
+slug: "json-parsing-error-9300"
+---
+
+## Raw Error Text
+
+```text
+Invalid JSON payload received. Unknown name "minRelevanceScore" at 'tools[0].google_search_retrieval.dynamic_retrieval_config': Cannot find field. Invalid JSON payload received. Unknown name "maxResults" at 'tools[0].google_search_retrieval.dynamic_retrieval_config': Cannot find field. Invalid JSON payload received. Unknown name "maxSnippetsPerResult" at 'tools[0].google_search_retrieval.dynamic_retrieval_config': Cannot find field.
+```
+
+## Reason
+
+The 400 Bad Request error is caused by a schema mismatch in the JSON payload sent to the Google API, specifically within the Google Search Retrieval tool configuration. The API identifies three specific fields as unrecognized within the `tools[0].google_search_retrieval.dynamic_retrieval_config` object: `minRelevanceScore`, `maxResults`, and `maxSnippetsPerResult`.
+
+Key reasons for this failure include:
+1. **Unrecognized Field Names**: The Google Gemini and Vertex AI APIs have a strict schema for the `DynamicRetrievalConfig` object. Including parameters that are not part of the official specification causes the JSON decoder to fail.
+2. **Malformed Request Syntax**: The error can be triggered if the request body does not adhere to the expected nesting or hierarchy. Even minor typos or misplaced characters in the JSON structure will lead to a rejection.
+3. **Incorrectly Formatted Fields**: The API requires specific data types (e.g., floats for thresholds, enums for modes). If these fields are missing or provided in an unrecognized format, the request will be flagged as invalid.
+
+## Solution
+To resolve the "Invalid JSON payload received" error, you must modify your request to align with the official Google API specification for Search Retrieval tools.
+
+Follow these remediation steps:
+1. **Remove Unrecognized Fields**: Delete the `minRelevanceScore`, `maxResults`, and `maxSnippetsPerResult` keys from the `dynamic_retrieval_config` section of your JSON payload. These are not supported parameters for this object.
+2. **Use Valid Configuration Parameters**: Ensure you are only using fields supported by the `DynamicRetrievalConfig`. Generally, this includes:
+    - `mode`: The retrieval mode (e.g., `MODE_DYNAMIC`).
+    - `dynamic_threshold`: A floating-point value representing the threshold for triggering a search.
+3. **Validate JSON Syntax**: Use a JSON validator to ensure the payload is correctly formatted, with proper nesting, double-quoted keys, and no trailing commas.
+4. **Verify Mandatory Fields**: Ensure all required fields for the `tools` array are present and correctly typed according to the API version you are using (e.g., `v1beta` or `v1`).
+5. **Review API Documentation**: Consult the official Google AI documentation for the Gemini API or Vertex AI to confirm the exact schema for grounding with Google Search.
+
+## Suggested Links
+- [https://www.hostinger.com/tutorials/how-to-fix-400-bad-request-error](https://www.hostinger.com/tutorials/how-to-fix-400-bad-request-error)
+- [https://kinsta.com/knowledgebase/400-bad-request/](https://kinsta.com/knowledgebase/400-bad-request/)
+- [https://www.googlecloudcommunity.com/gc/Workspace-Q-A/Seeing-400-error-while-trying-to-send-a-mail/m-p/536255](https://www.googlecloudcommunity.com/gc/Workspace-Q-A/Seeing-400-error-while-trying-to-send-a-mail/m-p/536255)
+- [https://community.make.com/t/google-authentication-issue-status-code-error-400/3001](https://community.make.com/t/google-authentication-issue-status-code-error-400/3001)
+- [https://community.zapier.com/troubleshooting-99/google-sheets-status-code-400-bad-request-20303](https://community.zapier.com/troubleshooting-99/google-sheets-status-code-400-bad-request-20303)
+- [https://googleanalytics4.co/forums/discussion/invalid-json-payload-error-when-using-google-analytics-4/](https://googleanalytics4.co/forums/discussion/invalid-json-payload-error-when-using-google-analytics-4/)
+- [https://github.com/langchain-ai/langchainjs/issues/5825](https://github.com/langchain-ai/langchainjs/issues/5825)
+- [https://cloud.google.com/knowledge/kb/publishing-json-message-to-pub-sub-topic-fails-with-400-bad-request-error-000004171](https://cloud.google.com/knowledge/kb/publishing-json-message-to-pub-sub-topic-fails-with-400-bad-request-error-000004171)
+- [https://groups.google.com/g/adwords-api/c/WGSb_7P4Uz4](https://groups.google.com/g/adwords-api/c/WGSb_7P4Uz4)
+- [https://github.com/googleapis/google-api-nodejs-client/issues/588](https://github.com/googleapis/google-api-nodejs-client/issues/588)
+- [https://ai.google.dev/api/rest/v1beta/generators/create#DynamicRetrievalConfig](https://ai.google.dev/api/rest/v1beta/generators/create#DynamicRetrievalConfig)
+- [https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference)

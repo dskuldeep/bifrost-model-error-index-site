@@ -1,0 +1,40 @@
+---
+title: "Invalid schema for function 'guidance_web_qna': 'bool' is not valid under any of the given schemas"
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "schema-validation-error-9414"
+---
+
+## Reason
+
+The `400` status error in the Azure OpenAI API, specifically the "Invalid schema for function" error, occurs when the JSON schema provided in the function definition does not conform to the expected format or the JSON Schema specification. 
+
+Key reasons include:
+1. **Invalid Data Type Naming**: The error message specifically highlighting `'bool'` suggests a syntax error in the schema definition. JSON Schema standardizes the boolean type as `"boolean"`. Using shorthand like `"bool"` (common in various programming languages) within the `type` field is invalid and will cause the schema to be rejected.
+2. **Schema Mismatch**: The structure defined for the function parameters does not match the data types or structure of the parameters being passed. This occurs if a schema expects an object or string but receives a boolean value instead.
+3. **Incorrect Request Configuration**: Issues such as missing required properties, incorrect nesting of arrays/objects, or parameters that do not conform to the defined JSON schema structure will trigger this error.
+4. **Strict Mode Compliance**: When using features like Structured Outputs or `strict: true` in tool definitions, the API enforces a subset of JSON Schema. Any deviation—such as using unsupported keywords (e.g., `default`) or failing to set `additionalProperties: false`—will result in a validation failure.
+5. **Data Type Mismatch**: A discrepancy between the expected data type in the schema and the actual value provided in the request payload (e.g., providing a string for a property defined as a boolean).
+
+## Solution
+To resolve the schema validation error for the 'guidance_web_qna' function, follow these remediation steps:
+1. **Correct JSON Schema Types**: Review the function definition and ensure that all data types follow JSON Schema standards. Specifically, ensure that any boolean fields are defined as `"type": "boolean"` rather than `"type": "bool"`.
+2. **Verify the Request Payload**: Match your request payload against the expected schema for the function. Ensure the structure of the `arguments` string generated or passed matches the `parameters` object in your function definition.
+3. **Ensure Strict Schema Compliance**: If you have enabled strict mode for tools:
+   - Set `"additionalProperties": false` for every object in the schema.
+   - Ensure all properties defined in the `properties` object are also listed in the `required` array.
+   - Ensure no unsupported properties like `default` or `pattern` are used if they are restricted by the specific API version.
+4. **Include All Required Properties**: Confirm that every field marked as `required` in the schema is present in the request and correctly formatted.
+5. **Validate Input and Context**: Verify that the input structure complies with API specifications and does not exceed context length limits. Use a JSON schema validator to test your function definition before sending it to the API.
+6. **Correct Data Types**: Ensure that the values assigned to parameters match the types defined (e.g., do not pass a numeric `1` for a `boolean` type).
+
+## Suggested Links
+- [https://github.com/instructor-ai/instructor/issues/961](https://github.com/instructor-ai/instructor/issues/961)
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/invalid-schema-error-in-function-using-arrays/426257](https://community.openai.com/t/invalid-schema-error-in-function-using-arrays/426257)
+- [https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue](https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue)
+- [https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md](https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md)
+- [https://community.openai.com/t/azure-open-ai-assistant-api-connection-error/662198](https://community.openai.com/t/azure-open-ai-assistant-api-connection-error/662198)
+- [https://platform.openai.com/docs/guides/structured-outputs](https://platform.openai.com/docs/guides/structured-outputs)
+- [https://json-schema.org/understanding-json-schema/reference/boolean](https://json-schema.org/understanding-json-schema/reference/boolean)

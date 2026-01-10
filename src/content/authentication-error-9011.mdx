@@ -1,0 +1,36 @@
+---
+title: "Invalid response from Google: API key not found or invalid. Please provide a valid API key."
+provider: "google"
+provider_icon: "/logos/google.png"
+solved: true
+slug: "authentication-error-9011"
+---
+
+## Raw Error Text
+
+```text
+Invalid response recieved from google: [{"error":{"code":400,"message":"API Key not found. Please pass a valid API key.","status":"INVALID_ARGUMENT","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"API_KEY_INVALID","domain":"googleapis.com","metadata":{"service":"generativelanguage.googleapis.com"}}]}}]
+```
+
+## Reason
+
+The `400 Bad Request` error with the status `INVALID_ARGUMENT` and error reason `API_KEY_INVALID` occurs when the Google Generative Language API (`generativelanguage.googleapis.com`) cannot validate the provided authentication credentials.
+
+Key reasons for this error include:
+1. **Invalid or Missing API Key**: The request was sent without an API key, or the key provided is no longer valid (e.g., it was deleted or expired).
+2. **Client-Side Request Formatting**: The API key may not be passed in the expected format. Google APIs typically require the key to be sent either as a query parameter (`?key=YOUR_KEY`) or via a specific header like `x-goog-api-key`.
+3. **Environment Configuration Issues**: In many development environments, the API key is stored in a `.env` file. If the environment variables are not loaded correctly by the application, the key may be passed as an empty string or `undefined`.
+4. **Service Restriction Mismatch**: The API key might be restricted in the Google Cloud Console to specific services. If the key is not authorized for the "Generative Language API," the request will be rejected even if the key itself is active.
+
+## Solution
+To resolve the `API_KEY_INVALID` error, follow these remediation steps:
+1. **Verify API Key Generation**: Confirm that you have a valid API key. You can generate or check your keys in [Google AI Studio](https://aistudio.google.com/app/apikey) or the [Google Cloud Console Credentials page](https://console.cloud.google.com/apis/credentials).
+2. **Validate Environment Configuration**: Ensure the API key is correctly defined in your `.env` or configuration file without quotes or spaces. Verify that your application is properly loading these variables (e.g., using `dotenv.config()` in Node.js or `load_dotenv()` in Python).
+3. **Check for API Restrictions**: In the Google Cloud Console, inspect your API key's settings. Under "API restrictions," ensure that either "Don't restrict key" is selected or that "Generative Language API" is explicitly included in the allowed list.
+4. **Correct Request Headers**: If you are making raw HTTP requests, ensure the key is passed correctly. The Gemini API generally expects the header `x-goog-api-key: YOUR_API_KEY`.
+5. **Confirm Billing and Service Status**: Ensure that the Generative Language API is enabled for your project. For some tiers, a linked billing account may be required even if you are using a free quota.
+6. **Test with a New Key**: If the error persists, create a brand-new API key in a different Google Cloud project to rule out account-level or project-level provisioning delays.
+
+## Suggested Links
+- [https://ai.google.dev/gemini-api/docs/api-key](https://ai.google.dev/gemini-api/docs/api-key)
+- [https://cloud.google.com/docs/authentication/api-keys](https://cloud.google.com/docs/authentication/api-keys)

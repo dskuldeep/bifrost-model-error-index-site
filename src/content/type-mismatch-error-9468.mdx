@@ -1,0 +1,44 @@
+---
+title: "The input message does not match the required object type in \"messages.0\". Please ensure your query is formatted correctly and matches the expected data structure."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "type-mismatch-error-9468"
+---
+
+## Raw Error Text
+
+```text
+"customer has a query where is my order, I would like you to choose a question from list that best matches the intent and context and could be used to reply for same." is not of type "object" - "messages.0"
+```
+
+## Reason
+
+The HTTP 400 Bad Request error with the message **"is not of type 'object' - 'messages.0'"** occurs because the Azure OpenAI Service expects the `messages` field to be an array of JSON objects, but it received a different data type (likely a string) at the first index of that array. 
+
+Key underlying causes include:
+1. **Invalid Request Structure**: The Chat Completion API requires a specific conversation format. If the input is passed as a simple list of strings instead of a list of role-based objects, the validation fails.
+2. **Missing Schema Requirements**: Each element in the `messages` array must be an object containing at least two mandatory keys: `role` (e.g., "system", "user", or "assistant") and `content` (the text of the message).
+3. **API Parameter Validation**: Using parameters incompatible with the selected model or API version can trigger a 400 error. For example, newer reasoning models (like the o1-series) may require `max_completion_tokens` instead of the traditional `max_tokens` parameter.
+4. **Data Type Mismatch**: The error explicitly points to `messages.0`, indicating that the very first item in the array is a primitive value (like the raw query string mentioned in the error log) rather than the required JSON object structure.
+
+## Solution
+To resolve the type mismatch error, ensure your request payload conforms to the Chat Completion API schema. Follow these steps:
+1. **Format the Messages Array Correctly**: Convert any raw strings in the `messages` array into objects. A valid structure looks like this:
+
+   `"messages": [{ "role": "user", "content": "customer has a query where is my order..." }]`
+2. **Include Required Fields**: Verify that every object within the `messages` array contains both the `role` and `content` keys. Valid roles include:
+
+   - `system`: For high-level instructions.
+   - `user`: For end-user queries.
+   - `assistant`: For previous model responses in a conversation history.
+3. **Validate API Parameters**: Check that you are using the correct parameters for your specific deployment. Ensure you are not using deprecated fields and that parameters like `max_tokens` are supported by the model version you have deployed.
+4. **Confirm API Configuration**: 
+
+   - Verify that the `Content-Type` header is set to `application/json`.
+   - Double-check that the endpoint URL and `api-version` query parameter are correct for your Azure resource.
+   - Ensure your API key is valid and passed correctly in the `api-key` header.
+
+## Suggested Links
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)
+- [https://platform.openai.com/docs/api-reference/chat/create#messages](https://platform.openai.com/docs/api-reference/chat/create#messages)

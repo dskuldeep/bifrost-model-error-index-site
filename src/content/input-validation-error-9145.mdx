@@ -1,0 +1,35 @@
+---
+title: "Function name does not conform to the required pattern: Only letters, numbers, underscores, or hyphens are allowed, with a maximum length of 64 characters."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "input-validation-error-9145"
+---
+
+## Raw Error Text
+
+```text
+"multi_tool_use.parallel" does not match "^[a-zA-Z0-9_-]{1,64}$" - "messages.5.tool_calls.0.function.name"
+```
+
+## Reason
+
+The error occurs because the OpenAI API encountered a tool or function name that violates its strict validation regex: `^[a-zA-Z0-9_-]{1,64}$`. Specifically, the model attempted to invoke a function named `multi_tool_use.parallel`, which contains a dot (`.`), an invalid character according to the API schema.
+
+Key reasons for this failure include:
+
+- **Naming Convention Mismatch**: The API requires tool names to consist only of alphanumeric characters, underscores, and hyphens. The inclusion of a dot in `multi_tool_use.parallel` triggers a validation failure.
+- **Model Hallucination**: During complex interactions involving parallel tool calling, the model may occasionally hallucinate or output internal system-level tool names like `multi_tool_use.parallel` instead of using the tools defined in the request.
+- **Nested Tool Call Issues**: This issue often arises when the model generates nested or parallel tool calls that the API validation layer interprets as a single invalid tool name string.
+
+## Solution
+To resolve the 400 status error and ensure valid tool invocation, follow these remediation steps:
+1. **Rename the Tool**: Ensure that any tool defined in your `tools` or `functions` array does not use dots. If your code explicitly references `multi_tool_use.parallel`, rename it to a valid format using underscores or hyphens (e.g., `multi_tool_use_parallel`).
+2. **Remove Invalid Characters**: Audit your tool definitions and eliminate any characters that do not match the allowed set: letters (a-z, A-Z), numbers (0-9), underscores (`_`), or hyphens (`-`).
+3. **Validate Name Length**: Ensure the tool name is between 1 and 64 characters in length.
+4. **Prompt Engineering**: If the model is hallucinating the `multi_tool_use.parallel` name autonomously, update the System Prompt to explicitly instruct the model to only use the tool names provided in the current context.
+5. **Check Library Versions**: Ensure you are using the latest version of the OpenAI SDK, as updates often include fixes for how parallel tool calls are structured and transmitted.
+
+## Suggested Links
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)
+- [https://community.openai.com/t/model-hallucinating-multi-tool-use-parallel-function/612255](https://community.openai.com/t/model-hallucinating-multi-tool-use-parallel-function/612255)

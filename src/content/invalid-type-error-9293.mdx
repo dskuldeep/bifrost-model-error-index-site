@@ -1,0 +1,57 @@
+---
+title: "Invalid type for 'messages[0].content[1].image_url': expected an object, but got a string instead."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "invalid-type-error-9293"
+---
+
+## Reason
+
+The error **'Invalid type for messages.content.image_url: expected an object, but got a string instead'** is triggered when the Azure OpenAI API receives a request where the `image_url` field is provided as a simple string rather than the required JSON object. 
+
+In the context of multi-modal models (such as GPT-4o or GPT-4 Turbo with Vision), the API schema for the `messages` array requires a specific structure when handling image inputs. If the `content` field is an array, each element of type `image_url` must contain a nested object. Providing the URL directly as a value to the `image_url` key violates this schema, leading to a **400 Bad Request** error. This mismatch often occurs when developers follow older or simplified string-based patterns for text-only inputs and attempt to apply them to vision-based inputs.
+
+## Solution
+To fix this error, you must ensure that the `image_url` field is formatted as a structured object containing a `url` property. Follow these steps to remediate the request:
+1. Identify the message content block where the image is being passed.
+2. Change the value of the `image_url` key from a string (e.g., `"image_url": "https://..."`) to a JSON object (e.g., `"image_url": { "url": "https://..." }`).
+3. Verify that the `type` field is correctly set to `"image_url"` within that specific content item.
+4. Optionally, you can include the `detail` parameter within the `image_url` object to control the image processing resolution (set to `"auto"`, `"low"`, or `"high"`).
+
+**Correct JSON Structure Example:**
+
+```json
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "Describe this image."
+        },
+        {
+          "type": "image_url",
+          "image_url": {
+            "url": "https://example.com/path/to/image.jpg",
+            "detail": "auto"
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+By ensuring the `image_url` is wrapped in an object as shown above, the request will align with the Azure OpenAI API schema requirements.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/references/on-your-data](https://learn.microsoft.com/en-us/azure/ai-services/openai/references/on-your-data)
+- [https://github.com/danny-avila/LibreChat/discussions/3115](https://github.com/danny-avila/LibreChat/discussions/3115)
+- [https://community.openai.com/t/how-can-i-write-a-post-request-for-azure-openai-that-uses-structured-output/898569](https://community.openai.com/t/how-can-i-write-a-post-request-for-azure-openai-that-uses-structured-output/898569)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/structured-outputs?tabs=rest](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/structured-outputs?tabs=rest)
+- [https://community.openai.com/t/image-url-for-gpt-4o-api-giving-error-expected-an-object-but-got-a-string-instead/748188](https://community.openai.com/t/image-url-for-gpt-4o-api-giving-error-expected-an-object-but-got-a-string-instead/748188)
+- [https://github.com/Azure/azure-rest-api-specs/blob/main/specification/cognitiveservices/data-plane/AzureOpenAI/authoring/stable/2022-12-01/azureopenai.json](https://github.com/Azure/azure-rest-api-specs/blob/main/specification/cognitiveservices/data-plane/AzureOpenAI/authoring/stable/2022-12-01/azureopenai.json)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/gpt-with-vision?tabs=rest](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/gpt-with-vision?tabs=rest)

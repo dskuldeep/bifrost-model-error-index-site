@@ -1,0 +1,43 @@
+---
+title: "Missing parameter 'name': messages with role 'function' must have a 'name'."
+provider: "openai"
+provider_icon: "/logos/openai.png"
+solved: true
+slug: "parameter-error-9373"
+---
+
+## Reason
+
+The error **"Missing parameter 'name': messages with role 'function' must have a 'name'"** occurs because the OpenAI Chat Completions API requires a specific identifier for messages representing function responses. 
+
+When a message object in the `messages` array is assigned the role of `function`, the API expects a `name` parameter to be included. This parameter serves as a bridge, allowing the model to identify which specific function from the initial request produced the output provided in the content field. 
+
+Key details regarding this error include:
+1. **Validation Requirement:** The `name` parameter is mandatory for any message where `role: "function"` is used.
+2. **Identification:** The `name` must match the identifier of the function that was called previously in the conversation history.
+3. **HTTP Status:** Failure to provide this parameter results in a **400 Bad Request** error, as the payload does not adhere to the strict schema required for function calling.
+
+## Solution
+To resolve this error, you must ensure that every message with the role `function` is properly structured with a `name` property. Follow these steps:
+1. **Identify the Function Message:** Locate the message in your API request payload that contains `"role": "function"`.
+2. **Add the Name Parameter:** Include the `name` key within that message object. The value should be the name of the function that generated the result.
+3. **Verify Match:** Ensure that the value provided to the `name` parameter exactly matches the name defined in your `functions` or `tools` declaration.
+4. **Example Correction:** 
+   Change this:
+   `{"role": "function", "content": "..."}`
+   To this:
+   `{"role": "function", "name": "get_weather", "content": "..."}`
+
+**Note on Deprecation:** While the `function` role is still supported for backward compatibility, OpenAI recommends migrating to the `tool` role for modern models (like GPT-4o or GPT-4-turbo). When using `role: "tool"`, you must provide a `tool_call_id` instead of a `name` parameter.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/what-am-i-missing-error-message-you-must-provide-a-model-parameter/694004](https://community.openai.com/t/what-am-i-missing-error-message-you-must-provide-a-model-parameter/694004)
+- [https://github.com/langchain-ai/langchainjs/issues/6570](https://github.com/langchain-ai/langchainjs/issues/6570)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://community.openai.com/t/openai-beta-threads-messages-create-missing-required-parameter-role/762173](https://community.openai.com/t/openai-beta-threads-messages-create-missing-required-parameter-role/762173)
+- [https://community.openai.com/t/is-name-a-supported-parameter-for-tool-messages/843543](https://community.openai.com/t/is-name-a-supported-parameter-for-tool-messages/843543)
+- [https://github.com/openai/openai-cookbook/blob/main/examples/How_to_call_functions_with_chat_models.ipynb?short_path=963bcd7](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_call_functions_with_chat_models.ipynb?short_path=963bcd7)
+- [https://github.com/run-llama/llama_index/issues/13715](https://github.com/run-llama/llama_index/issues/13715)
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages](https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages)

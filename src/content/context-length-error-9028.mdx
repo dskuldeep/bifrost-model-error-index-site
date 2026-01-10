@@ -1,0 +1,31 @@
+---
+title: "This model\"s maximum context length is 16385 tokens. However, your messages resulted in 31228 tokens. Please reduce the length of the messages."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "context-length-error-9028"
+---
+
+## Reason
+
+This error occurs when an API request to Azure OpenAI returns a **400 Bad Request** status with the code `context_length_exceeded`. The primary reason is that the total token count of your request has exceeded the model's hard limit (in this specific case, 16,385 tokens, which is common for models like `gpt-35-turbo-16k` or `gpt-35-turbo-0125`).
+
+Key reasons include:
+1.  **Exceeding Maximum Context Length**: The request contained 31,228 tokens, nearly double the model's 16,385-token capacity. This count includes the system message, all user prompts, the assistant's conversation history, and any function/tool definitions.
+2.  **Token Reservation**: The `max_tokens` (or `max_completion_tokens`) parameter effectively "reserves" space. If the sum of your input tokens and your `max_tokens` setting exceeds 16,385, the request will be rejected before processing.
+3.  **Invalid Request Configuration**: The API identifies the payload as a "Bad Request" because the parameters provided are technically impossible for the specific model deployment to fulfill.
+
+## Solution
+To resolve the context length error, you must reduce the total token footprint of your request to stay within the 16,385-token limit. Follow these remediation steps:
+1.  **Reduce Message Length**: Truncate or summarize long conversation histories. Retain only the most recent or relevant exchanges to ensure the total count remains well below the limit.
+2.  **Implement a Sliding Window**: Use a dynamic mechanism to remove the oldest messages from the conversation array once the total token count approaches the limit.
+3.  **Split Input into Chunks**: For large documents or long prompts, split the text into smaller segments and process them individually. You can use a "Map-Reduce" approach to summarize chunks before final processing.
+4.  **Remove Unnecessary Context**: Condense instructions and remove redundant metadata or boilerplate text from the prompt to optimize the token budget.
+5.  **Adjust API Parameters**: Lower the `max_tokens` value in your request configuration to leave more room for the input context, or vice versa.
+6.  **Use Token Counting Libraries**: Implement a pre-flight check using libraries like `tiktoken` to calculate the exact token count before sending the request. This allows your application to handle overflow gracefully (e.g., by alerting the user or auto-summarizing).
+7.  **Consider a Larger Model**: If your use case consistently requires high context, consider upgrading to a model with a larger window, such as `gpt-4-turbo` (128k tokens) or `gpt-4o`.
+
+## Suggested Links
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/quotas-limits](https://learn.microsoft.com/en-us/azure/ai-services/openai/quotas-limits)
+- [https://github.com/openai/tiktoken](https://github.com/openai/tiktoken)

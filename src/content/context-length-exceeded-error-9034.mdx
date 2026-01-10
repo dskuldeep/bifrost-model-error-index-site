@@ -1,0 +1,38 @@
+---
+title: "Prompt contains 66385 tokens, too large for model with 32768 maximum context length"
+provider: "mistral-ai"
+provider_icon: "/file.svg"
+solved: true
+slug: "context-length-exceeded-error-9034"
+---
+
+## Reason
+
+This error occurs when the total number of tokens in your request exceeds the maximum context window supported by the Mistral-AI model. 
+
+In this specific instance, the prompt contains **66,385 tokens**, while the model's limit is **32,768 tokens**. Because the input size is significantly larger than the model's capacity, the API returns an **HTTP 400 Bad Request** error. This limit represents the maximum 'memory' the model has available for a single interaction, which includes both the input (prompt) and the generated output (completion).
+
+## Solution
+To resolve this error and ensure your request fits within the model's limits, implement the following strategies:
+
+**1. Shorten the Prompt**
+Review the input text and remove any non-essential information. Ensure that the total token count—including any system instructions—stays well below the 32,768 limit to allow room for the model's response.
+
+**2. Break Down the Prompt**
+If the query is complex or involves multiple tasks, split it into several smaller, independent requests. This reduces the token load per call and often results in higher-quality outputs.
+
+**3. Optimize Context and Token Usage**
+
+*   **Summarize:** Instead of providing full documents as context, use a summarization step to extract only the most relevant points.
+*   **System Prompts:** Keep system instructions concise.
+*   **Token Counting:** Use the `mistral-common` library or the official Mistral tokenizer to calculate token counts locally before sending the request to avoid 400 errors.
+
+**4. Implement Chunking**
+For large datasets or long documents, use a 'chunking' strategy. Divide the text into smaller segments that fit within the context window, process them individually, and then aggregate the results.
+
+**5. Adjust Parameters**
+Check the `max_tokens` parameter in your API call. The total context is calculated as `input_tokens + max_tokens`. If your input is close to the limit, a high `max_tokens` value can trigger this error even if the prompt itself technically fits.
+
+## Suggested Links
+- [https://docs.mistral.ai/guides/tokenization/](https://docs.mistral.ai/guides/tokenization/)
+- [https://docs.mistral.ai/platform/endpoints/](https://docs.mistral.ai/platform/endpoints/)

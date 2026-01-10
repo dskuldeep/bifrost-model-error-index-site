@@ -1,0 +1,38 @@
+---
+title: "The provided input does not match the expected type \"array\" for the \"functions\" field. Ensure that the input structure is an array as required."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "input-type-error-9123"
+---
+
+## Raw Error Text
+
+```text
+{"default": [{"type": "function", "function": {"name": "create_summary_of_suggestion", "parameters": {"type": "object", "description": "Once a user has responded 3 times generate a summary of a user"s suggestion", "properties": {"title": {"type": "string", "description": "A short 70 character sentence that describes the users suggestion"}, "summary": {"type": "string", "description": "A summary of the user"s suggestion written from their perspective"}, "why": {"type": "string", "description": "a short description that explains why the user made this suggestion"}}, "required": ["title", "summary", "why"]}}}]} is not of type "array" - "functions"
+```
+
+## Reason
+
+The 400 Bad Request error occurs because the Azure OpenAI API expects the `functions` parameter to be an array of objects, but it received a dictionary/object instead. 
+
+In the provided error log, the function definition is nested within a key named `"default"`. Azure OpenAI's schema validation is strict; if the top-level value passed to `functions` is an object (e.g., `{"default": [...]}`) rather than a flat array (e.g., `[...]`), the request will fail.
+
+Key reasons include:
+1.  **Invalid Request Payload**: The structure of the JSON body does not match the expected API schema. The error specifically identifies that the input is not of type "array".
+2.  **Incorrect API Version or Configuration**: Function calling support was introduced in the `2023-07-01-preview` API version. Using an older version that does not recognize the `functions` parameter, or using an incompatible model version, can trigger this error.
+3.  **Missing or Incorrect Parameters**: Required fields within the function definition (like `name` or `parameters`) might be incorrectly formatted or missing, causing the validation to fail at the parameter level.
+4.  **Rate Limiting or Throttling**: While usually resulting in a 429 error, unexpected payload behavior can occasionally stem from hitting limits during request processing.
+5.  **API Key or Authentication Issues**: Invalid or expired credentials can lead to generic bad request errors, although they typically produce distinct status codes.
+
+## Solution
+To resolve the 400 error in the Azure OpenAI API, follow these remediation steps:
+1.  **Correct Payload Structure**: Verify that the input for the `functions` field is a flat array. If your code or framework is wrapping the array in a parent object (such as `{"default": [...]}`), modify your implementation to pass the array directly.
+2.  **Use Supported API Version**: Ensure your deployment is using an API version that supports function calling. The minimum required version is `2023-07-01-preview`. For newer models (like GPT-4o or GPT-4 Turbo), use a stable version such as `2024-02-01` or `2024-06-01`.
+3.  **Migrate to Tools Parameter**: If you are using a recent API version (starting from `2023-12-01-preview`), the `functions` and `function_call` parameters are deprecated. It is recommended to migrate to the `tools` and `tool_choice` parameters for better compatibility.
+4.  **Complete and Correct Parameters**: Audit your function definitions to ensure all required properties—`name`, `description`, and `parameters`—are included and adhere to the JSON Schema standard.
+5.  **Check API Keys and Authentication**: Confirm that your API keys are valid and that your endpoint URL is correctly formatted for your specific Azure resource.
+
+## Suggested Links
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)
