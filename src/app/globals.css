@@ -56,30 +56,6 @@
   --link-muted: var(--color-gray-600);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --greptile-green: #34d399;
-    --greptile-green-light: #6ee7b7;
-    --greptile-green-dark: #10b981;
-    
-    /* Legacy compatibility */
-    --primary: #34d399;
-    --primary-hover: #10b981;
-    --accent: #6ee7b7;
-    --card-bg: rgba(30, 41, 59, 0.7);
-    --card-border: rgba(255, 255, 255, 0.1);
-    --solved-bg: #064e3b;
-    --solved-text: #dcfce7;
-    --unsolved-bg: #7f1d1d;
-    --unsolved-text: #fee2e2;
-
-    /* Muted link color (used for breadcrumbs + MDX links) */
-    --link-muted: var(--color-gray-400);
-  }
-}
-
 * {
   box-sizing: border-box;
   padding: 0;
