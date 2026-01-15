@@ -19,18 +19,18 @@ Key reasons for this error include:
 ## Solution
 To resolve the 400 status error and ensure your request is processed correctly by the Anyscale API, follow these steps:
 1. **Adhere to API Constraints**: Review the `messages` array in your request payload. If you have defined multiple system prompts, consolidate them into a single string within a single message object that has `role: "system"`.
-2. **Verify Request Format**: Check the JSON structure of your request body to ensure it is valid and strictly follows the [Anyscale Endpoints documentation](https://docs.anyscale.com/endpoints/text-generation/query-a-model/).
+2. **Verify Request Format**: Check the JSON structure of your request body to ensure it is valid and strictly follows the Anyscale Endpoints documentation.
 3. **Check for Validation Errors**: Confirm that all required parameters (such as `model` and `messages`) are present. Remove any deprecated or unsupported fields that might be causing the API's validation logic to reject the request.
 4. **Correct Encoding**: Ensure the `Content-Type` and `Content-Encoding` headers correctly represent the payload. If you are not using compression, ensure no compression headers are sent.
 5. **Review Request Details**: Utilize the provided `Request ID` and the specific error text to identify which part of the payload failed validation. If the issue persists, this ID can be used to track the request in Anyscale's observability tools.
 
 ## Suggested Links
-- [https://github.com/ray-project/ray/issues/31370](https://github.com/ray-project/ray/issues/31370)
-- [https://docs.anyscale.com/endpoints/text-generation/query-a-model/](https://docs.anyscale.com/endpoints/text-generation/query-a-model/)
-- [https://forum.bubble.io/t/i-raw-response-for-the-api-status-code-400/253114](https://forum.bubble.io/t/i-raw-response-for-the-api-status-code-400/253114)
-- [https://docs.apigee.com/api-platform/troubleshoot/runtime/400-decompressionfailureatrequest](https://docs.apigee.com/api-platform/troubleshoot/runtime/400-decompressionfailureatrequest)
-- [https://docs.anyscale.com/endpoints/fine-tuning/dataset-prep/](https://docs.anyscale.com/endpoints/fine-tuning/dataset-prep/)
-- [https://appwrite.io/docs/products/ai/integrations/anyscale](https://appwrite.io/docs/products/ai/integrations/anyscale)
-- [https://github.com/mindsdb/mindsdb/issues/9189](https://github.com/mindsdb/mindsdb/issues/9189)
-- [https://developer.genesys.cloud/forum/t/error-message-400-bad-request-at-simple-dataaction/8148](https://developer.genesys.cloud/forum/t/error-message-400-bad-request-at-simple-dataaction/8148)
-- [https://docs.anyscale.com/endpoints/model-serving/query-a-model/](https://docs.anyscale.com/endpoints/model-serving/query-a-model/)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)

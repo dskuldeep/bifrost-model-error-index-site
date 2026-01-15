@@ -22,7 +22,7 @@ To resolve the 404 error and correctly access generative models via the Google A
    * `models/gemini-1.5-pro`
    * `models/gemini-1.0-pro`
 2. **List Available Models**: Use the `ListModels` method to programmatically retrieve a list of all models available to your API key. This will confirm the exact strings required and their supported methods.
-   * **REST**: `GET https://generativelanguage.googleapis.com/v1beta/models?key=YOUR_API_KEY`
+   * **REST**: `GET [REDACTED_URL]
    * **Python SDK**: `for m in genai.list_models(): print(m.name)`
 3. **Confirm Method Support**: In the output of `ListModels`, check the `supportedGenerationMethods` field for your chosen model to ensure it includes `generateContent`.
 4. **Check API Version**: Ensure the model you are targeting is compatible with the `v1beta` version of the API. If the model is older or strictly a production release, you may need to switch the endpoint to `v1`.
@@ -32,13 +32,13 @@ To resolve the 404 error and correctly access generative models via the Google A
 6. **Review Framework Configuration**: If you are using a proxy or multi-provider gateway (like Bifrost or LangChain), double-check that your 'provider' field is set to `openai` if you intended to use `gpt-4o`, or update the model to a Gemini model if the provider is set to `google`.
 
 ## Suggested Links
-- [https://community.particle.io/t/error-status-404-from-www-googleapis-com/43572](https://community.particle.io/t/error-status-404-from-www-googleapis-com/43572)
-- [https://github.com/google-gemini/generative-ai-python/issues/633](https://github.com/google-gemini/generative-ai-python/issues/633)
-- [https://community.openai.com/t/can-not-access-gpt-4o-issue-with-billing/752051](https://community.openai.com/t/can-not-access-gpt-4o-issue-with-billing/752051)
-- [https://community.make.com/t/404-error-http-oauth-google-ads-api/42398](https://community.make.com/t/404-error-http-oauth-google-ads-api/42398)
-- [https://discuss.ai.google.dev/t/imagen-model-not-found-in-python-google-generative-ai/46547](https://discuss.ai.google.dev/t/imagen-model-not-found-in-python-google-generative-ai/46547)
-- [https://developers.google.com/drive/api/guides/handle-errors](https://developers.google.com/drive/api/guides/handle-errors)
-- [https://ai.google.dev/gemini-api/docs/api-versions](https://ai.google.dev/gemini-api/docs/api-versions)
-- [https://cloud.google.com/php/docs/reference/analytics-data/0.9.5/V1beta.BetaAnalyticsDataClient](https://cloud.google.com/php/docs/reference/analytics-data/0.9.5/V1beta.BetaAnalyticsDataClient)
-- [https://ai.google.dev/gemini-api/docs/models/gemini](https://ai.google.dev/gemini-api/docs/models/gemini)
-- [https://ai.google.dev/api/rest/v1beta/models/list](https://ai.google.dev/api/rest/v1beta/models/list)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)

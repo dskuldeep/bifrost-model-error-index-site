@@ -21,12 +21,12 @@ A 400 status error in the Azure OpenAI API, typically returning a "Bad Request" 
 To resolve the 400 status error in Azure OpenAI, follow these remediation steps:
 1. **Inspect Content Filter Flags**: Review the prompt for language that might trigger safety filters. You can test and adjust filter sensitivity levels within the Azure OpenAI Studio under the "Content filtering" section.
 2. **Validate Authentication Headers**: Ensure the API key is valid. If using the Azure-specific endpoint, confirm you are using the `api-key` header. If using the OpenAI SDK, ensure the environment variables for `AZURE_OPENAI_API_KEY` are correctly set.
-3. **Verify Deployment Name and URL**: Confirm that the deployment name in your API URL matches the exact name you assigned to the model in the Azure portal. The URL format should generally follow: `https://{resource-name}.openai.azure.com/openai/deployments/{deployment-id}/...`.
+3. **Verify Deployment Name and URL**: Confirm that the deployment name in your API URL matches the exact name you assigned to the model in the Azure portal. The URL format should generally follow: `[REDACTED_URL]
 4. **Check API Versioning**: Ensure the `api-version` query parameter is present and set to a supported date format (e.g., `2023-05-15`).
 5. **Audit Request Payload**: Verify that the JSON body is well-formed and includes all required fields. Check that `max_tokens` is not set to a value higher than the model's remaining context window.
 6. **Test with a Baseline Prompt**: Send a simple, neutral prompt like "Hello" to determine if the issue is related to the specific content of your original prompt or a broader configuration error.
 
 ## Suggested Links
-- [https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/content-filter](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/content-filter)
-- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/error-handling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/error-handling)
-- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)

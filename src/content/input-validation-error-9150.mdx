@@ -23,13 +23,13 @@ Key reasons for this error include:
 To resolve the 400 status error and fix the invalid messages value, follow these remediation steps:
 1.  **Validate the Messages Array**: Ensure the `messages` field is a JSON array where each item is an object containing a `role` (e.g., "system", "user", "assistant") and `content`. Ensure `content` is not null or empty unless allowed by the specific model version.
 2.  **Verify API Key and Credentials**: Check that the API key is active and correctly placed in the `api-key` header. If using Azure Entra ID, ensure the `Authorization` header includes the `Bearer` prefix and a valid token.
-3.  **Check the URL and API Version**: Confirm the endpoint follows the pattern: `https://{resource-name}.openai.azure.com/openai/deployments/{deployment-id}/chat/completions?api-version={api-version}`. Ensure the `api-version` is compatible with your model.
+3.  **Check the URL and API Version**: Confirm the endpoint follows the pattern: `[REDACTED_URL] Ensure the `api-version` is compatible with your model.
 4.  **Correct HTTP Headers**: Verify that the `Content-Type` is set to `application/json` and that no unexpected headers are interfering with the request.
 5.  **Review Token Limits**: Calculate the total tokens for your prompt. If they exceed the model's limit (e.g., 8,192 for GPT-4), reduce the input size or lower the `max_tokens` parameter.
 6.  **Remove Unsupported Arguments**: Review the API reference for the specific model and deployment to ensure all sent parameters (like `temperature`, `top_p`, or `functions`) are supported.
 7.  **Check Structured Output Schemas**: If using `response_format` for JSON schemas, ensure `additionalProperties` is set to `false` and all fields are marked as `required` where necessary.
 
 ## Suggested Links
-- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)
-- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/chatgpt](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/chatgpt)
-- [https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)

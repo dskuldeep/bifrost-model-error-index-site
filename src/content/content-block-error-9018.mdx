@@ -20,16 +20,16 @@ The error message "This request has been blocked by our content filters" typical
 
 ## Solution
 To resolve the content block or 400 status error, follow these remediation steps:
-1.  **Check Content Compliance**: Review your input prompt against OpenAI's Usage Policies. You can use the [Moderation API](https://platform.openai.com/docs/guides/moderation) to test if specific text triggers a safety flag before sending it to a generative model.
+1.  **Check Content Compliance**: Review your input prompt against OpenAI's Usage Policies. You can use the Moderation API to test if specific text triggers a safety flag before sending it to a generative model.
 2.  **Validate the API Key**: Verify your API key in the OpenAI Developer Dashboard. Ensure it is active and has not been deleted or replaced.
 3.  **Audit Request Syntax**: Double-check the structure of your API call. Ensure all required properties are included and that the JSON payload is valid. For example, in Chat Completions, ensure the `messages` array is correctly formatted.
-4.  **Verify Base URL and Headers**: Confirm that your request is targeting the correct endpoint (e.g., `https://api.openai.com/v1/chat/completions`) and that the `Authorization` header is formatted correctly as `Bearer YOUR_API_KEY`.
+4.  **Verify Base URL and Headers**: Confirm that your request is targeting the correct endpoint (e.g., `[REDACTED_URL]) and that the `Authorization` header is formatted correctly as `Bearer YOUR_API_KEY`.
 5.  **Manage Rate Limits**: Review your current usage and tier limits in the OpenAI account settings. Implement a retry logic with exponential backoff to handle 429 or 400 errors related to frequency.
 6.  **Inspect Network Traffic**: If the error is triggered by a security service like Cloudflare, check for local network blocks. Try making the request from a different network or disabling any active VPNs/proxies.
-7.  **Review Geographical Access**: Ensure you are accessing the service from a [supported country](https://platform.openai.com/docs/supported-countries). If the issue persists despite a valid configuration, contact OpenAI support for detailed diagnostics.
+7.  **Review Geographical Access**: Ensure you are accessing the service from a supported country. If the issue persists despite a valid configuration, contact OpenAI support for detailed diagnostics.
 
 ## Suggested Links
-- [https://platform.openai.com/docs/guides/moderation](https://platform.openai.com/docs/guides/moderation)
-- [https://platform.openai.com/docs/guides/error-codes](https://platform.openai.com/docs/guides/error-codes)
-- [https://openai.com/policies/usage-policies](https://openai.com/policies/usage-policies)
-- [https://platform.openai.com/docs/supported-countries](https://platform.openai.com/docs/supported-countries)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)

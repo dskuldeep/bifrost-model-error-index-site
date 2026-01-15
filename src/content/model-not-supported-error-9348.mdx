@@ -19,20 +19,20 @@ Key reasons for this failure include:
 ## Solution
 To resolve the 404 error when using the `models/gemini-2.0-flash-thinking-exp-121` model, follow these remediation steps:
 1. **Call ListModels**: Use the `ListModels` method to retrieve a real-time list of all models accessible via your API key. This will provide the exact string required for the `model` parameter.
-   - Endpoint: `GET https://generativelanguage.googleapis.com/v1beta/models?key=YOUR_API_KEY`
+   - Endpoint: `GET [REDACTED_URL]
 2. **Verify Method Support**: Examine the `supportedGenerationMethods` field in the `ListModels` response for the specific model. Ensure that `generateContent` is listed as a supported method.
 3. **Validate API Version**: Check if the model is available in the `v1beta` version. If the model is not found there, try switching your endpoint to the stable version (`v1`) or check if a newer experimental version has been released.
 4. **Use a Supported Model**: If the specific version `121` is no longer listed, update your implementation to use a supported variant, such as the base `gemini-2.0-flash-thinking-exp` or a stable model like `gemini-1.5-flash`.
 5. **Check Release Notes**: Consult the official Google AI documentation for the latest updates on experimental model availability and naming conventions to ensure your application is targeting current endpoints.
 
 ## Suggested Links
-- [https://developers.google.com/drive/api/guides/handle-errors](https://developers.google.com/drive/api/guides/handle-errors)
-- [https://discuss.ai.google.dev/t/how-to-use-gemini-flash-via-the-rest-curl-api/2457](https://discuss.ai.google.dev/t/how-to-use-gemini-flash-via-the-rest-curl-api/2457)
-- [https://community.particle.io/t/error-status-404-from-www-googleapis-com/43572](https://community.particle.io/t/error-status-404-from-www-googleapis-com/43572)
-- [https://github.com/home-assistant/core/issues/105679](https://github.com/home-assistant/core/issues/105679)
-- [https://www.techtarget.com/whatis/definition/404-status-code](https://www.techtarget.com/whatis/definition/404-status-code)
-- [https://community.make.com/t/404-error-http-oauth-google-ads-api/42398](https://community.make.com/t/404-error-http-oauth-google-ads-api/42398)
-- [https://cloud.google.com/php/docs/reference/analytics-data/0.21.1/V1beta.Compatibility](https://cloud.google.com/php/docs/reference/analytics-data/0.21.1/V1beta.Compatibility)
-- [https://ai.google.dev/gemini-api/docs/api-versions](https://ai.google.dev/gemini-api/docs/api-versions)
-- [https://ai.google.dev/api/rest/v1beta/models/list](https://ai.google.dev/api/rest/v1beta/models/list)
-- [https://ai.google.dev/gemini-api/docs/models/gemini](https://ai.google.dev/gemini-api/docs/models/gemini)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)

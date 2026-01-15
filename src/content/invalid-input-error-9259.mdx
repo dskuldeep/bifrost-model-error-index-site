@@ -20,20 +20,20 @@ The "Provided image is not valid" error is a 400 Bad Request status indicating t
 To resolve the 400 Bad Request error regarding an invalid image, follow these remediation steps:
 1. **Verify the URL**: Double-check the image URL for accuracy. Ensure it is a direct link to the image file (ending in .jpg, .png, etc.) and does not contain extra spaces or invalid characters.
 2. **Check Access Permissions**: Ensure the image is publicly accessible or that the API service account has the `storage.objects.get` permission. You can test this by trying to open the URL in a private/incognito browser window.
-3. **Correct the URL Prefix**: For images stored in Google Cloud Storage, use the public URL format: `https://storage.googleapis.com/[BUCKET_NAME]/[OBJECT_NAME]` instead of the `gs://` prefix, unless the specific API documentation explicitly requests the `gs://` format.
+3. **Correct the URL Prefix**: For images stored in Google Cloud Storage, use the public URL format: `[REDACTED_URL]]/[OBJECT_NAME]` instead of the `gs://` prefix, unless the specific API documentation explicitly requests the `gs://` format.
 4. **Test Direct Access**: Ensure the image can be fetched by common web tools (like `curl` or a browser) without requiring a login session.
 5. **Disable or Fix URL Encoding**: Check if the URL contains special characters that require encoding. Conversely, if the URL is already encoded, ensure that it is not being double-encoded by your application logic.
 6. **Local Download and Base64 Encoding**: If URL-based access remains problematic due to network restrictions or complex permissions, download the image to your local environment and send it to the API as a Base64-encoded string in the request body.
 7. **Validate File Type and Size**: Confirm the image meets the provider's technical requirements (e.g., typical support includes JPEG, PNG, WebP, BMP, and GIF) and does not exceed the maximum resolution or file size limits.
 
 ## Suggested Links
-- [https://community.openai.com/t/gpt4-vision-error-when-passing-gcp-storage-bucket-url/582414](https://community.openai.com/t/gpt4-vision-error-when-passing-gcp-storage-bucket-url/582414)
-- [https://community.miro.com/ask-the-community-45/resolved-getting-400-that-s-an-error-when-trying-to-use-google-drive-8774](https://community.miro.com/ask-the-community-45/resolved-getting-400-that-s-an-error-when-trying-to-use-google-drive-8774)
-- [https://github.com/googleapis/google-api-go-client/issues/178](https://github.com/googleapis/google-api-go-client/issues/178)
-- [https://www.dreamhost.com/blog/400-bad-request-error/](https://www.dreamhost.com/blog/400-bad-request-error/)
-- [https://discuss.ai.google.dev/t/error-analyzing-image-status-400/58621](https://discuss.ai.google.dev/t/error-analyzing-image-status-400/58621)
-- [https://forum.bubble.io/t/google-cloud-storage-images-not-displaying-in-bubble-but-visible-via-direct-url-why/332019](https://forum.bubble.io/t/google-cloud-storage-images-not-displaying-in-bubble-but-visible-via-direct-url-why/332019)
-- [https://community.openai.com/t/gpt-4-vision-error-badrequesterror-400-invalid-image/516486](https://community.openai.com/t/gpt-4-vision-error-badrequesterror-400-invalid-image/516486)
-- [https://developers.google.com/drive/api/guides/handle-errors](https://developers.google.com/drive/api/guides/handle-errors)
-- [https://cloud.google.com/vision/docs/supported-files](https://cloud.google.com/vision/docs/supported-files)
-- [https://cloud.google.com/storage/docs/request-endpoints](https://cloud.google.com/storage/docs/request-endpoints)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
+- [Redacted URL](Redacted URL)
