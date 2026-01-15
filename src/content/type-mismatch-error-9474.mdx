@@ -1,40 +1,31 @@
 ---
-title: "The input provided is not of the expected type 'array'. Ensure the structure of the data matches the required format."
-provider: "azure-openai"
-provider_icon: "/file.svg"
+title: "\"0.1\" is not of type \"number\" - \"temperature\""
+provider: "openai"
+provider_icon: "/logos/openai.svg"
 solved: true
 slug: "type-mismatch-error-9474"
 ---
 
-## Raw Error Text
-
-```text
-{'guidance_web_qna': {'description': "The 'guidance_web_qna' function is designed to generate relevant maximum 20 FAQs related to a business from scrapped information passed as text and It can be used to reply to customers when they ask generic questions. In this function we create queries and answers and variations for each question", 'parameters': {'type': 'object', 'properties': {'query_arr': {'type': 'array', 'description': "The 'query_arr' parameter represents the list of question or request that will be sent to the API. It should be structured to ask generic questions about business limited to 150 characters", 'items': {'type': 'object', 'properties': {'query_item': {'description': "the 'query_item' is for single question", 'type': 'string'}, 'answer': {'type': 'string', 'description': "The 'answer' parameter represents the actual answer of the business present in the context which is scrapped textual data"}, 'query_variations': {'type': 'array', 'description': "The 'query_variations' parameter represents the list of variations  of query_item formed above so as to cover various cases when an actual customer of the business asks questions. for example if query_item is Where is my order?, query_variations would be What is status of my order or where did my order reach or can you tell me where is my order or can you help track my order or is my order dispatched etc", 'items': {'type': 'object', 'properties': {'variation': {'type': 'string', 'description': "The 'variation' parameter represents the unique variation of the query_item formed above"}}}}}}}, 'context_not_enough': {'type': 'string', 'description': "The 'context_not_enough' parameter is the string response only with allowed values true or false and return true from assistant in case the atleast relevant 1 FAQ is not formed from the context passed"}}}}} is not of type 'array' - 'functions'
-```
-
 ## Reason
 
-The 400 Bad Request error in the Azure OpenAI API, specifically the message indicating a parameter is not of type 'array' (e.g., `functions`), occurs when the request payload does not conform to the expected JSON schema. Key causes include:
-1. **Incorrect Data Type or Structure**: The most direct cause is providing a single object where an array is required. In this instance, the `functions` (or `tools`) parameter must be an array of objects, even if only one function is defined. Passing the function definition as a lone object triggers a schema validation failure.
-2. **Invalid Request Parameters**: Requests may contain unrecognized or deprecated parameters. For example, the "o1" model series requires the use of `max_completion_tokens` instead of `max_tokens`. Attempting to use `max_tokens` with these specific models will result in a 400 error.
-3. **Incorrect API Configuration**: Issues with API keys, mismatched headers (such as `Authorization`), or using an API version that does not support specific features (like function calling) can lead to request rejection.
-4. **Managed Identity Issues**: When using Entra ID (formerly Azure AD) for authentication, the error may arise from a malformed resource URI, incorrect scope, or missing RBAC roles like **Cognitive Services OpenAI User**.
-5. **Rate Limiting and Payload Size**: Exceeding the established rate limits or sending a data payload that exceeds the maximum allowed context window size will trigger this error.
-6. **Content Filtering**: Prompts that violate Azure OpenAI's content management policies are filtered out, often returning a 400 status code.
+The "400 Bad Request" error with the message `"0.1" is not of type "number" - "temperature"` occurs when the OpenAI API receives a parameter value as a string that strictly requires a numeric data type.
+
+Key causes include:
+1. **Invalid Parameter Type**: The API expects the `temperature` parameter to be a numeric value (e.g., `0.1`). If the value is enclosed in quotes (e.g., `"0.1"`), the JSON parser treats it as a string, triggering a schema validation failure.
+2. **Environment Variable Casting**: In many development environments, values retrieved from `.env` files or system environment variables are read as strings by default. If these values are passed directly to the API without conversion, they will cause a type mismatch.
+3. **Model-Specific Constraints**: While most models accept a range between 0 and 2, certain models have specific restrictions. For instance, some newer models (like the `o1` series) may not support the `temperature` parameter at all, or might only support the default value of `1`. Passing a formatted string where a numeric value or no value is expected can lead to this error.
 
 ## Solution
-To resolve the 400 status error and fix the type mismatch, follow these steps:
-1. **Correct the Payload Structure**: Ensure that the `functions` or `tools` parameter is wrapped in an array. For example, change `"functions": { ... }` to `"functions": [{ ... }]`. Additionally, verify that nested parameters like `query_arr` are correctly passed as arrays as defined in your schema.
-2. **Update Request Parameters**: Audit your parameters to ensure they match the model requirements. If you are using the "o1" series, replace `max_tokens` with `max_completion_tokens`.
-3. **Verify API Configuration**: Double-check that your API key is valid and the `api-version` in your endpoint URL supports the features you are using (e.g., `2023-07-01-preview` or later for functions).
-4. **Configure Managed Identity and Roles**: If using managed identities, ensure the resource URI is correct and the identity has been assigned the **Cognitive Services OpenAI User** and **Cognitive Services User** roles in the Azure portal under Access Control (IAM).
-5. **Manage Quotas and Content**: Monitor your rate limits and break down large prompts into smaller chunks. Review the Azure OpenAI Studio to check if your content is being flagged by safety filters.
-6. **Enable Detailed Logging**: Activate diagnostic logging in Azure API Management (APIM) or your application to capture the full request and response body, which will provide the specific parameter name that failed validation.
+To resolve the type mismatch for the `temperature` parameter, follow these remediation steps:
+1. **Convert the temperature value to a number**: Ensure the value is explicitly cast to a numeric type (float or integer) before it is included in the request body. 
+   - In **Python**, use `float(value)`.
+   - In **JavaScript/Node.js**, use `parseFloat(value)` or `Number(value)`.
+2. **Verify JSON serialization**: Check that your request payload does not accidentally wrap numeric values in double quotes. The parameter should appear as `"temperature": 0.1` rather than `"temperature": "0.1"`.
+3. **Check model-specific constraints**: Verify if the specific model you are using supports the `temperature` parameter. Note that for reasoning models like `o1-preview` or `o1-mini`, the `temperature` parameter is currently unsupported and should be removed from the request.
+4. **Ensure valid ranges**: Confirm that the numeric value is within the allowed range (typically 0 to 2). Values outside this range may trigger different 400 errors related to out-of-bounds constraints.
+5. **Review API documentation**: Consult the latest OpenAI API Reference to verify the expected data types and supported parameters for the specific model version you are targeting.
 
 ## Suggested Links
-- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
-- [https://learn.microsoft.com/en-us/answers/questions/1680345/issue-with-authenticating-api-management-with-azur](https://learn.microsoft.com/en-us/answers/questions/1680345/issue-with-authenticating-api-management-with-azur)
-- [https://github.com/explodinggradients/ragas/issues/649](https://github.com/explodinggradients/ragas/issues/649)
-- [https://luke.geek.nz/azure/troubleshooting-scenarios-azure-open-ai/](https://luke.geek.nz/azure/troubleshooting-scenarios-azure-open-ai/)
-- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)
-- [https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models#o1-series-models-preview](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models#o1-series-models-preview)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-temperature](https://platform.openai.com/docs/api-reference/chat/create#chat-create-temperature)
+- [https://platform.openai.com/docs/guides/text-generation](https://platform.openai.com/docs/guides/text-generation)
+- [https://community.openai.com/t/i-am-receiving-an-error-status-code-400/351121](https://community.openai.com/t/i-am-receiving-an-error-status-code-400/351121)

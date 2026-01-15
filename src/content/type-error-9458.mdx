@@ -1,37 +1,40 @@
 ---
-title: "\"json_object\" is not of type \"object\" - \"response_format\""
+title: "'json' is not of type 'object' - 'response_format'"
 provider: "openai"
-provider_icon: "/logos/openai.png"
+provider_icon: "/logos/openai.svg"
 solved: true
 slug: "type-error-9458"
 ---
 
 ## Reason
 
-The error `"json_object" is not of type "object" - "response_format"` with an HTTP 400 status code indicates that the OpenAI API received an invalid data type for the `response_format` parameter. 
+The OpenAI API error `'json' is not of type 'object' - 'response_format'` occurs when the `response_format` parameter is incorrectly passed as a string (e.g., `"response_format": "json"`) instead of a structured JSON object. According to the OpenAI API specification, this field must be an object containing a `type` key.
 
-Key reasons for this failure include:
-1. **Parameter Type Mismatch**: The API expects `response_format` to be a JSON object (e.g., `{"type": "json_object"}`), but the request is likely providing a string (e.g., `"response_format": "json_object"`). This mismatch triggers a validation error.
-2. **Invalid Request Syntax**: The request body is malformed or uses incorrect syntax that does not align with the API's schema requirements.
-3. **Configuration Issues**: Improperly constructed request headers or parameters that do not match the expected API structure, leading to a "Bad Request" response.
+Key reasons for this error include:
+1. **Incorrect Parameter Syntax**: The API expects `{"type": "json_object"}` or `{"type": "json_schema", ...}`. Providing a simple string like `"json"` triggers a schema validation failure.
+2. **Model Incompatibility**: The `json_object` format is only supported on specific models, such as `gpt-4o`, `gpt-4-turbo`, and `gpt-3.5-turbo-1106` or later. Attempting to use this parameter with older models will result in a `400 Bad Request` error.
+3. **Missing Prompt Requirements**: When using JSON mode, the API requires that the word "json" be explicitly mentioned in the system or user prompt. If the prompt is missing this keyword, the API may reject the request even if the formatting is technically correct.
+4. **Invalid Request Body Structure**: The error can also stem from extra fields in the request body that are not permitted for the specific endpoint or a mismatch in the expected JSON structure when using SDKs or HTTP libraries.
 
 ## Solution
-To resolve the 400 status error related to the `response_format` parameter, follow these steps:
-
-**1. Correct the Parameter Syntax**
-Ensure that `response_format` is passed as a structured object rather than a string. The correct format for enabling JSON mode is:
-`"response_format": { "type": "json_object" }` 
-
-**2. Include a Mandatory Prompt Instruction**
-When using `json_object`, you must also explicitly instruct the model to generate JSON in your system or user message. For example: 
-`"messages": [{"role": "system", "content": "You are a helpful assistant designed to output JSON."}]` 
-
-**3. Use a Supported Model**
-Verify that the model you are calling supports the `json_object` format. This feature is typically available in models such as `gpt-4o`, `gpt-4-turbo`, and `gpt-3.5-turbo-0125` or later. If your model does not support this format, remove the `response_format` parameter to allow the API to default to standard text.
-
-**4. Verify Request Alignment**
-Check your request structure against the official OpenAI API documentation to ensure all parameters match the expected types and structures. If specific formatting is not required, removing the `response_format` parameter entirely will resolve the type mismatch.
+To resolve the `400` status error and correctly implement the `response_format` parameter, follow these steps:
+1. **Correct the Response Format Syntax**: Ensure the `response_format` is passed as an object. For standard JSON mode, use:
+   `"response_format": { "type": "json_object" }`.
+2. **Update the Prompt**: You must include the word "json" somewhere in your prompt (system or user message) to instruct the model to produce a valid JSON string.
+3. **Verify Model Compatibility**: Confirm that your request is targeting a compatible model. Supported models include:
+   * `gpt-4o` and `gpt-4o-mini`
+   * `gpt-4-turbo` (and `gpt-4-1106-preview`)
+   * `gpt-3.5-turbo-0125` and `gpt-3.5-turbo-1106`
+4. **Validate the Request Payload**: Ensure your JSON payload is well-formed and does not include deprecated or unsupported fields. If you are using Structured Outputs, use the `json_schema` type with the appropriate `schema` and `strict: true` parameters.
+5. **Remove Extra Fields**: Review your API call to ensure no additional, non-permitted fields are being sent in the request body which might interfere with schema validation.
 
 ## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://github.com/openai/openai-python/issues/887](https://github.com/openai/openai-python/issues/887)
+- [https://forum.bubble.io/t/openai-api-error-http-400/263917](https://forum.bubble.io/t/openai-api-error-http-400/263917)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://community.openai.com/t/using-response-format-in-chat-completion-throws-error/484377](https://community.openai.com/t/using-response-format-in-chat-completion-throws-error/484377)
+- [https://github.com/langchain-ai/langchain/issues/12953](https://github.com/langchain-ai/langchain/issues/12953)
+- [https://swagger.io/docs/specification/v3_0/describing-request-body/describing-request-body/](https://swagger.io/docs/specification/v3_0/describing-request-body/describing-request-body/)
 - [https://platform.openai.com/docs/api-reference/chat/create#chat-create-response_format](https://platform.openai.com/docs/api-reference/chat/create#chat-create-response_format)
-- [https://platform.openai.com/docs/guides/text-generation/json-mode](https://platform.openai.com/docs/guides/text-generation/json-mode)
+- [https://platform.openai.com/docs/guides/structured-outputs](https://platform.openai.com/docs/guides/structured-outputs)

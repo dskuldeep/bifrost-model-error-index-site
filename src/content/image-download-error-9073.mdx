@@ -1,7 +1,7 @@
 ---
 title: "Failed to download image from https://quizizz-static.s3.amazonaws.com/_media/quizzes/53170066-0929-44ac-bf56-fb84c2b4acf6-v2. Image size exceeds the limit."
 provider: "openai"
-provider_icon: "/logos/openai.png"
+provider_icon: "/logos/openai.svg"
 solved: true
 slug: "image-download-error-9073"
 ---
@@ -28,7 +28,7 @@ To resolve the 400 status error related to image processing in the OpenAI API, f
 2. **Check Image File Size**: Verify that the image file size does not exceed 20MB. If you are providing the image as a base64-encoded string, ensure the original unencoded file is under the 20MB threshold. If the image is hosted at a URL, check the file size at that source.
 3. **Validate Request Parameters**: Ensure that all parameters in your API request are valid. This includes confirming the model name (e.g., `gpt-4o`), checking that the `image_url` object is correctly structured, and ensuring no unsupported fields are included in the JSON body.
 4. **Verify Image Format**: Confirm that the image being processed is one of the supported formats: `.png`, `.jpeg`, `.jpg`, `.webp`, or non-animated `.gif`.
-5. **Inspect Network Traffic**: Use debugging tools or middleware (such as Postman) to inspect the raw request and response traffic. This helps identify if the image is being corrupted during transmission or if the source URL is returning a large header that might interfere with the download.
+5. **Inspect Network Traffic**: Use debugging tools or middleware (such as Portkey or Postman) to inspect the raw request and response traffic. This helps identify if the image is being corrupted during transmission or if the source URL is returning a large header that might interfere with the download.
 
 ## Suggested Links
 - [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)

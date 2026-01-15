@@ -1,29 +1,37 @@
 ---
-title: "Invalid request: \"functions\" and \"tools\" cannot both be provided. \"functions\" are deprecated; use the \"tools\" parameter instead."
+title: "Invalid request: 'functions' and 'tools' cannot both be provided. 'functions' are deprecated; use the 'tools' parameter instead."
 provider: "openai"
-provider_icon: "/logos/openai.png"
+provider_icon: "/logos/openai.svg"
 solved: true
 slug: "request-parameter-error-9393"
 ---
 
 ## Reason
 
-This error occurs because the OpenAI API does not allow the simultaneous use of the legacy `functions` parameter and the modern `tools` parameter in a single Chat Completions request. 
+This error occurs because the OpenAI Chat Completions API does not allow the simultaneous use of legacy and modern function-calling parameters in a single request. 
 
-Key reasons for this conflict include:
-1. **Mutually Exclusive Parameters:** The `functions` and `tools` parameters are architecturally different and cannot be processed together. The API requires a single, consistent method for defining external capabilities.
-2. **Deprecation of Functions:** OpenAI has officially deprecated the `functions` parameter in favor of the more robust `tools` framework. This transition was designed to support advanced features like parallel function calling, which allows the model to invoke multiple functions in a single turn.
-3. **Schema Mismatch:** Including both parameters creates a mismatch in the request configuration, as the API expects the newer `tools` schema for all modern integrations.
+Key reasons for this failure include:
+1. **Parameter Conflict**: The API enforces mutual exclusivity between the `functions` and `tools` parameters. Including both triggers a validation error.
+2. **Deprecation**: The `functions` parameter is deprecated. OpenAI has transitioned to the `tools` architecture to support enhanced capabilities like Parallel Function Calling.
+3. **Schema Incompatibility**: The internal processing logic for `tools` differs from the legacy `functions` pipeline. Mixing them creates an ambiguous request that the API cannot parse.
 
 ## Solution
-To resolve the 400 status error, you must update your API request to use the `tools` parameter exclusively. Follow these steps to migrate your implementation:
-1. **Remove the `functions` Parameter:** Eliminate the `functions` and `function_call` keys from your request payload entirely.
-2. **Migrate to the `tools` Schema:** Reformat your function definitions into the `tools` array. Each entry should be an object with a `type` (set to `"function"`) and a `function` object containing your original definition.
-3. **Update Call Logic:** If you previously used `function_call` to force a specific function, replace it with the `tool_choice` parameter.
-4. **Refactor Response Handling:** Update your code to handle the API response. Instead of looking for `message.function_call`, look for the `message.tool_calls` array, as the model can now return multiple tool invocations at once.
-5. **Verify Against Documentation:** Ensure your request structure adheres to the latest OpenAI API guidelines to maintain compatibility with current and future model versions.
+To resolve this error, you must migrate your request structure to the current OpenAI API specifications by following these steps:
+1. **Remove the `functions` Parameter**: Delete the `functions` key and its associated array from your API request payload.
+2. **Migrate to the `tools` Parameter**: Replace the legacy definition with the `tools` parameter. Unlike the old array of function objects, `tools` requires an array of objects where each item has a `type: "function"` and a `function` object containing the name, description, and parameters.
+3. **Update Tool Selection Logic**: If your code uses `function_call` to force or disable a function, change this parameter to `tool_choice` to maintain compatibility with the `tools` parameter.
+4. **Verify Request Cleanliness**: Ensure that no legacy fields (like an empty `functions: []` array) remain in the JSON body, as any presence of the key alongside `tools` will cause a 400 Bad Request error.
+5. **Check Model Support**: Confirm you are using a model version that supports tools, such as `gpt-4o`, `gpt-4-turbo`, or `gpt-3.5-turbo-0125`.
 
 ## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/content-is-required-property-error-400/486260](https://community.openai.com/t/content-is-required-property-error-400/486260)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://github.com/Nutlope/aicommits/issues/137](https://github.com/Nutlope/aicommits/issues/137)
+- [https://community.openai.com/t/request-failed-with-status-code-400/39242](https://community.openai.com/t/request-failed-with-status-code-400/39242)
+- [https://learn.microsoft.com/en-us/answers/questions/1476122/for-how-long-will-the-functions-parameter-be-suppo](https://learn.microsoft.com/en-us/answers/questions/1476122/for-how-long-will-the-functions-parameter-be-suppo)
+- [https://discuss.ai.google.dev/t/gemini-openai-compatibility-multiple-functions-support-in-function-calling-error-400/49431](https://discuss.ai.google.dev/t/gemini-openai-compatibility-multiple-functions-support-in-function-calling-error-400/49431)
+- [https://community.openai.com/t/i-am-receiving-an-error-status-code-400/351121](https://community.openai.com/t/i-am-receiving-an-error-status-code-400/351121)
+- [https://github.com/langchain-ai/langchainjs/issues/5237](https://github.com/langchain-ai/langchainjs/issues/5237)
 - [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)
 - [https://platform.openai.com/docs/api-reference/chat/create#chat-create-tools](https://platform.openai.com/docs/api-reference/chat/create#chat-create-tools)
-- [https://openai.com/blog/new-models-and-developer-products-announced-at-devday](https://openai.com/blog/new-models-and-developer-products-announced-at-devday)

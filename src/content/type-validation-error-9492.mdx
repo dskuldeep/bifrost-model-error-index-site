@@ -1,41 +1,37 @@
 ---
-title: "1719 is not of type 'string' - 'user'"
-provider: "azure-openai"
-provider_icon: "/file.svg"
+title: "Invalid type for 'messages': expected an array of objects, but got a string instead."
+provider: "openai"
+provider_icon: "/logos/openai.svg"
 solved: true
 slug: "type-validation-error-9492"
 ---
 
 ## Reason
 
-The Azure OpenAI API returns a 400 Bad Request error when the request payload fails schema validation. In this specific instance, the error message `"1719 is not of type 'string' - 'user'"` indicates that the value assigned to the `user` property is an integer (1719) rather than the required string format.
+The error **"Invalid type for 'messages': expected an array of objects, but got a string instead"** occurs when the OpenAI Chat Completions API receives data that does not conform to its schema requirements for the `messages` parameter. 
 
-Key causes include:
-1.  **Invalid Data Type for 'user' Field**: The `user` parameter is an optional field intended to help track and monitor end-user activity for abuse detection. It must always be a string. Passing a numeric ID without quotes causes a type mismatch.
-2.  **Incorrect Request Configuration**: Structural issues in the JSON payload, such as improper nesting of the `messages` array or providing non-string values to properties that strictly require them, will trigger validation failures.
-3.  **Missing Required Properties**: If mandatory fields like `role` or `content` within the messages array are missing or formatted as null/numeric, the API rejects the request.
-4.  **Payload Size or Content Violations**: Large payloads exceeding token limits or content that triggers automated safety filters may occasionally result in rejection, though type validation is the primary driver for this specific error string.
+Key reasons for this error include:
+1. **Incorrect Data Type**: The Chat Completions endpoint (`/v1/chat/completions`) strictly requires the `messages` field to be a JSON array. Providing a single string (which was the format for legacy Completions models using the `prompt` parameter) will trigger this validation error.
+2. **JSON Parsing Failures**: If your application passes a JSON-stringified array directly to the API client instead of a native array/list object, the API may interpret the entire payload as a single string rather than a structured collection of objects.
+3. **Variable Misinterpretation**: Data retrieved from environment variables, database fields, or UI input components (like those in FlutterFlow or Retool) is often stored as a raw string. If this data is not explicitly parsed into an array before the API call, the type mismatch occurs.
+4. **Malformed Payload Structure**: This error can also manifest if the `messages` key is accidentally wrapped in quotes or if the request headers (specifically `Content-Type: application/json`) are missing or incorrectly handled, causing the body to be treated as plain text.
 
 ## Solution
-To resolve the type validation error, ensure the request payload adheres strictly to the Azure OpenAI API schema. Follow these steps:
-1.  **Enforce String Types**: Convert the `user` field value and any other string-only fields to a string format. For example, change `"user": 1719` to `"user": "1719"`.
-2.  **Validate Request Structure**: Verify that the JSON body is correctly structured. The `messages` property must be an array of objects, and each object should typically contain a `role` (string) and `content` (string).
-3.  **Check Required Fields**: Ensure that all mandatory parameters for the specific API endpoint (e.g., `model`, `messages`) are included and correctly typed.
-4.  **Audit Payload Constraints**: Confirm the payload size does not exceed the deployment's quota and that the content complies with Azure's content management policies.
-
-**Best Practices for Implementation:**
-
-*   Use a JSON validator or a language-specific SDK (like the Azure OpenAI SDK for Python or .NET) to ensure objects are serialized correctly.
-*   Explicitly cast numeric identifiers to strings before including them in the API request body.
+To resolve this type validation error, ensure the `messages` parameter is correctly structured as an array of objects and properly parsed before transmission. Follow these steps:
+1. **Verify the Array Structure**: Ensure the `messages` field is an array where each element is an object containing the required `role` (e.g., "system", "user", "assistant") and `content` keys.
+2. **Explicitly Parse JSON Data**: If your messages are coming from a string source (like an environment variable or a web form), use a JSON parser before sending the request:
+   - In JavaScript: Use `JSON.parse(variable)`.
+   - In Python: Use `json.loads(variable)`.
+3. **Check API Client Implementation**: Ensure you are using the correct model and endpoint. If you are migrating from older models (like `text-davinci-003`), you must change your payload from a single `prompt` string to the `messages` array format.
+4. **Sanitize the Input**: Check for trailing or leading characters, such as accidental quotes or escape characters, that could cause the JSON object to be misinterpreted as a string literal.
+5. **Review Header Configuration**: Ensure your request includes the header `Content-Type: application/json` so the API correctly interprets the incoming data as a JSON structure.
 
 ## Suggested Links
-- [https://github.com/danny-avila/LibreChat/discussions/3115](https://github.com/danny-avila/LibreChat/discussions/3115)
 - [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
-- [https://forum.bubble.io/t/openai-api-error-http-400/263917](https://forum.bubble.io/t/openai-api-error-http-400/263917)
-- [https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue](https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue)
-- [https://learn.microsoft.com/en-us/answers/questions/1680345/issue-with-authenticating-api-management-with-azur](https://learn.microsoft.com/en-us/answers/questions/1680345/issue-with-authenticating-api-management-with-azur)
+- [https://community.flutterflow.io/ask-the-community/post/openai-api-call---invalid-type-for-messages-expected-an-array-of-hcePsYztblsvMse](https://community.flutterflow.io/ask-the-community/post/openai-api-call---invalid-type-for-messages-expected-an-array-of-hcePsYztblsvMse)
 - [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
-- [https://bobcares.com/blog/azure-openai-invalid_request_error/](https://bobcares.com/blog/azure-openai-invalid_request_error/)
-- [https://community.openai.com/t/azure-open-ai-assistant-api-connection-error/662198](https://community.openai.com/t/azure-open-ai-assistant-api-connection-error/662198)
-- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)
-- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-user](https://platform.openai.com/docs/api-reference/chat/create#chat-create-user)
+- [https://github.com/danny-avila/LibreChat/discussions/3115](https://github.com/danny-avila/LibreChat/discussions/3115)
+- [https://community.openai.com/t/request-failed-with-status-code-400/39242](https://community.openai.com/t/request-failed-with-status-code-400/39242)
+- [https://community.openai.com/t/api-error-message-mixes-up-object-and-string/827221](https://community.openai.com/t/api-error-message-mixes-up-object-and-string/827221)
+- [https://github.com/Nutlope/aicommits/issues/137](https://github.com/Nutlope/aicommits/issues/137)
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)

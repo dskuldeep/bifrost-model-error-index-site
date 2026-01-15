@@ -1,0 +1,49 @@
+---
+title: "Target model is not a vision model and does not support image inputs"
+provider: "together-ai"
+provider_icon: "/file.svg"
+solved: true
+slug: "model-input-error-9346"
+---
+
+## Reason
+
+The 400 Bad Request error occurs when the Together AI API receives image data for a model that lacks multi-modal capabilities. This is primarily caused by:
+
+**Incorrect Model Type Selection**
+Together AI categorizes models into specific types. If you attempt to send image inputs (base64 encoded strings or image URLs) to a standard Large Language Model (LLM) designed only for text, the API will reject the request because the target model lacks the vision encoder required to process visual data.
+
+**Data Schema Violations**
+Vision-capable models expect a specific request schema where the `messages.content` field is an array of objects (containing `type: "text"` and `type: "image_url"`). Standard text models expect the `content` field to be a simple string. Sending the complex array structure used for vision tasks to a text-only model results in a schema validation failure.
+
+## Solution
+To resolve this error, ensure your request configuration matches the capabilities of the selected model by following these steps:
+1. **Select a Vision-Compatible Model**: Ensure you are using a model explicitly identified as a vision model (VLM). Examples on Together AI include `meta-llama/Llama-3.2-11B-Vision-Instruct-Turbo` or `google/paligemma-3b-pt-224`.
+2. **Review API Documentation**: Consult the Together AI Model Library to verify the specific input requirements and supported modalities for your chosen model.
+3. **Sanitize Inputs for Text Models**: If you intend to use a text-only model (such as Llama-3-70b), remove all image-related fields and content from your request payload.
+4. **Verify Payload Structure**: Ensure that if you are using a vision model, your JSON payload follows the multi-modal format:
+
+```json
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        { "type": "text", "text": "What is in this image?" },
+        { "type": "image_url", "image_url": { "url": "..." } }
+      ]
+    }
+  ]
+}
+```
+
+## Suggested Links
+- [https://www.googlecloudcommunity.com/gc/AI-ML/Gemini-Pro-Vision-API-error-Unable-to-submit-request-because-it/m-p/784566](https://www.googlecloudcommunity.com/gc/AI-ML/Gemini-Pro-Vision-API-error-Unable-to-submit-request-because-it/m-p/784566)
+- [https://github.com/evo-design/evo/issues/95](https://github.com/evo-design/evo/issues/95)
+- [https://github.com/openai/openai-openapi/issues/15](https://github.com/openai/openai-openapi/issues/15)
+- [https://www.npmjs.com/package/together-ai?activeTab=readme](https://www.npmjs.com/package/together-ai?activeTab=readme)
+- [https://github.com/guidance-ai/guidance/issues/795](https://github.com/guidance-ai/guidance/issues/795)
+- [https://js.langchain.com/docs/integrations/chat/togetherai/](https://js.langchain.com/docs/integrations/chat/togetherai/)
+- [https://github.com/charmbracelet/mods/issues/206](https://github.com/charmbracelet/mods/issues/206)
+- [https://community.retool.com/t/gpt-4-vision-not-working/32758](https://community.retool.com/t/gpt-4-vision-not-working/32758)
+- [https://docs.together.ai/docs/inference-models#vision-models](https://docs.together.ai/docs/inference-models#vision-models)

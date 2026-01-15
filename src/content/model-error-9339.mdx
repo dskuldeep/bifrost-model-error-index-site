@@ -1,0 +1,41 @@
+---
+title: "model: gpt-4o-mini"
+provider: "anthropic"
+provider_icon: "/logos/anthropic.svg"
+solved: true
+slug: "model-error-9339"
+---
+
+## Reason
+
+The 404 status error occurs when the Anthropic API receives a request for a model identifier it does not recognize. In this instance, the error is caused by a provider-model mismatch where the user is attempting to call an OpenAI model via an Anthropic endpoint.
+
+Key reasons include:
+1. **Model Not Found**: The identifier `gpt-4o-mini` belongs to the **OpenAI** model family. Anthropic’s API (which hosts the Claude family of models) cannot fulfill requests for OpenAI models, resulting in a "Resource Not Found" error.
+2. **Access Restrictions**: API keys are provider-specific. Your Anthropic API key does not have permissions to access OpenAI models, and the Anthropic server will reject the request as the resource is outside its catalog.
+3. **Configuration Mismatch**: This error often arises when using multi-provider SDKs or proxies (such as Portkey or LiteLLM) where the provider is incorrectly set to `anthropic` while the model is set to an OpenAI string.
+
+## Solution
+To resolve the 404 status error when using the model `gpt-4o-mini`, follow these remediation steps:
+1. **Verify Model Provider**: Determine which provider you intended to use. 
+   - If you want to use `gpt-4o-mini`, ensure your API base URL is set to OpenAI (`api.openai.com`) and that you are using an OpenAI API key.
+   - If you want to use the Anthropic API, you must use a Claude model name.
+2. **Update to a Valid Claude Model**: If you are calling Anthropic, replace `gpt-4o-mini` with a supported identifier, such as:
+   - `claude-3-5-sonnet-20241022`
+   - `claude-3-opus-20230229` 
+   - `claude-3-haiku-20240307`
+3. **Check API Key and Environment**: Confirm that your environment variables (e.g., `ANTHROPIC_API_KEY`) are correctly paired with the corresponding provider's SDK or client configuration.
+4. **Review API Documentation**: Consult the official Anthropic documentation to verify the exact string for current model versions and ensure they are available for your specific account tier.
+5. **Contact Support**: If the correct Anthropic model name still yields a 404, contact Anthropic support. Be sure to include the `request-id` from the API response headers to help them diagnose potential account-level restrictions.
+
+## Suggested Links
+- [https://www.restack.io/p/anthropic-answer-api-curl-cat-ai](https://www.restack.io/p/anthropic-answer-api-curl-cat-ai)
+- [https://github.com/openai/openai-python/issues/1574](https://github.com/openai/openai-python/issues/1574)
+- [https://github.com/assafelovic/gpt-researcher/issues/588](https://github.com/assafelovic/gpt-researcher/issues/588)
+- [https://codingmall.com/knowledge-base/25-global/1533-how-do-i-handle-errors-and-exceptions-when-using-the-anthropic-python-sdk](https://codingmall.com/knowledge-base/25-global/1533-how-do-i-handle-errors-and-exceptions-when-using-the-anthropic-python-sdk)
+- [https://community.openai.com/t/bizarre-issue-preventing-response-from-gpt-4o-mini-the-model-produces-invalid-content/875432](https://community.openai.com/t/bizarre-issue-preventing-response-from-gpt-4o-mini-the-model-produces-invalid-content/875432)
+- [https://www.restack.io/p/anthropic-answer-http-400-bad-request-cat-ai](https://www.restack.io/p/anthropic-answer-http-400-bad-request-cat-ai)
+- [https://community.openai.com/t/cannot-use-gpt-4o-mini-404-error/878713](https://community.openai.com/t/cannot-use-gpt-4o-mini-404-error/878713)
+- [https://community.make.com/t/404-error-with-claudes-make-an-api-call-module/59143](https://community.make.com/t/404-error-with-claudes-make-an-api-call-module/59143)
+- [https://docs.anthropic.com/en/api/errors](https://docs.anthropic.com/en/api/errors)
+- [https://docs.anthropic.com/en/docs/about-claude/models](https://docs.anthropic.com/en/docs/about-claude/models)

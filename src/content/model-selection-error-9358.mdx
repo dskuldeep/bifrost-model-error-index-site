@@ -1,66 +1,36 @@
 ---
-title: "Invalid model name"
-provider: "mistral-ai"
-provider_icon: "/file.svg"
+title: "model: claude-3-5-sonnet"
+provider: "anthropic"
+provider_icon: "/logos/anthropic.svg"
 solved: true
 slug: "model-selection-error-9358"
 ---
 
 ## Reason
 
-The "Invalid model name" error (typically accompanied by an HTTP 400 Bad Request status) occurs when the Mistral AI API or similar providers cannot recognize the model identifier provided in the request payload. 
-
-**Incorrect Model Name**
-The model name specified does not match the provider's permitted or available models. This is frequently caused by typos, using outdated model names that have been deprecated, or requesting a model that is not supported by the specific endpoint being called (e.g., calling a chat completion endpoint with a non-chat model).
-
-**Invalid Configuration**
-The request may contain malformed syntax or missing required properties. Common issues include missing `Content-Type: application/json` headers, incorrectly formatted `Authorization` bearer tokens, or providing parameters in the wrong data type.
-
-**Rate Limiting or Throttling**
-While rate limits usually return a 429 status code, certain middleware configurations or API gateways may manifest throttling issues as a 400 error if the request is rejected before reaching the core model processing logic.
-
-**Environmental or Variable Issues**
-The error can arise if environment variables used to store the model name are incorrectly defined. For example, the variable might include accidental whitespace, hidden characters, or extra quotation marks that invalidate the string when passed to the API client.
-
-**Network or Middleware Issues**
-General network problems or misconfigured middleware (such as Axios, LangChain, or proxy wrappers) can lead to malformed requests where the model name is stripped or altered before it reaches the API server.
+The `404 Not Found` error when requesting the `claude-3-5-sonnet` model indicates that the Anthropic API cannot find the specified resource. This typically occurs due to one of the following reasons:
+1. **Incorrect Model Identifier**: The API requires exact model strings. Using a colloquial name like `claude-3-5-sonnet` instead of the specific versioned identifier (e.g., `claude-3-5-sonnet-20240620`) or the supported alias (e.g., `claude-3-5-sonnet-latest`) can trigger this error.
+2. **Model Deprecation or Removal**: The requested model version may have been deprecated or removed from the active models list, making it unavailable for new requests.
+3. **Incorrect Endpoint or URL**: The request may be targeting an incorrect or legacy API endpoint. Errors often arise if the base URL includes extra paths or if the endpoint used is no longer valid for the Claude 3.5 series.
+4. **Resource Not Available**: The specific model might not be enabled for your account or region. This is common when using cloud-managed versions (like Vertex AI or AWS Bedrock) where models must be explicitly enabled in the console.
 
 ## Solution
-To resolve the "Invalid model name" error, follow these structured remediation steps:
-
-**1. Verify the Model Name**
-Cross-reference the model string in your code with the official Mistral AI documentation. Ensure you are using the correct identifier for the desired model, such as:
-
-*   `open-mistral-7b`
-*   `open-mixtral-8x7b`
-*   `mistral-small-latest`
-*   `mistral-medium-latest`
-*   `mistral-large-latest`
-
-**2. Check API Keys and Headers**
-Confirm that your API keys are active and that your headers are correctly configured. The `Authorization` header must follow the `Bearer <API_KEY>` format, and the `Content-Type` must be set to `application/json`.
-
-**3. Review Request Syntax**
-Inspect the JSON payload for syntax errors. Ensure that the `model` field is a valid string and that all other mandatory fields (e.g., the `messages` array) are properly structured according to the API specification.
-
-**4. Inspect Network Traffic**
-Use network inspection tools or logging to view the raw HTTP request being sent. This will help identify if the model name or other parameters are being modified by a library or proxy before transmission.
-
-**5. Check Environment Variables**
-If you are loading the model name from an environment variable, log the variable's value immediately before the API call to ensure it contains only the intended string without leading/trailing spaces or incorrect casing.
-
-**6. Monitor Rate Limits**
-Check your provider dashboard to ensure you have not exceeded your usage limits or tier quotas. If you are being throttled, reduce the frequency of your requests or upgrade your plan.
+To resolve the `404 Not Found` error for the `claude-3-5-sonnet` model, follow these remediation steps:
+1. **Validate the Model Identifier**: Update your request to use a valid, specific model name. For Claude 3.5 Sonnet, the correct identifier is typically `claude-3-5-sonnet-20240620` or the dynamic alias `claude-3-5-sonnet-latest`.
+2. **Check the API Endpoint**: Ensure your application is pointing to the correct Anthropic Messages API endpoint: `https://api.anthropic.com/v1/messages`. Verify that there are no typos or unnecessary subdirectories in the base URL configuration.
+3. **Verify Model Availability**: 
+- Consult the official Anthropic documentation to confirm that the model is still active.
+- If using a cloud provider (GCP or AWS), navigate to the 'Model Garden' or 'Model Access' page to ensure the Claude 3.5 Sonnet model is enabled for your project and region.
+4. **Contact Support**: If the configuration is verified but the error continues, retrieve the `request-id` from the API response headers. Provide this ID when contacting Anthropic support to help them diagnose account-specific resource issues.
 
 ## Suggested Links
-- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
-- [https://community.make.com/t/400-invalid-model-llama-3-8b-instruct-how-is-that-possible-if-it-is-actually-permitted/53562](https://community.make.com/t/400-invalid-model-llama-3-8b-instruct-how-is-that-possible-if-it-is-actually-permitted/53562)
-- [https://community.openai.com/t/request-failed-with-status-code-400/39242](https://community.openai.com/t/request-failed-with-status-code-400/39242)
-- [https://community.openai.com/t/content-is-required-property-error-400/486260](https://community.openai.com/t/content-is-required-property-error-400/486260)
-- [https://discuss.huggingface.co/t/400-client-error-in-inference-api-for-sentence-similarity-task/34784](https://discuss.huggingface.co/t/400-client-error-in-inference-api-for-sentence-similarity-task/34784)
-- [https://learn.microsoft.com/en-us/answers/questions/2117664/my-mistral-large-2407-serverless-deployment-api-is](https://learn.microsoft.com/en-us/answers/questions/2117664/my-mistral-large-2407-serverless-deployment-api-is)
-- [https://community.crewai.com/t/crewai-on-mistral-api-error/1559](https://community.crewai.com/t/crewai-on-mistral-api-error/1559)
-- [https://github.com/langchain-ai/langchain/issues/16869](https://github.com/langchain-ai/langchain/issues/16869)
-- [https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/discussions/98](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/discussions/98)
-- [https://docs.mistral.ai/getting-started/models/](https://docs.mistral.ai/getting-started/models/)
-- [https://docs.mistral.ai/api/](https://docs.mistral.ai/api/)
+- [https://www.restack.io/p/anthropic-answer-api-curl-cat-ai](https://www.restack.io/p/anthropic-answer-api-curl-cat-ai)
+- [https://community.postman.com/t/api-call-request-404-not-found/55565](https://community.postman.com/t/api-call-request-404-not-found/55565)
+- [https://support.anthropic.com/en/articles/10366432-i-m-getting-an-api-connection-error-how-can-i-fix-it](https://support.anthropic.com/en/articles/10366432-i-m-getting-an-api-connection-error-how-can-i-fix-it)
+- [https://community.make.com/t/integration-with-anthropic-claude/54102](https://community.make.com/t/integration-with-anthropic-claude/54102)
+- [https://codingmall.com/knowledge-base/25-global/1533-how-do-i-handle-errors-and-exceptions-when-using-the-anthropic-python-sdk](https://codingmall.com/knowledge-base/25-global/1533-how-do-i-handle-errors-and-exceptions-when-using-the-anthropic-python-sdk)
+- [https://www.restack.io/p/anthropic-answer-http-400-bad-request-cat-ai](https://www.restack.io/p/anthropic-answer-http-400-bad-request-cat-ai)
+- [https://www.googlecloudcommunity.com/gc/AI-ML/Can-t-Enable-any-Anthropic-Models/m-p/836124](https://www.googlecloudcommunity.com/gc/AI-ML/Can-t-Enable-any-Anthropic-Models/m-p/836124)
+- [https://www.googlecloudcommunity.com/gc/AI-ML/Not-able-to-use-anthropic-claude-3-5-model-API/m-p/830352](https://www.googlecloudcommunity.com/gc/AI-ML/Not-able-to-use-anthropic-claude-3-5-model-API/m-p/830352)
+- [https://github.com/continuedev/continue/issues/1185](https://github.com/continuedev/continue/issues/1185)
+- [https://docs.anthropic.com/en/docs/about-claude/models](https://docs.anthropic.com/en/docs/about-claude/models)

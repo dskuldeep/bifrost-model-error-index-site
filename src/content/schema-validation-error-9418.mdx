@@ -1,5 +1,5 @@
 ---
-title: "Invalid schema for function 'guidance_web_qna': In context=('properties', 'query_variations'), array schema missing items"
+title: "Invalid schema for function \"information_extraction\": [\"Tech Sector Concerns\", \"Bot Development Work\", \"Expense Question\", \"API Configuration Progress\"] is not of type \"object\", \"boolean\""
 provider: "azure-openai"
 provider_icon: "/file.svg"
 solved: true
@@ -8,36 +8,38 @@ slug: "schema-validation-error-9418"
 
 ## Reason
 
-The **400 Bad Request** error occurs because the JSON schema provided for a function or tool definition does not comply with the expected specification. In this specific case, the Azure OpenAI API is unable to parse the `guidance_web_qna` function because the `query_variations` property is defined as an array but lacks the mandatory `items` descriptor.
+The **Invalid schema for function** error (HTTP 400) occurs when the JSON structure provided for a function or tool definition does not comply with the expected JSON Schema specification. In the Azure OpenAI API, the `parameters` field of a function must be a valid JSON Schema object (typically defined with `type: "object"`) or, in specific contexts, a boolean.
 
 Key reasons for this error include:
-1. **Missing Items Schema**: In JSON Schema (Draft 4 or later, which Azure OpenAI uses for function calling), any property defined with `"type": "array"` must also include an `items` field to define the data type of the elements within that array. Leaving this out causes a validation failure.
-2. **Incorrect Schema Formatting**: The request payload may have structural issues, such as misplaced brackets or incorrect nesting of the `properties` object, leading the validator to find an incomplete array definition.
-3. **Model-Specific Validation**: Azure OpenAI's underlying models (like GPT-4-Turbo or GPT-4o) enforce strict schema validation for Tool Calling. Parameters that do not match the expected data types or are missing mandatory fields in the schema definition will result in this error.
+1. **Incorrect Data Type**: The error message explicitly states that an array (the list of strings starting with "Tech Sector Concerns") was provided where an object or boolean was expected. Arrays are not valid top-level structures for function parameter definitions.
+2. **Invalid Schema Definition**: The schema defined for the function `information_extraction` does not align with the structure of the data being passed. If the function is intended to receive a list of topics, those topics must be wrapped within a property of an object rather than passed as the root element.
+3. **Request Argument Errors**: The payload or request arguments might contain fields that are unrecognized or incorrectly formatted, leading the server to reject the "Bad Request."
+4. **Structure Mismatch**: A mismatch exists between the expected data type defined in the function's schema and the actual data structure provided in the API request.
 
 ## Solution
-To resolve this schema validation error, you must update the function definition for `guidance_web_qna` to include a valid schema for the `query_variations` array. 
+To resolve the "Invalid schema for function" error, you must ensure your function definitions and the data provided adhere strictly to JSON Schema standards.
 
-Follow these steps to remediate the issue:
-1. **Locate the Function Definition**: Find the JSON object where you define the `guidance_web_qna` function in your API request (usually within the `functions` or `tools` parameter).
-2. **Update the Array Schema**: Ensure that the `query_variations` property includes the `items` keyword. For example, if the array should contain strings, your schema should look like this:
-   ```json
-   "query_variations": {
-     "type": "array",
-     "items": {
-       "type": "string"
-     }
-   }
-   ```
-3. **Verify Data Types**: Check that all other properties within the schema have a clearly defined `type` (e.g., `string`, `integer`, `object`) and that required fields are listed in the `required` array at the appropriate level.
-4. **Check for Mandatory Fields**: Ensure the overall structure includes the required root fields for a function: `name`, `description` (optional but recommended), and `parameters`.
-5. **Validate with a JSON Schema Validator**: Before sending the request, test your schema against a JSON Schema validator to ensure it is syntactically correct and includes all necessary keywords for the specified types.
-6. **Review API Documentation**: Consult the official Azure OpenAI documentation on function calling to ensure you are using supported keywords (e.g., Azure OpenAI may not support certain advanced JSON Schema keywords like `additionalProperties` depending on the model version).
+Follow these remediation steps:
+1. **Verify the Function Definition**: Ensure the `parameters` field in your function call definition is a valid JSON Schema object. It must explicitly define a `type`. For example, instead of passing a list directly, define an object with an array property:
+
+```json
+"parameters": {
+  "type": "object",
+  "properties": {
+    "concerns": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "required": ["concerns"]
+}
+```
+2. **Match the Expected Data Type**: Verify that the input data conforms to the type specified in the schema. In this instance, ensure you are passing an object (e.g., `{ "concerns": [...] }`) rather than a raw array.
+3. **Validate the Schema**: Use a JSON Schema validator to ensure the structure aligns with the function's requirements. Every property must have a valid type (string, number, object, etc.).
+4. **Correct Request Arguments**: Check that all fields in the request payload are recognized by the specific Azure OpenAI API version you are using. Unrecognized fields often trigger 400 errors.
+5. **Review Function Parameters**: Double-check that all parameters passed to the function adhere to the specified schema, paying close attention to nested properties and required fields.
 
 ## Suggested Links
-- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
-- [https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue](https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue)
-- [https://yourazurecoach.com/2023/05/17/validate-payloads-in-azure-api-management/](https://yourazurecoach.com/2023/05/17/validate-payloads-in-azure-api-management/)
-- [https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md](https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md)
 - [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)
-- [https://json-schema.org/understanding-json-schema/reference/array](https://json-schema.org/understanding-json-schema/reference/array)
+- [https://json-schema.org/understanding-json-schema/reference/object.html](https://json-schema.org/understanding-json-schema/reference/object.html)
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)

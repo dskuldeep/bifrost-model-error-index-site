@@ -1,5 +1,5 @@
 ---
-title: "Invalid schema for function 'matching_auto_reply': 'float' is not valid under any of the given schemas"
+title: "Invalid schema for function \"guidance_web_qna\": In context=(\"properties\", \"query_variations\"), array schema missing items"
 provider: "azure-openai"
 provider_icon: "/file.svg"
 solved: true
@@ -8,28 +8,40 @@ slug: "schema-validation-error-9416"
 
 ## Reason
 
-The `400 Bad Request` error in the Azure OpenAI API, specifically the **Invalid schema for function** error, occurs when the JSON schema provided in the `functions` or `tools` parameter does not conform to the expected specification. 
-
-Key reasons for this failure include:
-1.  **Data Type Mismatch (The 'float' issue)**: The error message `'float' is not valid under any of the given schemas` is a common pitfall. JSON Schema (the standard used by OpenAI) does not recognize `float` as a valid primitive type. It supports `string`, `number`, `integer`, `object`, `array`, `boolean`, and `null`. Using `type: "float"` instead of `type: "number"` will trigger this validation error.
-2.  **Invalid or Missing Schema**: The JSON schema may be missing required structural items. For example, if a property is defined as an `array`, it must include an `items` object to define the contents of that array.
-3.  **Incorrect Request Payload**: The overall payload sent to the API may fail validation if it contains unrecognized request arguments, incorrect formatting, or is missing fields required by the API version being used.
-4.  **Model-Specific Parameters**: Different OpenAI models (such as GPT-4 Turbo vs. GPT-4o) have specific parameter constraints. For instance, substituting `max_tokens` with `max_completion_tokens` on models that do not support the latter can result in a 400 error.
-5.  **Header and Content-Type Issues**: If the `Content-Type` header is not explicitly set to `application/json`, the server may fail to parse the incoming request, leading to a schema-related error.
+The 400 status error "Invalid schema for function" in the Azure OpenAI API occurs when the JSON Schema provided for a function (tool) definition does not strictly conform to the expected specification. Key reasons include:
+1. **Missing Array Items**: The specific error `array schema missing items` indicates that a property defined with `"type": "array"` (in this case, `query_variations`) does not contain the mandatory `"items"` field. In JSON Schema, if you declare a type as an array, you must specify what types of items the array contains.
+2. **JSON Schema Version Mismatch**: Azure OpenAI and OpenAI use a specific subset of JSON Schema. While some newer drafts allow keywords like `prefixItems`, the API typically requires the standard `"items"` keyword for array definitions. Using unsupported keywords or omitting required ones leads to validation failure.
+3. **Invalid Request Parameters**: Providing parameters that are incompatible with the specific model or API version. For instance, using `max_completion_tokens` (required for the **o1** model series) instead of `max_tokens` (used for GPT-4 and GPT-3.5 models), or vice versa, can trigger a 400 error.
+4. **Payload Validation**: The API strictly validates the structure and data types of the payload. Any deviation—such as missing required fields, additional unrecognized properties, or nested `anyOf` blocks that the parser cannot resolve—will result in a schema error.
+5. **Header or Content-Type Issues**: If the `Content-Type` header is not set to `application/json` or if authentication headers are improperly formatted, the server may reject the request before schema processing is complete.
 
 ## Solution
-To resolve the `400` status error and fix the invalid function schema, follow these remediation steps:
-1.  **Match Valid Data Types**: Locate the parameter in your function definition that uses `"type": "float"` and change it to `"type": "number"`. Use `number` for any decimal or floating-point values.
-2.  **Validate the JSON Schema**: Ensure the function definition is a valid JSON Schema. Verify that every `object` has a `properties` field and every `array` has an `items` field defined. You can use an online JSON Schema validator to test your `parameters` block.
-3.  **Correct Request Payload**: Double-check the structure of your API request. Ensure that the `tools` or `functions` array is correctly formatted and that all mandatory fields for the specific API endpoint are present.
-4.  **Use Correct Model Parameters**: Verify the documentation for the specific model deployment you are using. Ensure you are utilizing the correct token limit parameters (e.g., `max_tokens` vs. `max_completion_tokens`) and that your model supports tool calling.
-5.  **Check Headers and Content-Type**: Ensure your HTTP client is configured to send the `Content-Type: application/json` header with every request to the Azure OpenAI endpoint.
+To resolve the "Invalid schema for function" error, follow these remediation steps:
+1. **Update the Array Schema**: Locate the `query_variations` property in your function definition and ensure it includes the `"items"` field. A valid schema should look like this:
+
+   ```json
+   "query_variations": {
+     "type": "array",
+     "items": {
+       "type": "string"
+     }
+   }
+   ```
+2. **Verify Request Parameters**: Use the parameters specific to the model you have deployed:
+
+   * Use `max_tokens` for GPT-4, GPT-4o, and GPT-3.5 models.
+   * Use `max_completion_tokens` specifically for the **o1-preview** and **o1-mini** models.
+3. **Validate the Payload**: Ensure the JSON structure matches the function definition exactly. Check for common issues like:
+
+   * Missing required parameters in the `"required"` array.
+   * Using `"type": "object"` for fields that are being passed as strings.
+   * Incorrectly nested properties within the `"parameters"` block.
+4. **Confirm Headers**: Verify that your request includes the following header:
+
+   * `Content-Type: application/json`
+5. **Review API Documentation**: Ensure you are using a supported API version (e.g., `2023-07-01-preview` or later) that supports function calling and tools. Refer to the Azure OpenAI documentation to confirm the exact schema requirements for the `guidance_web_qna` function if it is a pre-defined or system-level tool.
 
 ## Suggested Links
-- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
-- [https://github.com/instructor-ai/instructor/issues/961](https://github.com/instructor-ai/instructor/issues/961)
-- [https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue](https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue)
-- [https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md](https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md)
-- [https://community.openai.com/t/azure-open-ai-assistant-api-connection-error/662198](https://community.openai.com/t/azure-open-ai-assistant-api-connection-error/662198)
-- [https://json-schema.org/understanding-json-schema/reference/numeric](https://json-schema.org/understanding-json-schema/reference/numeric)
 - [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)
+- [https://json-schema.org/understanding-json-schema/reference/array](https://json-schema.org/understanding-json-schema/reference/array)
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)

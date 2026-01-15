@@ -57,7 +57,27 @@ export function SearchAndFilter({
             onClick={() => setIsExpanded(!isExpanded)}
             className="provider-filter-toggle"
           >
-            {selectedProvider ? `Provider: ${selectedProviderDisplay}` : 'All Providers'}
+            <span>{selectedProvider ? `Provider: ${selectedProviderDisplay}` : 'All Providers'}</span>
+            <svg
+              style={{
+                width: '16px',
+                height: '16px',
+                transition: 'transform 0.2s',
+                transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                flexShrink: 0,
+              }}
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M4 6L8 10L12 6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </button>
           
           {isExpanded && (

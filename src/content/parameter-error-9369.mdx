@@ -1,0 +1,40 @@
+---
+title: "Missing parameter \"name\": messages with role \"function\" must have a \"name\"."
+provider: "openai"
+provider_icon: "/logos/openai.svg"
+solved: true
+slug: "parameter-error-9369"
+---
+
+## Reason
+
+The error `Missing parameter "name"` occurs because the OpenAI Chat Completions API enforces a strict schema for messages where the `role` is set to `function`. 
+
+In the OpenAI function-calling workflow, when a model requests to call a function, the developer must provide the result back to the model using a message with the `function` role. For these specific messages, the `name` parameter is mandatory. This parameter serves as a unique identifier that allows the API to map the function output back to the original function call request, ensuring the conversation thread remains logically consistent. Without the `name` field, the API cannot determine which function the content belongs to, resulting in a validation failure.
+
+## Solution
+To resolve this error, you must modify your message payload to include the `name` property for any message using the `function` role. Follow these steps:
+1. Locate the message objects in your `messages` array where the `role` is defined as `function`.
+2. Add the `name` parameter to each of these objects. The value of `name` must match the name of the function that was originally invoked.
+3. Ensure the `content` parameter is also present, containing the stringified output of your function.
+
+**Example Request Body Structure:**
+
+```json
+{
+  "messages": [
+    {
+      "role": "function",
+      "name": "calculate_tax",
+      "content": "{\"total\": 125.50}"
+    }
+  ]
+}
+```
+
+**Note on Tool Calling:**
+If you are using the newer Tool Calling API (available in newer models like GPT-4o or GPT-4-turbo), you should transition from `role: "function"` to `role: "tool"`. In that schema, you must provide a `tool_call_id` instead of just the `name` to link the result to the specific request.
+
+## Suggested Links
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages](https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages)

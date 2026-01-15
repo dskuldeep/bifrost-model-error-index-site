@@ -1,0 +1,41 @@
+---
+title: "-1 is less than the minimum of 1 - \"max_tokens\""
+provider: "openai"
+provider_icon: "/logos/openai.svg"
+solved: true
+slug: "value-below-minimum-error-9552"
+---
+
+## Reason
+
+This error indicates that the `max_tokens` parameter provided in your API request does not meet the minimum requirements or violates the model's architectural constraints. There are several potential causes:
+
+**Invalid Parameter Value**
+
+The specific raw error message `-1 is less than the minimum of 1` occurs because the `max_tokens` value must be a positive integer. Passing a negative number (like -1) or zero triggers a schema validation error before the model even processes the request.
+
+**Model Context Length Limitation**
+
+The total token count—which includes both your input tokens (prompt, system messages, and history) and the `max_tokens` requested for the response—cannot exceed the model's maximum context window. For example, if you are using an older model with a 4,096-token limit, your input plus the `max_tokens` value must stay under that total.
+
+**Total Token Count Exceeding Limits**
+
+If the sum of the input and the specified `max_tokens` exceeds the window, the API returns an error. This often happens when a large `max_tokens` value is requested on a prompt that is already long.
+
+**Misalignment with Documentation**
+
+There is often a misunderstanding of how `max_tokens` works. It does not just limit the output; it reserves space within the context window. If the reserved space (`max_tokens`) plus the existing prompt is larger than what the model supports (e.g., 8,192 for standard GPT-4), the request will fail.
+
+## Solution
+To resolve this error and ensure your `max_tokens` parameter is configured correctly, follow these steps:
+1. Ensure `max_tokens` is a positive integer of at least
+1. Verify that your code is not passing a negative number or a null value where an integer is expected.
+2. Adjust the `max_tokens` value downward so that the total of (Input Tokens + `max_tokens`) remains within the model's specific context length (e.g., 128,000 for GPT-4o, though many models have a separate, smaller limit for the output tokens themselves, often 4,096).
+3. Optimize the input by trimming unnecessary conversation history or reducing the length of the system prompt to leave more room for the response.
+4. Use appropriate models for your use case. If your application requires a large context, switch to high-capacity models like GPT-4o or GPT-4-Turbo which support 128k tokens.
+5. Split the task into smaller segments. If the prompt and the required answer are too large to fit in one window, use multiple API calls to process the data in chunks.
+
+## Suggested Links
+- [https://platform.openai.com/docs/models](https://platform.openai.com/docs/models)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-max_tokens](https://platform.openai.com/docs/api-reference/chat/create#chat-create-max_tokens)
+- [https://platform.openai.com/tokenizer](https://platform.openai.com/tokenizer)

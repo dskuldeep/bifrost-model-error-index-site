@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import { getProviderDisplayName } from './providerDisplayName';
+import { getProviderDisplayName, getProviderLogoPath } from './providerDisplayName';
 
 const contentDirectory = path.join(process.cwd(), 'src/content');
 
@@ -62,9 +62,9 @@ export function getAllProviders() {
                 providerMap.get(providerLower)!.count++;
             } else {
                 providerMap.set(providerLower, {
-                    name: getProviderDisplayName(provider),
+                    name: providerLower, // Store the original identifier for URL routing
                     count: 1,
-                    icon: error.frontmatter.provider_icon
+                    icon: getProviderLogoPath(provider) // Use the logo mapping function
                 });
             }
         }

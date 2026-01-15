@@ -1,40 +1,39 @@
 ---
-title: "'json' is not of type 'object' - 'response_format'"
+title: "\"ab\" is not of type \"number\" - \"top_p\""
 provider: "openai"
-provider_icon: "/logos/openai.png"
+provider_icon: "/logos/openai.svg"
 solved: true
 slug: "type-error-9459"
 ---
 
 ## Reason
 
-The OpenAI API error `'json' is not of type 'object' - 'response_format'` occurs when the `response_format` parameter is incorrectly passed as a string (e.g., `"response_format": "json"`) instead of a structured JSON object. According to the OpenAI API specification, this field must be an object containing a `type` key.
+The error occurs when the OpenAI API receives a request that is syntactically invalid or contains improperly typed parameters, resulting in an `AxiosError` with a 400 status code. 
 
-Key reasons for this error include:
-1. **Incorrect Parameter Syntax**: The API expects `{"type": "json_object"}` or `{"type": "json_schema", ...}`. Providing a simple string like `"json"` triggers a schema validation failure.
-2. **Model Incompatibility**: The `json_object` format is only supported on specific models, such as `gpt-4o`, `gpt-4-turbo`, and `gpt-3.5-turbo-1106` or later. Attempting to use this parameter with older models will result in a `400 Bad Request` error.
-3. **Missing Prompt Requirements**: When using JSON mode, the API requires that the word "json" be explicitly mentioned in the system or user prompt. If the prompt is missing this keyword, the API may reject the request even if the formatting is technically correct.
-4. **Invalid Request Body Structure**: The error can also stem from extra fields in the request body that are not permitted for the specific endpoint or a mismatch in the expected JSON structure when using SDKs or HTTP libraries.
+**Type Mismatch for top_p**
+The specific error `"ab" is not of type "number" - "top_p"` indicates a schema validation failure. The `top_p` parameter (nucleus sampling) requires a numeric value, typically between 0 and 1. Providing a string like "ab" causes the API to reject the request immediately.
+
+**Incorrect or Expired API Key**
+An invalid, expired, or improperly configured API key can trigger authentication-related 400 errors if the request header is malformed or if the server cannot process the credentials provided.
+
+**Invalid Request Parameters**
+Requests may fail if they include parameters not supported by the specific model version. For instance, attempting to specify dimensions for a model that does not support that parameter will result in a 400 error.
+
+**Middleware and Axios Configuration Issues**
+Issues within the Axios setup, such as an incorrect `baseURL` or misconfigured headers (specifically the `Authorization` field), can prevent the request from being processed correctly by OpenAI's servers.
+
+**Rate Limiting and Quotas**
+While often associated with a 429 status code, exceeding rate limits or usage quotas can sometimes lead to general request failures (400) if the client library or a proxy layer fails to handle the exhaustion state properly.
 
 ## Solution
-To resolve the `400` status error and correctly implement the `response_format` parameter, follow these steps:
-1. **Correct the Response Format Syntax**: Ensure the `response_format` is passed as an object. For standard JSON mode, use:
-   `"response_format": { "type": "json_object" }`.
-2. **Update the Prompt**: You must include the word "json" somewhere in your prompt (system or user message) to instruct the model to produce a valid JSON string.
-3. **Verify Model Compatibility**: Confirm that your request is targeting a compatible model. Supported models include:
-   * `gpt-4o` and `gpt-4o-mini`
-   * `gpt-4-turbo` (and `gpt-4-1106-preview`)
-   * `gpt-3.5-turbo-0125` and `gpt-3.5-turbo-1106`
-4. **Validate the Request Payload**: Ensure your JSON payload is well-formed and does not include deprecated or unsupported fields. If you are using Structured Outputs, use the `json_schema` type with the appropriate `schema` and `strict: true` parameters.
-5. **Remove Extra Fields**: Review your API call to ensure no additional, non-permitted fields are being sent in the request body which might interfere with schema validation.
+To resolve the 400 status error and the specific `top_p` type mismatch, follow these steps:
+1. **Correct the data type**: Ensure that the `top_p` parameter is passed as a float or integer (e.g., `0.9`) rather than a string. OpenAI expects a value between 0 and 1 for this parameter.
+2. **Validate API key**: Verify that your OpenAI API key is active, has not expired, and is correctly formatted in your environment variables.
+3. **Review request parameters**: Check the OpenAI API documentation to ensure all parameters in your payload are supported by the model you are calling. Remove unsupported parameters like `dimensions` if using older models.
+4. **Inspect Axios configuration**: Confirm that the `Authorization` header is set as `Bearer YOUR_API_KEY` and that the `baseURL` points to the official OpenAI endpoint (`https://api.openai.com/v1`).
+5. **Check rate limits**: Visit the OpenAI usage dashboard to confirm your account has sufficient credits and that you have not hit your organizational rate limits.
 
 ## Suggested Links
-- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
-- [https://github.com/openai/openai-python/issues/887](https://github.com/openai/openai-python/issues/887)
-- [https://forum.bubble.io/t/openai-api-error-http-400/263917](https://forum.bubble.io/t/openai-api-error-http-400/263917)
-- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
-- [https://community.openai.com/t/using-response-format-in-chat-completion-throws-error/484377](https://community.openai.com/t/using-response-format-in-chat-completion-throws-error/484377)
-- [https://github.com/langchain-ai/langchain/issues/12953](https://github.com/langchain-ai/langchain/issues/12953)
-- [https://swagger.io/docs/specification/v3_0/describing-request-body/describing-request-body/](https://swagger.io/docs/specification/v3_0/describing-request-body/describing-request-body/)
-- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-response_format](https://platform.openai.com/docs/api-reference/chat/create#chat-create-response_format)
-- [https://platform.openai.com/docs/guides/structured-outputs](https://platform.openai.com/docs/guides/structured-outputs)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-top_p](https://platform.openai.com/docs/api-reference/chat/create#chat-create-top_p)
+- [https://platform.openai.com/docs/guides/error-codes](https://platform.openai.com/docs/guides/error-codes)
+- [https://platform.openai.com/docs/api-reference/parameter-details](https://platform.openai.com/docs/api-reference/parameter-details)

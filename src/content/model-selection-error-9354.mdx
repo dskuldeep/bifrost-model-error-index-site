@@ -1,5 +1,5 @@
 ---
-title: "Invalid model: mistral-ai"
+title: "Invalid model: minstral-medium"
 provider: "mistral-ai"
 provider_icon: "/file.svg"
 solved: true
@@ -8,30 +8,51 @@ slug: "model-selection-error-9354"
 
 ## Reason
 
-The 400 Bad Request error `Invalid model: mistral-ai` occurs when the Mistral AI API receives a request it cannot process due to client-side errors. The primary reasons include:
-1. **Incorrect Model Specification**: The identifier `mistral-ai` is often used incorrectly as a model name; it is actually the provider's name. The API requires a specific model slug (e.g., `mistral-large-latest`) to function.
-2. **Syntax or Configuration Issues**: The request may be malformed, containing invalid syntax in the JSON payload, incorrect headers (such as a missing `Content-Type: application/json`), or an invalid API key.
-3. **Extra or Disallowed Parameters**: The Mistral API performs strict validation on request bodies. If the request includes parameters that the specific model does not support (such as `frequency_penalty` or `logit_bias` which are common in other LLM APIs), the server will return a 400 error unless the environment is configured to ignore them.
+The error `Invalid model: minstral-medium` in the Mistral AI API environment typically occurs due to the following reasons:
+
+**1. Typographical Errors**
+As seen in the raw error text, a common cause is a typo (e.g., using `minstral` instead of `mistral`). API model identifiers are string-sensitive and must be spelled exactly as defined by the provider.
+
+**2. Invalid or Deprecated Model Specification**
+The identifier `mistral-medium` may no longer be supported or may have been renamed. Mistral AI often moves legacy models to specific versioned strings (like `mistral-medium-2312`) or uses the `-latest` suffix (like `mistral-medium-latest`). If the specific string used is not in the permitted list for your API tier, the request will fail.
+
+**3. API Configuration or Syntax Issues**
+A "400 Bad Request" response can be triggered if the request payload contains invalid syntax, improperly formatted JSON, or incorrect headers. This includes issues with the `Authorization` header or missing required parameters in the data body.
+
+**4. API Compatibility and Structure**
+There may be a mismatch between the API client (or SDK) version and the Mistral AI API. If the client sends parameters that the current API version does not recognize, the request may be flagged as malformed.
+
+**5. Rate Limiting or Throttling**
+While typically associated with 429 errors, certain API gateways may return a 400 error if the request cannot be processed due to extreme rate limit violations or quota exhaustion.
 
 ## Solution
-To resolve the 400 status error and the `Invalid model` message, follow these remediation steps:
-1. **Verify the Model Name**: Replace the provider name `mistral-ai` with a supported model slug from the Mistral documentation. Examples include:
-   - `mistral-large-latest`
-   - `mistral-small-latest`
-   - `open-mistral-7b`
-   - `codestral-latest`
-2. **Check API Configuration**: Review the API request for syntax errors. Ensure the `Authorization` header is correctly formatted as `Bearer YOUR_API_KEY` and that the data payload follows the expected schema for the `/v1/chat/completions` endpoint.
-3. **Manage Extra Parameters**: Remove any parameters from the request payload that are not explicitly supported by Mistral. If you are using a proxy or gateway like Bifrost and need to send custom parameters, set the `extra-parameters` configuration to `pass-through` to prevent the API from rejecting the request due to unrecognized fields.
+To resolve the "Invalid model" error, follow these remediation steps:
+
+**1. Correct the Model Identifier**
+Check the model string for typos. Ensure you are using `mistral` (with a 't') and not `minstral`. Confirm the exact model name from the [Mistral AI Official Models list](https://docs.mistral.ai/getting-started/models/). Use current identifiers such as `mistral-medium-latest` or `mistral-large-latest` if the generic `mistral-medium` is rejected.
+
+**2. Verify API Keys and Configuration**
+* Ensure your API key is valid, active, and has not expired.
+* Verify that the API key has the necessary permissions/entitlements to access the 'Medium' tier models.
+* Check that the request headers and the JSON data payload are properly formatted according to the Mistral AI API specification.
+
+**3. Review API Client Compatibility**
+Ensure your API client or integration middleware is compatible with the latest Mistral AI API structure. Update any SDKs or libraries to their latest versions to ensure they are sending the correct parameters.
+
+**4. Monitor Rate Limits and Quotas**
+Check your Mistral AI dashboard to verify that you have sufficient credits and that you are not exceeding the rate limits assigned to your usage tier.
+
+**5. Test with a Known Model**
+If the error persists, try changing the model parameter to a widely available model like `open-mistral-7b` to determine if the issue is specific to the `mistral-medium` identifier or a broader configuration problem.
 
 ## Suggested Links
 - [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
-- [https://github.com/cline/cline/issues/938](https://github.com/cline/cline/issues/938)
-- [https://learn.microsoft.com/en-us/answers/questions/2117664/my-mistral-large-2407-serverless-deployment-api-is](https://learn.microsoft.com/en-us/answers/questions/2117664/my-mistral-large-2407-serverless-deployment-api-is)
-- [https://community.make.com/t/400-invalid-model-llama-3-8b-instruct-how-is-that-possible-if-it-is-actually-permitted/53562](https://community.make.com/t/400-invalid-model-llama-3-8b-instruct-how-is-that-possible-if-it-is-actually-permitted/53562)
+- [https://community.make.com/t/400-invalid-model/59048](https://community.make.com/t/400-invalid-model/59048)
 - [https://forum.cloudron.io/topic/11826/using-mistral-api-seems-broken-on-cloudron](https://forum.cloudron.io/topic/11826/using-mistral-api-seems-broken-on-cloudron)
-- [https://github.com/nomic-ai/gpt4all/issues/2317](https://github.com/nomic-ai/gpt4all/issues/2317)
-- [https://www.datacamp.com/tutorial/codestral-api-tutorial](https://www.datacamp.com/tutorial/codestral-api-tutorial)
-- [https://infobot.rikers.org/%23debian/20051219.html.gz](https://infobot.rikers.org/%23debian/20051219.html.gz)
-- [https://community.crewai.com/t/crewai-on-mistral-api-error/1559](https://community.crewai.com/t/crewai-on-mistral-api-error/1559)
+- [https://community.make.com/t/400-invalid-model-llama-3-8b-instruct-how-is-that-possible-if-it-is-actually-permitted/53562](https://community.make.com/t/400-invalid-model-llama-3-8b-instruct-how-is-that-possible-if-it-is-actually-permitted/53562)
+- [https://github.com/langchain-ai/langchain/issues/16869](https://github.com/langchain-ai/langchain/issues/16869)
+- [https://github.com/cline/cline/issues/938](https://github.com/cline/cline/issues/938)
+- [https://www.restack.io/p/mistral-inference-answer-rate-limits-cat-ai](https://www.restack.io/p/mistral-inference-answer-rate-limits-cat-ai)
+- [https://github.com/microsoft/autogen/issues/991](https://github.com/microsoft/autogen/issues/991)
 - [https://docs.mistral.ai/getting-started/models/](https://docs.mistral.ai/getting-started/models/)
 - [https://docs.mistral.ai/api/](https://docs.mistral.ai/api/)

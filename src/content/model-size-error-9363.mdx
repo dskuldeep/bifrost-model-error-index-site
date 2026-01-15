@@ -1,0 +1,45 @@
+---
+title: "The size is not supported by this model."
+provider: "openai"
+provider_icon: "/logos/openai.svg"
+solved: true
+slug: "model-size-error-9363"
+---
+
+## Reason
+
+The "400 Bad Request" error occurs when the OpenAI API cannot process a request due to invalid client-side parameters or configurations. Specifically, the error message **"The size is not supported by this model"** is a common manifestation of this status code when there is a mismatch between a requested size parameter and the specific model's capabilities.
+
+Key reasons for this issue include:
+1. **Model-Specific Size Constraints:** The most common cause is requesting an image resolution or vector dimension that the model does not support. For example, DALL-E 3 requires a minimum resolution of 1024x1024, while smaller sizes like 256x256 or 512x512 are only supported by DALL-E
+2. Similarly, using the `dimensions` parameter on older embedding models like `text-embedding-ada-002` will trigger this error, as they only support a fixed vector size.
+2. **Invalid Request Syntax or Configuration:** The request may contain malformed data, missing required properties (such as the `content` field), or incorrect headers.
+3. **Incorrect or Expired API Keys:** An invalid or expired API key prevents the server from authenticating the request, leading to a general 400 error.
+4. **Data Payload Size:** Sending a payload that exceeds the maximum token limit or byte size for the model. This includes prompts that are too long or large file uploads.
+5. **Rate Limiting and Throttling:** Exceeding the Requests Per Minute (RPM) or Tokens Per Minute (TPM) quotas assigned to your account tier.
+6. **Input Validation Issues:** Unsanitized inputs, such as leading or trailing newlines or the presence of control characters (like U+0004), can cause the API to reject the JSON body as invalid.
+
+## Solution
+To resolve the 400 Bad Request error and the "size not supported" message, follow these remediation steps:
+1. **Validate Model-Specific Parameters:**
+   * **For Image Generation:** If using `dall-e-3`, ensure the `size` parameter is set to one of the supported resolutions: `1024x1024`, `1024x1792`, or `1792x1024`. For `dall-e-2`, you can use `256x256`, `512x512`, or `1024x1024`.
+   * **For Embeddings:** Verify if the model supports the `dimensions` parameter. Only newer models like `text-embedding-3-small` and `text-embedding-3-large` support it. If using legacy models, remove the `dimensions` parameter from your request.
+2. **Check API Keys and Authentication:**
+   * Verify that your API key is active and correctly copied from the OpenAI Developer Dashboard.
+   * Ensure the `Authorization` header is correctly formatted as `Bearer YOUR_API_KEY`.
+3. **Sanitize Input Text:**
+   * Strip leading and trailing newlines from your prompt or input documents.
+   * Remove control characters or non-standard whitespace that might interfere with JSON parsing.
+4. **Audit Data Payload:**
+   * Ensure the total request size is within the model's context window and the API's maximum payload limit.
+5. **Manage Rate Limits:**
+   * Implement exponential backoff in your code to handle 429 errors that may occasionally present as 400 errors during high-traffic periods.
+   * Monitor your usage in the OpenAI dashboard to stay within your tier's TPM/RPM limits.
+6. **Review Request Syntax:**
+   * Use a JSON linter to ensure your request body is correctly structured and contains all mandatory parameters for the specific endpoint.
+
+## Suggested Links
+- [https://platform.openai.com/docs/guides/error-codes](https://platform.openai.com/docs/guides/error-codes)
+- [https://platform.openai.com/docs/api-reference/images/create](https://platform.openai.com/docs/api-reference/images/create)
+- [https://platform.openai.com/docs/api-reference/embeddings/create](https://platform.openai.com/docs/api-reference/embeddings/create)
+- [https://platform.openai.com/docs/guides/rate-limits](https://platform.openai.com/docs/guides/rate-limits)

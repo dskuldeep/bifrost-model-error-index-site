@@ -1,0 +1,28 @@
+---
+title: "Invalid model: mistral-ai"
+provider: "mistral-ai"
+provider_icon: "/file.svg"
+solved: true
+slug: "model-selection-error-9352"
+---
+
+## Reason
+
+The 400 Bad Request error `Invalid model: mistral-ai` occurs when the Mistral AI API receives a request it cannot process due to client-side errors. The primary reasons include:
+1. **Incorrect Model Specification**: The identifier `mistral-ai` is often used incorrectly as a model name; it is actually the provider's name. The API requires a specific model slug (e.g., `mistral-large-latest`) to function.
+2. **Syntax or Configuration Issues**: The request may be malformed, containing invalid syntax in the JSON payload, incorrect headers (such as a missing `Content-Type: application/json`), or an invalid API key.
+3. **Extra or Disallowed Parameters**: The Mistral API performs strict validation on request bodies. If the request includes parameters that the specific model does not support (such as `frequency_penalty` or `logit_bias` which are common in other LLM APIs), the server will return a 400 error unless the environment is configured to ignore them.
+
+## Solution
+To resolve the 400 status error and the `Invalid model` message, follow these remediation steps:
+1. **Verify the Model Name**: Replace the provider name `mistral-ai` with a supported model slug from the Mistral documentation. Examples include:
+   - `mistral-large-latest`
+   - `mistral-small-latest`
+   - `open-mistral-7b`
+   - `codestral-latest`
+2. **Check API Configuration**: Review the API request for syntax errors. Ensure the `Authorization` header is correctly formatted as `Bearer YOUR_API_KEY` and that the data payload follows the expected schema for the `/v1/chat/completions` endpoint.
+3. **Manage Extra Parameters**: Remove any parameters from the request payload that are not explicitly supported by Mistral. If you are using a proxy or gateway like Bifrostand need to send custom parameters, set the `extra-parameters` configuration to `pass-through` to prevent the API from rejecting the request due to unrecognized fields.
+
+## Suggested Links
+- [https://docs.mistral.ai/getting-started/models/](https://docs.mistral.ai/getting-started/models/)
+- [https://docs.mistral.ai/api/](https://docs.mistral.ai/api/)

@@ -1,0 +1,41 @@
+---
+title: "Requests which include `tool_use` or `tool_result` blocks must define tools."
+provider: "anthropic"
+provider_icon: "/logos/anthropic.svg"
+solved: true
+slug: "tool-definition-error-9454"
+---
+
+## Reason
+
+The `HTTP 400 Bad Request` error with the message "Requests which include `tool_use` or `tool_result` blocks must define tools" occurs when an Anthropic Messages API request contains tool-related content without providing the necessary tool schemas in the top-level request body.
+
+Key reasons for this error include:
+1. **Missing Top-Level `tools` Parameter**: The Anthropic API is stateless regarding tool definitions. Even if you are providing a `tool_result` for a tool defined in a previous turn, the current request must still include the `tools` array containing the definition of that tool.
+2. **Tool Definition Requirements**: Any request that includes a `tool_use` block (from the model) or a `tool_result` block (from the user) in the `messages` history must have a corresponding definition in the `tools` list. This definition must include the tool's `name`, `description`, and a valid JSON `input_schema`.
+3. **Incorrect Input and Output Structure**: The blocks within the `messages` array must strictly follow the Anthropic schema. If a `tool_use` block is present in the history, the API expects the `tools` parameter to be present so it can validate the context of that tool usage.
+4. **Request Format and Data Types**: The error can be triggered by missing required fields within the tool definition or using incorrect data types that prevent the API from parsing the tool schema correctly.
+
+## Solution
+To resolve this error, ensure that every API request containing tool activity includes the proper tool definitions. Follow these steps:
+1. **Define the `tools` Array**: Add a top-level `tools` parameter to your JSON request body. This should be an array of objects, where each object defines a tool available to the model.
+2. **Provide Complete Tool Schemas**: Ensure each tool in the `tools` array contains:
+    *   `name`: The name of the tool (must match the name used in `tool_use` blocks).
+    *   `description`: A detailed explanation of what the tool does.
+    *   `input_schema`: A full JSON Schema object defining the parameters the tool accepts.
+3. **Include Definitions in Every Turn**: If you are sending a `tool_result` back to the model, you must include the same `tools` definition that was provided when the model originally generated the `tool_use` block.
+4. **Format Message Blocks Correctly**: Verify that your `messages` array uses the correct structure for tool interactions:
+    *   `tool_use` blocks must have a unique `id`, `name`, and `input`.
+    *   `tool_result` blocks must have a `tool_use_id` that matches the ID from the corresponding `tool_use` block.
+5. **Validate JSON Syntax**: Use a JSON validator to ensure your `input_schema` is syntactically correct and adheres to JSON Schema standards (specifically the subset supported by Anthropic).
+
+## Suggested Links
+- [https://www.restack.io/p/anthropic-answer-http-400-bad-request-cat-ai](https://www.restack.io/p/anthropic-answer-http-400-bad-request-cat-ai)
+- [https://docs.anthropic.com/en/docs/build-with-claude/tool-use](https://docs.anthropic.com/en/docs/build-with-claude/tool-use)
+- [https://github.com/langgenius/dify/issues/9366](https://github.com/langgenius/dify/issues/9366)
+- [https://forum.cursor.com/t/unable-to-reach-anthropic/22766](https://forum.cursor.com/t/unable-to-reach-anthropic/22766)
+- [https://docs.anthropic.com/en/api/messages-count-tokens](https://docs.anthropic.com/en/api/messages-count-tokens)
+- [https://www.restack.io/p/anthropic-answer-api-curl-cat-ai](https://www.restack.io/p/anthropic-answer-api-curl-cat-ai)
+- [https://docs.anthropic.com/en/docs/build-with-claude/computer-use](https://docs.anthropic.com/en/docs/build-with-claude/computer-use)
+- [https://docs.anthropic.com/en/api/messages](https://docs.anthropic.com/en/api/messages)
+- [https://github.com/anthropics/anthropic-cookbook/tree/main/tool_use](https://github.com/anthropics/anthropic-cookbook/tree/main/tool_use)

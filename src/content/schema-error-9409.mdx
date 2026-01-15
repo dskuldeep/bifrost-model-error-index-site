@@ -1,0 +1,33 @@
+---
+title: "Invalid schema for function \"getApiQueryParamsForCRMConnectors\": In context=(\"properties\", \"email_addresses\"), array schema missing items"
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "schema-error-9409"
+---
+
+## Reason
+
+The 400 Bad Request error in the Azure OpenAI API, specifically the "Invalid schema for function" message, occurs because the function definition provided in the request does not adhere to the expected JSON Schema standards. 
+
+Key reasons for this failure include:
+1. **Missing Array Items**: The error explicitly identifies that within the `email_addresses` property, an array schema is missing the mandatory `items` field. In JSON Schema, any property defined with `"type": "array"` must include an `items` object to specify the data type of the elements within that array.
+2. **Invalid or Missing Schema**: The overall schema for the function `getApiQueryParamsForCRMConnectors` is structurally incomplete or contains a mismatch between the expected and provided data types.
+3. **Incorrect Request Payload**: The JSON payload sent to the Azure OpenAI endpoint may be malformed or use unrecognized arguments that do not conform to the function-calling specification.
+4. **Model-Specific Parameter Requirements**: Different models (e.g., GPT-3.5-Turbo vs. GPT-4o) may have specific requirements for parameters like `max_tokens` or `max_completion_tokens`. Using a parameter incompatible with the selected model version can trigger schema validation errors.
+5. **Header and Content-Type Issues**: If the `Content-Type` header is not strictly set to `application/json`, the API may fail to parse the body correctly, resulting in a 400 error.
+
+## Solution
+To resolve the "Invalid schema for function" error, follow these remediation steps:
+1. **Fix Array Definitions**: Locate the `email_addresses` property in your function's parameter schema. Ensure it includes an `items` definition. 
+   - **Incorrect**: `"email_addresses": { "type": "array" }` 
+   - **Correct**: `"email_addresses": { "type": "array", "items": { "type": "string" } }`
+2. **Verify the Request Payload**: Ensure the entire JSON body conforms to the OpenAI tool/function calling specification. Every property in the `parameters` object should have a defined `type`.
+3. **Check Model-Specific Parameters**: Review the parameters used for the specific deployment. Ensure you are using `max_tokens` for older models or `max_completion_tokens` where required by newer model versions.
+4. **Inspect Headers and Content-Type**: Confirm that the request includes the `Content-Type` header set to `application/json`.
+5. **Review API Documentation**: Consult the official Azure OpenAI documentation on function calling to ensure your schema complies with the latest supported syntax and API versions (e.g., `2023-07-01-preview` or later).
+
+## Suggested Links
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)
+- [https://json-schema.org/understanding-json-schema/reference/array](https://json-schema.org/understanding-json-schema/reference/array)

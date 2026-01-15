@@ -1,0 +1,31 @@
+---
+title: "\"false\" is not of type \"boolean\" - \"stream\""
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "type-validation-error-9488"
+---
+
+## Reason
+
+The Azure OpenAI API returns a `400 Bad Request` error with the message `"false" is not of type "boolean" - "stream"` when the request payload contains a type mismatch for the `stream` parameter. 
+
+Key reasons for this error include:
+1. **Invalid Data Types**: The API schema requires the `stream` parameter to be a literal boolean value (`true` or `false`). In this instance, the value is being passed as a string (`"false"`), which the validator rejects.
+2. **Malformed Request Payload**: The API is unable to parse the request because it does not conform to the expected JSON schema. Using quotation marks around boolean values transforms them into strings, violating the required data structure.
+3. **Strict Schema Validation**: Azure OpenAI uses strict type checking for its REST API endpoints. Parameters such as `stream`, `n`, or `echo` must strictly follow their defined types (boolean, integer, etc.) to be accepted by the gateway.
+
+## Solution
+To resolve the 400 status error caused by a type validation failure, you must ensure the `stream` parameter is correctly formatted as a boolean in your JSON payload. 
+
+Follow these steps to remediate the issue:
+1. **Correct the Boolean Formatting**: Update the `stream` parameter to use `true` or `false` without quotation marks.
+   - **Correct**: `"stream": false` or `"stream": true`
+   - **Incorrect**: `"stream": "false"` or `"stream": "true"`
+2. **Verify Type Serialization**: If you are using a programming language to build the request, ensure the JSON library is serializing boolean types correctly. For example, in Python, use the native `True` or `False` objects; in JavaScript, use the `true` or `false` literals.
+3. **Audit the Request Payload**: Review all other parameters in the request (such as `temperature`, `top_p`, or `max_tokens`) to ensure they match the data types specified in the documentation.
+4. **Consult API Reference**: Check the Azure OpenAI Service REST API reference for the specific model and API version you are using to confirm the expected data types for every field.
+
+## Suggested Links
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/error-codes](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/error-codes)

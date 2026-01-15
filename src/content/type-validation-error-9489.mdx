@@ -1,5 +1,5 @@
 ---
-title: "\"false\" is not of type \"boolean\" - \"stream\""
+title: "'false' is not of type 'boolean' - 'stream'"
 provider: "azure-openai"
 provider_icon: "/file.svg"
 solved: true
@@ -8,24 +8,42 @@ slug: "type-validation-error-9489"
 
 ## Reason
 
-The Azure OpenAI API returns a `400 Bad Request` error with the message `"false" is not of type "boolean" - "stream"` when the request payload contains a type mismatch for the `stream` parameter. 
+The 400 Bad Request error `'false' is not of type 'boolean' - 'stream'` occurs when the Azure OpenAI API's JSON schema validator encounters a data type mismatch. 
 
-Key reasons for this error include:
-1. **Invalid Data Types**: The API schema requires the `stream` parameter to be a literal boolean value (`true` or `false`). In this instance, the value is being passed as a string (`"false"`), which the validator rejects.
-2. **Malformed Request Payload**: The API is unable to parse the request because it does not conform to the expected JSON schema. Using quotation marks around boolean values transforms them into strings, violating the required data structure.
-3. **Strict Schema Validation**: Azure OpenAI uses strict type checking for its REST API endpoints. Parameters such as `stream`, `n`, or `echo` must strictly follow their defined types (boolean, integer, etc.) to be accepted by the gateway.
+Key reasons for this failure include:
+1. **Incorrect Data Type**: The `stream` parameter in the request payload expects a primitive boolean value (`true` or `false`). If the value is passed as a string (e.g., `'false'` or `"false"`), the API's validation layer rejects the request.
+2. **Strict Schema Validation**: Azure OpenAI enforces rigorous type checking on its input parameters. Any deviation from the defined JSON schema, such as quoting boolean or integer values, will trigger a validation error.
+3. **Malformed Request Configuration**: The error indicates that the JSON body is not being correctly interpreted or parsed by the endpoint, often due to how the payload is constructed in code or within integration platforms like Flowise or Logic Apps.
+4. **Payload Integrity Issues**: General issues with the JSON structure, such as missing required properties or incorrectly nested fields, can lead to the API being unable to map values to their respective data types.
 
 ## Solution
-To resolve the 400 status error caused by a type validation failure, you must ensure the `stream` parameter is correctly formatted as a boolean in your JSON payload. 
+To fix this error, you must ensure the `stream` parameter and the overall JSON payload conform to the API's expected types.
 
-Follow these steps to remediate the issue:
-1. **Correct the Boolean Formatting**: Update the `stream` parameter to use `true` or `false` without quotation marks.
-   - **Correct**: `"stream": false` or `"stream": true`
-   - **Incorrect**: `"stream": "false"` or `"stream": "true"`
-2. **Verify Type Serialization**: If you are using a programming language to build the request, ensure the JSON library is serializing boolean types correctly. For example, in Python, use the native `True` or `False` objects; in JavaScript, use the `true` or `false` literals.
-3. **Audit the Request Payload**: Review all other parameters in the request (such as `temperature`, `top_p`, or `max_tokens`) to ensure they match the data types specified in the documentation.
-4. **Consult API Reference**: Check the Azure OpenAI Service REST API reference for the specific model and API version you are using to confirm the expected data types for every field.
+**1. Correct the Data Type Syntax**
+Update the payload to use a literal boolean value for `stream`. Do not wrap the value in quotes:
+- **Incorrect**: `"stream": "false"` or `"stream": 'false'`
+- **Correct**: `"stream": false`
+
+**2. Validate JSON Payload Structure**
+Ensure that the request body is valid JSON. Use a JSON linter to confirm the formatting and check that all parameters are at the correct nesting level required by the Azure OpenAI Chat Completion or Completion API.
+
+**3. Verify Headers and Base URL**
+Check that your request configuration includes the necessary headers, particularly `Content-Type: application/json`, and that the `api-key` or `Authorization` headers are correctly set.
+
+**4. Review Model-Specific Parameters**
+Depending on the model deployment (e.g., GPT-4 vs. o1-series), check the usage of token limits:
+- Verify if the model requires `max_tokens` or the newer `max_completion_tokens` parameter.
+- Ensure no conflicting parameters are set that might interfere with the `stream` functionality.
+
+**5. Check Integration Platform Settings**
+If using a low-code tool (like Power Automate, Bubble, or Flowise), ensure the toggle or field for 'stream' is explicitly set to a boolean output rather than a dynamic string value.
 
 ## Suggested Links
+- [https://github.com/FlowiseAI/Flowise/issues/195](https://github.com/FlowiseAI/Flowise/issues/195)
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://forum.bubble.io/t/openai-api-error-http-400/263917](https://forum.bubble.io/t/openai-api-error-http-400/263917)
+- [https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue](https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue)
+- [https://github.com/vllm-project/vllm/issues/1273](https://github.com/vllm-project/vllm/issues/1273)
+- [https://learn.microsoft.com/en-us/answers/questions/2139738/openai-badrequesterror-error-code-400-((error-((me](https://learn.microsoft.com/en-us/answers/questions/2139738/openai-badrequesterror-error-code-400-((error-((me)
+- [https://api.python.langchain.com/en/latest/openai/llms/langchain_openai.llms.azure.AzureOpenAI.html](https://api.python.langchain.com/en/latest/openai/llms/langchain_openai.llms.azure.AzureOpenAI.html)
 - [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)
-- [https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/error-codes](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/error-codes)

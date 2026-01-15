@@ -1,7 +1,7 @@
 ---
 title: "Unrecognized request argument supplied: healthcheck"
 provider: "openai"
-provider_icon: "/logos/openai.png"
+provider_icon: "/logos/openai.svg"
 solved: true
 slug: "invalid-argument-error-9234"
 ---
@@ -24,7 +24,7 @@ Follow these remediation steps:
 2. **Review Official API Documentation**: Check the OpenAI API Reference for the specific endpoint you are using (e.g., `/v1/chat/completions`) to verify the exact names and types of all supported parameters.
 3. **Verify Model Compatibility**: Ensure that every parameter used is compatible with the specific model targeted in your request. Some parameters are only available for newer models or specific modes (like JSON mode or Function Calling).
 4. **Inspect Request Syntax**: Examine the structure of your JSON payload. If you are using a client SDK (like the OpenAI Python or Node.js libraries), ensure you are not passing extra keyword arguments that the library might inadvertently include in the API call.
-5. **Check Infrastructure Configuration**: If you are using a proxy or a platform like Bifrost, verify that any management-related parameters are handled by the proxy and stripped before the request reaches OpenAI's servers.
+5. **Check Infrastructure Configuration**: If you are using a proxy or a platform like Portkey, verify that any management-related parameters are handled by the proxy and stripped before the request reaches OpenAI's servers.
 
 ## Suggested Links
 - [https://platform.openai.com/docs/api-reference](https://platform.openai.com/docs/api-reference)

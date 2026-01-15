@@ -1,0 +1,28 @@
+---
+title: "Can\"t add messages to thread_DGLEaUgn2GcoePBT3OIBwt2g while a run run_P6Ym01xOZJsFmhTL7b5zfJVY is active."
+provider: "openai"
+provider_icon: "/logos/openai.svg"
+solved: true
+slug: "thread-operation-error-9445"
+---
+
+## Reason
+
+The error occurs because the OpenAI Assistants API enforces a thread-locking mechanism. When a **Run** is active, the associated thread is locked to maintain conversation integrity and sequence. You cannot add new messages to a thread until the current run reaches a terminal state.
+
+Key details regarding this error:
+1. **Active Run States**: A thread is considered locked if the run is in a non-terminal state such as `queued`, `in_progress`, or `requires_action` (waiting for tool outputs).
+2. **Invalid Request Error**: This is categorized as an `invalid_request_error` (HTTP 400). It indicates that the API cannot process the message addition because the thread's current state is incompatible with modifications.
+
+## Solution
+To resolve this error, you must ensure the thread is no longer engaged in an active run before attempting to add new messages. Follow these steps:
+1. **Check for Active Runs**: Use the `list_runs` or `active_runs` endpoint to verify the status of runs associated with the specific thread ID.
+2. **Poll for Completion**: If a run is in progress, implement a polling mechanism to monitor the run status. Wait until the run reaches a terminal state such as `completed`, `failed`, `cancelled`, or `expired`.
+3. **Handle Tool Actions**: If the run status is `requires_action`, ensure that any necessary tool outputs are submitted, as the run will remain active (and the thread locked) until these actions are resolved or the run expires.
+4. **Cancel the Run**: If the active run is no longer needed or appears to be hung, use the **Cancel Run** endpoint to manually terminate it. Note that cancellation may not be instantaneous.
+5. **Retry the Request**: Once the thread is unlocked (no active runs remain), retry the request to add the message.
+
+## Suggested Links
+- [https://platform.openai.com/docs/api-reference/runs](https://platform.openai.com/docs/api-reference/runs)
+- [https://platform.openai.com/docs/assistants/how-it-works/runs-and-run-steps](https://platform.openai.com/docs/assistants/how-it-works/runs-and-run-steps)
+- [https://community.openai.com/t/issue-with-assistant-api-cannot-add-message-to-thread-due-to-active-run/1090639](https://community.openai.com/t/issue-with-assistant-api-cannot-add-message-to-thread-due-to-active-run/1090639)

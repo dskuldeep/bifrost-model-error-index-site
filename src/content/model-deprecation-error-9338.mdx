@@ -1,36 +1,35 @@
 ---
-title: "The model `gpt-4-vision-preview` has been deprecated, learn more here: https://platform.openai.com/docs/deprecations"
+title: "The model `gpt-3.5-turbo-0301` has been deprecated, learn more here: https://platform.openai.com/docs/deprecations"
 provider: "openai"
-provider_icon: "/logos/openai.png"
+provider_icon: "/logos/openai.svg"
 solved: true
 slug: "model-deprecation-error-9338"
 ---
 
 ## Reason
 
-The 404 status error (Model Not Found) is caused by the deprecation of the `gpt-4-vision-preview` model. 
+The 404 error associated with the `gpt-3.5-turbo-0301` model typically occurs because the model has been officially retired or the request is targeting an incompatible API infrastructure. 
 
-Key reasons for this error include:
-1. **Deprecation Timeline**: On June 6, 2024, OpenAI announced that `gpt-4-vision-preview` and `gpt-4-32k` would be deprecated.
-2. **Access Restrictions**: Effective June 17, 2024, these models were restricted. New API users do not have access to these identifiers, and existing users are required to migrate to newer versions.
-3. **Model Non-Existence**: The error indicates that the model identifier `gpt-4-vision-preview` is no longer recognized as a valid endpoint or resource for your specific API key/organization context due to its retired status.
-4. **Tier-Based Access**: Access to certain legacy or preview models is often restricted based on the API usage tier (e.g., Tier 1 vs. Tier 5), and deprecated models are the first to be removed from lower-tier access.
+Key reasons include:
+1. **Model Deprecation**: OpenAI officially retired the `gpt-3.5-turbo-0301` snapshot on June 13, 2024. Requests made to a specific model ID after its shutdown date will result in a 404 Resource Not Found error.
+2. **Incorrect Endpoint**: The `gpt-3.5-turbo` series are chat-based models. They must be accessed via the `/v1/chat/completions` endpoint. Attempting to use these models with the legacy `/v1/completions` endpoint (designed for older models like `gpt-3.5-turbo-instruct` or `text-davinci-003`) triggers a 404 error.
+3. **API Version Changes**: The release of the OpenAI Python SDK v1.0.0 introduced significant breaking changes. If your code is using legacy syntax with the newer library, or vice-versa, it can lead to routing failures and endpoint errors.
+4. **Resource Availability**: If the model identifier is deprecated, misspelled, or unavailable to your specific API tier, the server cannot locate the resource, leading to a standard 404 response.
 
 ## Solution
-To resolve the 404 error and restore functionality, follow these remediation steps:
-1. **Migrate to a Supported Model**: Update your code to use a current model with vision capabilities. OpenAI recommends switching to `gpt-4o` (Omni) or `gpt-4-turbo`. `gpt-4o` is generally preferred as it is faster and more cost-effective while maintaining high performance for vision tasks.
-2. **Update API Parameters**: When switching to `gpt-4o` or `gpt-4-turbo`, ensure your payload follows the standard Chat Completions format. For vision tasks, ensure the image data is provided in the `messages` array using the `image_url` type.
-3. **Verify API Key Permissions**: Visit the OpenAI Dashboard and check your project settings to ensure the replacement model (e.g., `gpt-4o`) is enabled for your API key.
-4. **Check Billing Status**: Ensure your account has a positive credit balance. Access to newer, high-performance models may be restricted if the account is not in a paid tier or has reached its usage limit.
-5. **Update Client Libraries**: Run the appropriate update command (e.g., `pip install --upgrade openai` for Python or `npm install openai@latest` for Node.js) to ensure your environment supports the latest model definitions and endpoint configurations.
+To resolve the 404 error and ensure your application remains functional, implement the following steps:
+1. **Update the Model Name**: Replace the deprecated `gpt-3.5-turbo-0301` with a currently supported version. It is recommended to use the `gpt-3.5-turbo` alias, which automatically points to the latest stable version, or migrate to newer models like `gpt-4o-mini` for improved efficiency.
+2. **Verify the Endpoint**: Ensure your requests are directed to the correct API endpoint. For chat models, use `https://api.openai.com/v1/chat/completions`. In the Python SDK (v1+), ensure you are using `client.chat.completions.create` rather than the legacy completion methods.
+3. **Upgrade Dependencies**: Update your OpenAI Python package to the latest version to maintain compatibility with current API standards. Run `pip install --upgrade openai` in your terminal.
+4. **Audit API Credentials**: Check that your API key is active and that your account has the necessary permissions and credits to access the GPT-3.5 or GPT-4 model families.
+5. **Consult Official Deprecation Logs**: Regularly check the OpenAI Deprecation documentation to stay ahead of scheduled model retirements and ensure your application uses long-term support (LTS) versions where possible.
 
 ## Suggested Links
+- [https://community.openai.com/t/gpt-3-5-turbo-model-gives-me-a-404-error/83297](https://community.openai.com/t/gpt-3-5-turbo-model-gives-me-a-404-error/83297)
+- [https://community.openai.com/t/gpt-3-5-turbo-0301-showing-different-behavior-suddenly/431326](https://community.openai.com/t/gpt-3-5-turbo-0301-showing-different-behavior-suddenly/431326)
 - [https://github.com/langchain-ai/langchain/issues/13284](https://github.com/langchain-ai/langchain/issues/13284)
-- [https://github.com/tldraw/make-real-starter/issues/30](https://github.com/tldraw/make-real-starter/issues/30)
-- [https://community.openai.com/t/the-model-gpt-4-does-not-exist-is-gpt-4-deprecated/679768](https://community.openai.com/t/the-model-gpt-4-does-not-exist-is-gpt-4-deprecated/679768)
+- [https://github.com/crewAIInc/crewAI/issues/197](https://github.com/crewAIInc/crewAI/issues/197)
 - [https://community.openai.com/t/getting-404-not-found-error-for-api-endpoint-in-postman/903181](https://community.openai.com/t/getting-404-not-found-error-for-api-endpoint-in-postman/903181)
+- [https://community.deeplearning.ai/t/the-model-gpt-3-5-turbo-0301-has-been-deprecated/716988](https://community.deeplearning.ai/t/the-model-gpt-3-5-turbo-0301-has-been-deprecated/716988)
+- [https://community.openai.com/t/my-program-is-unable-to-use-the-gpt-3-5-turbo-model-and-i-need-help-urgently/207341](https://community.openai.com/t/my-program-is-unable-to-use-the-gpt-3-5-turbo-model-and-i-need-help-urgently/207341)
 - [https://platform.openai.com/docs/deprecations](https://platform.openai.com/docs/deprecations)
-- [https://community.openai.com/t/how-to-set-billing-limits-and-restrict-model-usage-for-a-project-via-openai-api/1087771](https://community.openai.com/t/how-to-set-billing-limits-and-restrict-model-usage-for-a-project-via-openai-api/1087771)
-- [https://community.openai.com/t/getting-a-404-error-when-making-a-createchatcompletion-call-with-gpt-4/541052](https://community.openai.com/t/getting-a-404-error-when-making-a-createchatcompletion-call-with-gpt-4/541052)
-- [https://community.openai.com/t/can-i-enable-some-models-for-api-key/583110](https://community.openai.com/t/can-i-enable-some-models-for-api-key/583110)
-- [https://platform.openai.com/docs/guides/vision](https://platform.openai.com/docs/guides/vision)

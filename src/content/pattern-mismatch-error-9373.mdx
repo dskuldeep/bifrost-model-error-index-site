@@ -1,0 +1,39 @@
+---
+title: "Invalid 'messages[13].tool_calls[0].function.name': string does not match pattern. Expected a string that matches the pattern '^[a-zA-Z0-9_-]+$'."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "pattern-mismatch-error-9373"
+---
+
+## Reason
+
+The `400 Bad Request` error in the Azure OpenAI API occurs because the `function.name` field within the `tool_calls` object does not adhere to the API's strict naming conventions. The API validates the function name against a specific regular expression to ensure compatibility and security.
+
+Key reasons for this error include:
+1. **Pattern Mismatch**: The function name must strictly match the regular expression `^[a-zA-Z0-9_-]+$`. This allows only uppercase and lowercase letters (a-z, A-Z), numbers (0-9), underscores (`_`), and hyphens (`-`).
+2. **Invalid Characters**: The presence of spaces, periods (`.`), or other special characters (such as `@`, `#`, `$`, or `!`) triggers a validation failure.
+3. **Non-Latin Characters**: The API does not permit non-Latin characters or Unicode symbols in function names.
+4. **Length Constraints**: While not explicitly stated in the regex, the API typically enforces a maximum length of 64 characters for function names.
+5. **Model Hallucination**: Occasionally, models may generate tool calls with invalid names (e.g., using a dot as a separator like `plugin.function_name`) which leads to this error when the request is sent back to the API.
+
+## Solution
+To resolve the pattern mismatch error, you must ensure that all function names in your request—both in the tool definitions and within the message history—comply with the naming schema.
+
+Follow these steps:
+1. **Identify the Offending Entry**: Locate the specific index mentioned in the error log. For example, `messages[13].tool_calls[0]` points to the first tool call in the 14th message of your conversation array.
+2. **Sanitize Function Names**: Review the `function.name` and remove any invalid characters. Replace spaces and dots with underscores (`_`) or hyphens (`-`).
+3. **Validate Against Regex**: Confirm the name contains only `a-z`, `A-Z`, `0-9`, `_`, and `-`.
+4. **Enforce Length Limits**: Ensure the final function name is between 1 and 64 characters long.
+5. **Update Definitions and History**: Update the name in your tool definition array as well as any existing `assistant` messages in the chat history that reference that function name.
+6. **Intercept Model Output**: If the model is frequently generating invalid names (hallucinations), implement a sanitation layer in your application logic to clean function names before they are processed by the Azure OpenAI endpoint.
+
+## Suggested Links
+- [https://community.openai.com/t/error-400-related-to-size-of-string/840368](https://community.openai.com/t/error-400-related-to-size-of-string/840368)
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://github.com/home-assistant/core/issues/119015](https://github.com/home-assistant/core/issues/119015)
+- [https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue](https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue)
+- [https://learn.microsoft.com/fi-fi/azure/ai-services/openai/reference](https://learn.microsoft.com/fi-fi/azure/ai-services/openai/reference)
+- [https://learn.microsoft.com/en-us/azure/api-management/api-management-authenticate-authorize-azure-openai](https://learn.microsoft.com/en-us/azure/api-management/api-management-authenticate-authorize-azure-openai)
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)

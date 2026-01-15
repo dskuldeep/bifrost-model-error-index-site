@@ -1,0 +1,36 @@
+---
+title: "Invalid schema for function \"guidance_web_qna\": [\"context_not_enough\"] is not of type \"object\", \"boolean\""
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "schema-validation-error-9412"
+---
+
+## Reason
+
+The 400 Bad Request error occurs because the JSON schema provided for the function `guidance_web_qna` is structurally invalid. Specifically, the Azure OpenAI API's schema validator encountered an array where it expected a schema definition (which must be either a JSON object or a boolean).
+
+Key details regarding this error include:
+1. **Schema Definition Mismatch**: In a standard JSON Schema (Draft 7), every property defined under `properties` must be an object (e.g., `{"type": "string"}`). The error indicates that `context_not_enough` was mistakenly provided as an array (e.g., `["context_not_enough"]`) instead of a proper schema object.
+2. **Type Expectation**: The validator explicitly states that the value associated with the parameter is not of type "object" or "boolean". This usually happens when the parameter name is accidentally passed as its own definition or when syntax errors cause the property value to be interpreted as a list.
+3. **Meta-schema Violation**: This error often arises during the initial validation of the function definition itself, rather than during the processing of a specific model completion request. If the function's `parameters` block does not strictly follow the JSON Schema specification, the API will reject the entire request.
+
+## Solution
+To resolve the "Invalid schema" error in the Azure OpenAI API, ensure your function's parameter definitions strictly adhere to the JSON Schema specification. Follow these remediation steps:
+1. **Correct Parameter Definition**: Locate the `context_not_enough` field within the `properties` object of your function. Ensure it is defined as a JSON object with a valid `type`. For example:
+   ```json
+   "context_not_enough": {
+     "type": "boolean",
+     "description": "Indicates if the provided context is insufficient for a complete answer."
+   }
+   ```
+2. **Check for Incorrect Nesting**: Verify that the `required` field is an array of strings placed as a sibling to the `properties` object. A common mistake is nesting the `required` keyword inside the `properties` definition or passing the parameter name as an array directly into a property value.
+3. **Verify API Documentation**: Consult the Azure OpenAI documentation to ensure you are using supported JSON Schema keywords. Note that some older models may have more restrictive schema requirements than the latest GPT-4o versions.
+4. **Validate Schema Syntax**: Use an external validator such as the [JSON Schema Validator](https://www.jsonschemavalidator.net/) or tools like Swagger Editor to test your `parameters` block against JSON Schema Draft 7 before including it in your API call.
+5. **Inspect for Syntax Errors**: Review your code for trailing commas, misplaced brackets, or variable interpolation errors that might be transforming a intended object into an array in the final JSON payload.
+
+## Suggested Links
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)
+- [https://json-schema.org/understanding-json-schema/reference/object](https://json-schema.org/understanding-json-schema/reference/object)
+- [https://community.openai.com/t/invalid-schema-error-in-function-using-arrays/430752](https://community.openai.com/t/invalid-schema-error-in-function-using-arrays/430752)

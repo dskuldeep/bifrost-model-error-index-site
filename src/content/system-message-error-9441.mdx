@@ -1,0 +1,24 @@
+---
+title: "Only one system message can be specified. (Request ID: fcaf3fcc-ede7-4c38-9163-8db9a18439ad)"
+provider: "anyscale"
+provider_icon: "/file.svg"
+solved: true
+slug: "system-message-error-9441"
+---
+
+## Reason
+
+The Anyscale API returns a 400 Bad Request error when it cannot process the request due to client-side configuration issues. The specific error message indicates that the request violates a protocol constraint regarding system instructions.
+
+Key reasons include:
+1. **Multiple System Messages**: The API identifies more than one object with the `"role": "system"` in the `messages` array. While some providers permit multiple system blocks, Anyscale strictly enforces a limit of one system message per request.
+2. **Malformed Request Body**: The JSON payload may contain syntax errors, such as missing commas or mismatched brackets, preventing the server from parsing the request.
+3. **Invalid Request Parameters**: The request may include query parameters or fields that are unsupported by the Anyscale endpoint, or values that do not match the required data types (e.g., passing a string where an integer is expected).
+4. **Exceeding API Constraints**: Beyond the system message limit, the request might violate other schema constraints, such as using an incorrect model name or improper field nesting.
+
+## Solution
+
+
+## Suggested Links
+- [https://docs.anyscale.com/endpoints/model-serving/openai-compatibility/](https://docs.anyscale.com/endpoints/model-serving/openai-compatibility/)
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)

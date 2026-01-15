@@ -1,0 +1,39 @@
+---
+title: "Invalid value: 'tool_call'. Value must be 'function'."
+provider: "openai"
+provider_icon: "/logos/openai.svg"
+solved: true
+slug: "value-mismatch-error-9558"
+---
+
+## Reason
+
+The error "Invalid value: 'tool_call'. Value must be 'function'" (typically accompanied by a 400 Bad Request status code) occurs when the OpenAI API encounters an unsupported value in the tool definition or message sequence schema. 
+
+Key reasons for this error include:
+
+*   **Incorrect Tool Type Specification**: In the OpenAI Chat Completions API, when defining the `tools` array, each tool object must have a `type` property. Currently, OpenAI only supports the value `"function"`. If your code specifies `"tool_call"` or any other string as the type, the API will reject it.
+*   **Incorrect Role Specification**: The API requires specific roles for tool interactions. Messages intended to provide tool outputs must use the role `tool`. Using `tool_call` as a role name is invalid and violates the schema requirements.
+*   **API Documentation Mismatch**: There is often confusion between the legacy `functions` parameter and the current `tools` parameter. While the logic involves "tool calls," the schema identifier remains `"function"` within the tool definitions.
+*   **Sequence of Messages**: This error can trigger if the conversation history is malformed. A message with the role `tool` must strictly follow an `assistant` message that contains a `tool_calls` array. If this sequence is broken or roles are mislabeled, the API may throw validation errors regarding the expected structure.
+
+## Solution
+To resolve the "Invalid value: 'tool_call'" error, you must align your request payload with the expected OpenAI schema. Follow these steps:
+1.  **Correct the Tool Type**: Review your `tools` definition array. Ensure that the `type` field for every tool is set to `"function"` rather than `"tool_call"`.
+2.  **Verify Role Names**: Ensure that the message responding to a tool request uses `role: "tool"`. Do not use `tool_call` as a role identifier.
+3.  **Validate Message Sequence**: Ensure your API request follows the required order:
+    *   An `assistant` message containing a `tool_calls` object.
+    *   A `tool` message containing the `tool_call_id` and the result of the function.
+4.  **Align with Latest Documentation**: If you are transitioning from the deprecated `functions` parameter to the `tools` parameter, ensure you are not mixing syntax. The modern `tools` array requires a nested `function` object containing the name and parameters.
+5.  **Check Parameter Definitions**: Ensure that the `function` object within your tool definition contains the mandatory `name` and `parameters` fields, and that no extra keys like `tool_call` are present at the root of the tool object.
+
+## Suggested Links
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/content-is-required-property-error-400/486260](https://community.openai.com/t/content-is-required-property-error-400/486260)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://github.com/run-llama/llama_index/issues/13715](https://github.com/run-llama/llama_index/issues/13715)
+- [https://community.openai.com/t/request-failed-with-status-code-400/39242](https://community.openai.com/t/request-failed-with-status-code-400/39242)
+- [https://cdn.openai.com/spec/model-spec-2024-05-08.html](https://cdn.openai.com/spec/model-spec-2024-05-08.html)
+- [https://forum.bubble.io/t/openai-api-error-http-400/263917](https://forum.bubble.io/t/openai-api-error-http-400/263917)
+- [https://arize.com/blog-course/mastering-openai-api-tips-and-tricks/](https://arize.com/blog-course/mastering-openai-api-tips-and-tricks/)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-tools](https://platform.openai.com/docs/api-reference/chat/create#chat-create-tools)

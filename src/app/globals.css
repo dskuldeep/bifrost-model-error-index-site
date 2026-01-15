@@ -7,26 +7,39 @@
 /* stylelint-enable at-rule-no-unknown */
 
 :root {
-  --background: #f9fafb;
-  --foreground: #111827;
-  --greptile-green: #10b981;
-  --greptile-green-light: #34d399;
-  --greptile-green-dark: #059669;
-  --greptile-accent: #6ee7b7;
-  --border-color: #80808012;
-  
-  /* Legacy compatibility */
-  --primary: #10b981;
-  --primary-hover: #059669;
-  --accent: #6ee7b7;
+  --background: #ffffff;
+  --foreground: #171717;
+
+  /* LLM Cost Calculator accent palette */
+  --accent: #35c09e; /* For buttons and pills */
+  --accent-dark: #2ba085; /* Darker variant for hover states */
+  --accent-text: #6fc3a9; /* For text and components */
+  --accent-text-dark: #5db89a; /* Darker variant for text hover */
+  --accent-light: rgba(53, 192, 158, 0.05); /* Light background for pills */
+  --accent-border: rgba(53, 192, 158, 0.2); /* Border for pills */
+
+  --gray-light: #f3f4f6;
+  --gray-medium: #9ca3af;
+  --gray-dark: #4b5563;
+
+  --border-color: rgba(0, 0, 0, 0.05);
+
+  /* Legacy compatibility (keep existing CSS working, but map to the new accent) */
+  --greptile-green: var(--accent);
+  --greptile-green-light: var(--accent-text);
+  --greptile-green-dark: var(--accent-dark);
+  --greptile-accent: var(--accent-text);
+
+  --primary: var(--accent);
+  --primary-hover: var(--accent-dark);
   --card-bg: rgba(255, 255, 255, 0.8);
   --card-border: rgba(0, 0, 0, 0.1);
-  --solved-bg: rgba(16, 185, 129, 0.15);
-  --solved-text: #059669;
+  --solved-bg: var(--accent-light);
+  --solved-text: var(--accent-dark);
   --unsolved-bg: #fee2e2;
   --unsolved-text: #991b1b;
-  --glass-shadow: 0 8px 32px 0 rgba(16, 185, 129, 0.1);
-  --header-color: #000000;
+  --glass-shadow: 0 8px 32px 0 rgba(53, 192, 158, 0.1);
+  --header-color: #111827;
   
   /* Green color palette */
   --color-green-50: #ecfdf5;
@@ -56,6 +69,19 @@
   --link-muted: var(--color-gray-600);
 }
 
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-accent-dark: var(--accent-dark);
+  --color-accent-text: var(--accent-text);
+  --color-accent-text-dark: var(--accent-text-dark);
+  --color-accent-light: var(--accent-light);
+  --color-accent-border: var(--accent-border);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -71,18 +97,41 @@ html {
 
 body {
   overscroll-behavior: none;
-  background: var(--background);
+  background: #f9fafb; /* bg-gray-50 */
   color: var(--foreground);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  font-weight: 400; /* Match calculator */
   min-height: 100vh;
   width: 100%;
   max-width: 100%;
   position: relative;
   background-image: none;
+}
+
+/* Typography improvements for Bifrost-style headings */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  /* Font weight is controlled via Tailwind classes per element */
+}
+
+h1 {
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+h2 {
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+/* Lighter bold text for better readability */
+strong, b {
+  font-weight: 600;
 }
 
 /* Use mono for code/technical elements */
@@ -191,17 +240,17 @@ header {
   padding: 0.25rem 0.75rem;
   font-size: 0.75rem;
   font-family: var(--font-geist-mono), monospace;
-  color: #15803d;
-  background: #f0fdf4;
+  color: var(--accent-dark);
+  background: var(--accent-light);
   border-radius: 9999px;
-  border: 1px solid #bbf7d0;
+  border: 1px solid var(--accent-border);
   font-weight: 400;
   letter-spacing: 0;
 }
 
 header h1 {
-  font-size: 1.875rem; /* Mobile: text-3xl */
-  font-weight: 700; /* font-bold */
+  font-size: 2.25rem; /* Mobile: text-4xl */
+  font-weight: 400; /* font-normal */
   color: #111827; /* text-gray-900 */
   margin-bottom: 1rem;
   letter-spacing: -0.02em;
@@ -215,7 +264,7 @@ header h1 {
 
 @media (min-width: 640px) {
   header h1 {
-    font-size: 2.25rem; /* Small tablets: text-4xl */
+    font-size: 2.5rem; /* Small tablets */
   }
 }
 
@@ -227,7 +276,7 @@ header h1 {
 
 header p {
   font-size: 0.875rem; /* Mobile: text-sm */
-  color: #4b5563; /* text-gray-600 */
+  color: #6b7280; /* text-gray-500 */
   line-height: 1.6;
   font-weight: 400;
   margin-top: 0;
@@ -236,7 +285,7 @@ header p {
   max-width: 42rem; /* max-w-2xl */
   margin-left: auto;
   margin-right: auto;
-  font-family: var(--font-geist-mono), monospace; /* font-mono */
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
   padding: 0 1rem; /* Mobile padding */
 }
 
@@ -248,7 +297,7 @@ header p {
 
 @media (min-width: 768px) {
   header p {
-    font-size: 1.125rem; /* Tablets and up: text-lg */
+    font-size: 1rem; /* Tablets and up: text-base */
     padding: 0;
   }
 }
@@ -562,10 +611,10 @@ header p {
   padding: 0.25rem 0.75rem;
   font-size: 0.75rem;
   font-family: var(--font-geist-mono), monospace;
-  color: #15803d;
-  background: #f0fdf4;
+  color: var(--accent-dark);
+  background: var(--accent-light);
   border-radius: 9999px;
-  border: 1px solid #bbf7d0;
+  border: 1px solid var(--accent-border);
   font-weight: 400;
   letter-spacing: 0;
   transition: all 0.2s ease;
@@ -581,7 +630,7 @@ header p {
 
 .provider-name {
   text-transform: capitalize;
-  color: #15803d;
+  color: var(--accent-dark);
   font-weight: 400;
   font-family: var(--font-geist-mono), monospace;
 }
@@ -768,8 +817,8 @@ code {
 }
 
 .mdx-link:hover {
-  border-bottom-color: var(--primary);
-  color: var(--primary);
+  border-bottom-color: var(--accent-text); /* Use accent-text for link hover */
+  color: var(--accent-text);
 }
 
 .mdx-link-external::after {
@@ -789,7 +838,7 @@ code {
 }
 
 .mdx-ul .mdx-li .mdx-link:hover {
-  color: var(--primary);
+  color: var(--accent-text); /* Use accent-text for link hover */
 }
 
 .mdx-image-wrapper {
@@ -865,8 +914,8 @@ code {
 }
 
 .mdx-code-inline {
-  background: rgba(0, 212, 170, 0.1);
-  color: var(--primary-hover);
+  background: var(--accent-light); /* Use accent-light for inline code bg */
+  color: var(--accent-dark); /* Use accent-dark for inline code text */
   padding: 0.2em 0.4em;
   border-radius: 4px;
   font-size: 0.9em;
@@ -882,7 +931,7 @@ code {
 }
 
 .mdx-blockquote {
-  border-left: 4px solid var(--primary);
+  border-left: 4px solid var(--accent); /* Use accent for blockquote border */
   padding-left: 1.5rem;
   margin: 2rem 0;
   font-style: italic;
@@ -917,7 +966,7 @@ code {
 
 .mdx-th {
   font-weight: 600;
-  background: rgba(99, 102, 241, 0.05);
+  background: var(--accent-light);
   color: var(--foreground);
 }
 
@@ -970,7 +1019,7 @@ code {
 }
 
 .breadcrumb-link:hover {
-  color: var(--primary);
+  color: var(--accent-text); /* Use accent-text for breadcrumb hover */
 }
 
 .breadcrumb-current {
@@ -1021,16 +1070,18 @@ code {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 1rem; /* Match calculator's padding */
   background: #ffffff;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #d1d5db; /* border-gray-300 like calculator */
   border-radius: 8px;
   transition: border-color 0.2s;
+  box-sizing: border-box;
+  min-height: 2.5rem; /* Match dropdown height */
 }
 
 .search-bar:focus-within {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.1);
+  border-color: var(--accent-text); /* Use accent-text for focus */
+  box-shadow: 0 0 0 3px var(--accent-light);
 }
 
 .search-input {
@@ -1039,6 +1090,7 @@ code {
   background: transparent;
   color: var(--foreground);
   font-size: 1rem;
+  line-height: 1.5; /* Match calculator */
   outline: none;
 }
 
@@ -1078,21 +1130,26 @@ code {
   width: 100%;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  background: #f9fafb; /* bg-gray-50 like calculator */
+  border: 1px solid #d1d5db; /* border-gray-300 like calculator */
+  border-radius: 0.5rem; /* rounded-lg = 8px */
   color: var(--foreground);
-  font-size: 0.95rem;
+  font-size: 1rem; /* Match calculator */
+  line-height: 1.5;
   cursor: pointer;
   transition: all 0.2s;
   font-weight: 400;
+  box-sizing: border-box;
+  min-height: 2.5rem; /* Ensure consistent height with search bar */
 }
 
 .provider-filter-toggle:hover {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.1);
+  background: #ffffff; /* White on hover */
+  border-color: var(--accent-text); /* Text color for border */
+  box-shadow: 0 0 0 3px var(--accent-light);
 }
 
 .provider-list {
@@ -1130,12 +1187,12 @@ code {
 }
 
 .provider-item:hover {
-  background: rgba(99, 102, 241, 0.05);
+  background: var(--accent-light);
 }
 
 .provider-item.active {
-  background: var(--solved-bg);
-  color: var(--solved-text);
+  background: var(--accent-light);
+  color: var(--accent-dark);
   font-weight: 600;
 }
 
@@ -1145,32 +1202,32 @@ code {
 }
 
 .provider-list-heading {
-  font-size: 1.25rem; /* Mobile */
-  font-weight: 700;
+  font-size: 1.25rem; /* text-xl */
+  font-weight: 500; /* font-medium */
   color: #111827; /* text-gray-900 */
-  margin-bottom: 0.75rem;
-  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem; /* mb-2 */
+  letter-spacing: -0.01em; /* tracking-tight */
   line-height: 1.2;
 }
 
 @media (min-width: 640px) {
   .provider-list-heading {
-    font-size: 1.5rem; /* Small tablets */
+    font-size: 1.25rem; /* Keep text-xl at small tablets */
   }
 }
 
 @media (min-width: 768px) {
   .provider-list-heading {
-    font-size: 2rem; /* Tablets and up */
+    font-size: 1.5rem; /* text-2xl */
   }
 }
 
 .provider-list-description {
-  font-size: 0.9em; /* text-lg */
+  font-size: 0.875rem; /* text-sm */
   color: #4b5563; /* text-gray-600 */
   margin-bottom: 1.5rem;
   line-height: 1.6;
-  font-family: var(--font-geist-mono), monospace; /* font-mono */
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
 }
 
 .provider-list-tags {
@@ -1187,10 +1244,10 @@ code {
   padding: 0.25rem 0.75rem;
   font-size: 0.75rem;
   font-family: var(--font-geist-mono), monospace;
-  color: #15803d;
-  background: #f0fdf4;
+  color: var(--accent-dark);
+  background: var(--accent-light);
   border-radius: 9999px;
-  border: 1px solid #bbf7d0;
+  border: 1px solid var(--accent-border);
   font-weight: 400;
   letter-spacing: 0;
   text-decoration: none;
@@ -1204,11 +1261,11 @@ code {
 }
 
 .provider-tag:hover {
-  background: #dcfce7;
-  color: #15803d;
-  border-color: #86efac;
+  background: var(--accent-light);
+  color: var(--accent-dark);
+  border-color: var(--accent-border);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px 0 rgba(21, 128, 61, 0.15);
+  box-shadow: 0 2px 8px 0 var(--accent-border);
 }
 
 .detail-footer {
@@ -1286,7 +1343,7 @@ code {
 }
 
 .toc-item-active .toc-link {
-  color: #16a34a; /* text-green-600 */
+  color: var(--accent-dark);
   font-weight: 500; /* font-medium */
 }
 
@@ -1852,7 +1909,7 @@ code {
 }
 
 .text-glow {
-  text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+  text-shadow: 0 0 10px rgba(53, 192, 158, 0.5);
 }
 
 .hover-lift {
@@ -1866,10 +1923,65 @@ code {
 
 /* Enhanced gradient backgrounds */
 .gradient-radial {
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(53, 192, 158, 0.1) 0%, transparent 70%);
 }
 
 .footer-bottom-copyright {
   font-size: 11px;
   color: #9ca3af;
+}
+
+/* Custom scrollbar (match llm-cost-calculator) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--gray-light);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-text);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-text-dark);
+}
+
+/* Utility classes for accent colors (used by navbar mobile CTA) */
+.bg-accent {
+  background-color: var(--accent);
+}
+
+.bg-accent-dark {
+  background-color: var(--accent-dark);
+}
+
+.bg-accent-light {
+  background-color: var(--accent-light);
+}
+
+.border-accent-border {
+  border-color: var(--accent-border);
+}
+
+.text-accent {
+  color: var(--accent-text);
+}
+
+.text-accent-dark {
+  color: var(--accent-text-dark);
+}
+
+.hover\:bg-accent:hover {
+  background-color: var(--accent);
+}
+
+.hover\:bg-accent-dark:hover {
+  background-color: var(--accent-dark);
+}
+
+.hover\:text-accent:hover {
+  color: var(--accent-text);
 }

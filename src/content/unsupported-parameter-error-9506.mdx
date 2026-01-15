@@ -1,0 +1,37 @@
+---
+title: "Unsupported value: 'temperature' does not support 0.2 with this model. Only the default (1) value is supported."
+provider: "openai"
+provider_icon: "/logos/openai.svg"
+solved: true
+slug: "unsupported-parameter-error-9506"
+---
+
+## Reason
+
+The error occurs because the specific OpenAI model being utilized—most notably the **o1 model series** (including `o1`, `o1-preview`, and `o1-mini`)—strictly requires the `temperature` parameter to be set to its default value of **1**.
+
+Key reasons for this behavior include:
+1.  **Model Constraints**: Unlike the GPT-4o or GPT-3.5 series, the `o1` reasoning models currently do not support varied sampling temperatures. They are optimized to function at a fixed temperature setting.
+2.  **Unsupported Values**: Any value other than 1 (such as 0, 0.2, or 0.7) is rejected by the API, leading to a `400 BadRequestError` with the message: "Unsupported value: 'temperature' does not support [specified value] with this model. Only the default (1) value is supported."
+3.  **API Limitations**: As these models involve complex reasoning chains, OpenAI restricts several sampling parameters during the beta and initial release phases to ensure stability and predictable output logic.
+
+## Solution
+To resolve the `BadRequestError` and successfully call the OpenAI `o1` models, you must align your request parameters with the model's requirements. Follow these steps:
+1.  **Adjust the Temperature Parameter**: Ensure the `temperature` parameter in your API call is set exactly to the default value of **1**.
+2.  **Update Explicit Configurations**: If your code, environment variables, or configuration files explicitly define a temperature (e.g., `temperature=0.2`), change this value to `1` or remove the parameter entirely to allow the API to use the default.
+3.  **Audit Third-Party Integrations**: If you are using platforms like LangChain, Bubble, Make.com, or Jupyter AI, check the model settings or advanced configuration panels. Ensure these tools are not overriding the default temperature value.
+4.  **Verify Related Parameters**: In addition to temperature, ensure other sampling parameters are set to their required defaults for `o1` models. This typically includes setting `top_p` to 1 and ensuring `presence_penalty` and `frequency_penalty` are set to
+0.
+5.  **Check SDK Versions**: Ensure you are using the latest version of the OpenAI SDK, as older versions may not handle the specific parameter validation requirements for reasoning models correctly.
+
+## Suggested Links
+- [https://github.com/jupyterlab/jupyter-ai/issues/994](https://github.com/jupyterlab/jupyter-ai/issues/994)
+- [https://community.openai.com/t/api-temperature-change-from-0-to-1-to-0-to-2-in-playground/217755](https://community.openai.com/t/api-temperature-change-from-0-to-1-to-0-to-2-in-playground/217755)
+- [https://forum.bubble.io/t/openai-api-error-http-400/263917](https://forum.bubble.io/t/openai-api-error-http-400/263917)
+- [https://community.openai.com/t/request-failed-with-status-code-400/39242](https://community.openai.com/t/request-failed-with-status-code-400/39242)
+- [https://github.com/Bin-Huang/chatbox/issues/1258](https://github.com/Bin-Huang/chatbox/issues/1258)
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://community.openai.com/t/i-am-receiving-an-error-status-code-400/351121](https://community.openai.com/t/i-am-receiving-an-error-status-code-400/351121)
+- [https://community.make.com/t/receiving-unsupported-parameter-logit-bias-error-with-openai-o1-model/64208](https://community.make.com/t/receiving-unsupported-parameter-logit-bias-error-with-openai-o1-model/64208)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://platform.openai.com/docs/guides/reasoning/beta-limitations](https://platform.openai.com/docs/guides/reasoning/beta-limitations)

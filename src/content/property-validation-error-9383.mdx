@@ -1,0 +1,29 @@
+---
+title: "Additional properties are not allowed (\"chiontent\" was unexpected) - \"messages.0\""
+provider: "openai"
+provider_icon: "/logos/openai.svg"
+solved: true
+slug: "property-validation-error-9383"
+---
+
+## Reason
+
+The OpenAI API returns a 400 Bad Request error when it encounters a JSON payload containing properties not defined in its strict schema. In this specific case, the error indicates that the property `"chiontent"` was detected at the first element of the `messages` array (`messages.0`).
+
+Key factors contributing to this error include:
+1. **Typographical Errors**: The property `"chiontent"` is a misspelling of the expected property `"content"`. The API's validation engine treats unknown or misspelled keys as invalid.
+2. **Incorrect Data Structure**: The objects within the `messages` array must strictly follow the defined schema. The API expects specific keys such as `role` and `content`. Any deviations, including additional or misspelled properties, will cause a validation failure.
+3. **Strict Schema Validation**: OpenAI uses JSON Schema to validate incoming requests. To prevent ambiguity or unintended behavior, the API is configured to reject requests that include any properties not explicitly allowed by the schema.
+
+## Solution
+To resolve the property validation error, align your request payload with the official OpenAI API schema. Follow these steps:
+1. **Correct Property Names**: Review your code for typos in property keys. In this reported error, change `"chiontent"` to `"content"`.
+2. **Verify the messages Array**: Ensure each object within the `messages` list contains only valid keys such as `role`, `content`, `name`, or `tool_calls` (depending on the model and use case).
+3. **Review the API Reference**: Check the OpenAI API documentation to understand the correct parameters and data structure expected for the specific API method you are using.
+4. **Remove Unexpected Properties**: Delete any additional properties or metadata that are not recognized by the API schema.
+5. **Use Type-Safe SDKs**: Where possible, use official OpenAI libraries for Python or Node.js. These libraries provide built-in validation and IntelliSense, which help catch typos during development before a request is sent.
+6. **Test with Tools**: Use tools like Postman or `curl` to test your raw JSON payload and ensure it works as expected before integrating the logic into your application code.
+
+## Suggested Links
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)
+- [https://platform.openai.com/docs/guides/error-codes](https://platform.openai.com/docs/guides/error-codes)

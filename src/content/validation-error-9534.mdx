@@ -1,35 +1,33 @@
 ---
-title: "1 validation error for Request body -> assistant_id field required (type=value_error.missing)"
+title: "Additional properties are not allowed (\"result\", \"type\" were unexpected) - \"messages.17\""
 provider: "openai"
-provider_icon: "/logos/openai.png"
+provider_icon: "/logos/openai.svg"
 solved: true
 slug: "validation-error-9534"
 ---
 
 ## Reason
 
-The OpenAI API returns a 400 status error with the message `field required (type=value_error.missing)` for `assistant_id` when a request is submitted without the mandatory Assistant identifier in the request body.
+The error **"Additional properties are not allowed ('result', 'type' were unexpected)"** indicates that the OpenAI API encountered fields in the request body that do not conform to its strict JSON schema. Specifically, the suffix `- "messages.17"` identifies that the violation occurred within the 18th element (index 17) of the `messages` array.
 
-This error occurs because the specific endpoint you are calling (most commonly the **Create Run** or **Create Thread and Run** endpoints) requires the `assistant_id` parameter to determine which Assistant should process the messages. The API uses strict validation to ensure all required fields are present and populated with valid values; if the field is missing, empty, or misspelled in the JSON payload, the request is rejected as improperly formatted.
+Key reasons for this error include:
+1. **Invalid Request Structure**: The Chat Completion API expects each object in the `messages` array to contain only specific, predefined keys such as `role`, `content`, `name`, `tool_calls`, and `tool_call_id`. Adding arbitrary keys like `result` or `type` triggers a validation failure.
+2. **Schema Validation**: OpenAI uses rigorous JSON Schema validation for all API endpoints. Any property not explicitly defined in the API's specification is rejected to prevent unpredictable model behavior.
+3. **Incorrect Parameter Names**: This error often occurs when developers accidentally pass metadata or raw response objects from a previous API call (which might include fields like `type` or `result`) back into the `messages` history without sanitizing the objects first.
+4. **Indexing Errors**: The API specifically points to the exact location of the error (e.g., `messages.17`), helping to pinpoint which specific message object contains the unauthorized properties.
 
 ## Solution
-To resolve the 400 validation error and ensure your request is properly configured, follow these steps:
-1.  **Retrieve the Assistant ID**: Ensure you have created an Assistant via the OpenAI Dashboard or the API. The ID should be a string starting with `asst_` (e.g., `asst_abc123...`).
-2.  **Include the assistant_id in the Request Body**: Explicitly add the `assistant_id` field to your JSON payload. For example, when creating a Run, your body should look like this:
-    `{ "assistant_id": "asst_your_id_here" }`.
-3.  **Verify API Documentation**: Consult the OpenAI API reference for the specific endpoint you are using to identify all required parameters. Some endpoints may also require a `thread_id` or `model` field.
-4.  **Validate the JSON Payload**: Ensure your request body is well-formed JSON. Use a JSON linter to check for syntax errors such as missing commas or mismatched brackets that might lead to validation failures.
-5.  **Check Header Requirements**: For Assistants API features, ensure you are including the required `OpenAI-Beta: assistants=v2` (or current version) header in your request.
-6.  **Review Full Error Details**: Examine the complete error response from the API, as it may list multiple missing fields if your request body is significantly incomplete.
+To resolve the "Additional properties are not allowed" error, you must align your request payload strictly with the official OpenAI API schema.
+
+Follow these steps to remediate the issue:
+1. **Identify the Erroneous Object**: Use the index provided in the error message (e.g., `messages.17`) to locate the exact message object in your code that is causing the failure.
+2. **Sanitize Message Objects**: Review the identified message object and remove any keys that are not supported. For standard chat messages, ensure you are only using `role`, `content`, and optionally `name`. If you are handling tool outputs, ensure you are using `tool_call_id` and `role: "tool"` correctly.
+3. **Review API Documentation**: Consult the OpenAI Chat Completion API reference to verify the allowed properties for the specific API version and model you are using.
+4. **Validate Request Payload**: Implement a local validation step or use a schema validation library to check your JSON payload against the OpenAI spec before sending the request.
+5. **Use Official SDKs**: Utilize the official OpenAI Python or Node.js libraries. these SDKs provide built-in type checking and validation that can catch unexpected properties during development rather than at runtime.
+6. **Cleanse Recycled Data**: If you are building a conversation history by appending previous assistant responses, ensure you only extract the necessary fields (`role` and `content`) rather than passing the entire raw response object back to the API.
 
 ## Suggested Links
-- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
-- [https://help.openai.com/en/articles/6897213-openai-library-error-types-guidance](https://help.openai.com/en/articles/6897213-openai-library-error-types-guidance)
-- [https://community.openai.com/t/i-am-facing-field-required-type-value-error-missing/496344](https://community.openai.com/t/i-am-facing-field-required-type-value-error-missing/496344)
-- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
-- [https://github.com/explodinggradients/ragas/issues/1133](https://github.com/explodinggradients/ragas/issues/1133)
-- [https://community.openai.com/t/sorry-i-couldnt-process-the-response-correctly/513153](https://community.openai.com/t/sorry-i-couldnt-process-the-response-correctly/513153)
-- [https://community.openai.com/t/i-am-receiving-an-error-status-code-400/351121](https://community.openai.com/t/i-am-receiving-an-error-status-code-400/351121)
-- [https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096](https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096)
-- [https://platform.openai.com/docs/api-reference/runs/createRun](https://platform.openai.com/docs/api-reference/runs/createRun)
-- [https://platform.openai.com/docs/assistants/overview](https://platform.openai.com/docs/assistants/overview)
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)
+- [https://platform.openai.com/docs/guides/structured-outputs](https://platform.openai.com/docs/guides/structured-outputs)
+- [https://platform.openai.com/docs/guides/text-generation/chat-completions-api](https://platform.openai.com/docs/guides/text-generation/chat-completions-api)

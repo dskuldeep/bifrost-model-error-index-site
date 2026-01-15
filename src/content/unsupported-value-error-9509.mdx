@@ -1,32 +1,48 @@
 ---
-title: "Unsupported value: 'messages[0].role' does not support 'system' with this model."
+title: "Unsupported value: 'messages[0].role' does not support 'developer' with this model."
 provider: "openai"
-provider_icon: "/logos/openai.png"
+provider_icon: "/logos/openai.svg"
 solved: true
 slug: "unsupported-value-error-9509"
 ---
 
 ## Reason
 
-The error **"Unsupported value: 'messages[0].role' does not support 'system' with this model"** occurs because certain OpenAI models, specifically those in the **o1** reasoning family (such as `o1-preview` and `o1-mini`), do not support the standard `system` role in the messages array. This is due to the following factors:
-1. **Model Architecture Limitations**: The initial versions of `o1-preview` and `o1-mini` were designed with a different internal instruction-following mechanism that does not recognize the `system` role as a valid input parameter.
-2. **Invalid Role Specification**: OpenAI has introduced a new role, the `developer` role, intended to replace the `system` role for the **o1** family of models. Passing `system` to these models triggers a 400 Bad Request error because it is not part of the model's supported schema.
-3. **Beta Status Restrictions**: As these models are in beta, they have stricter requirements for the `messages` array, typically requiring the conversation to start with a `user` message or a `developer` message rather than a `system` message.
+The error `Unsupported value: 'messages.role' does not support 'developer' with this model` occurs because the message configuration uses a role identifier that is incompatible with the selected OpenAI model. 
+
+Key reasons for this failure include:
+1. **Model Limitation**: The `developer` role was recently introduced by OpenAI to replace the `system` role for specific reasoning models. However, models such as `o1-preview` and `o1-mini` do not support the `developer` role in certain configurations or API versions.
+2. **Invalid Role Set**: The API expects roles from a strictly defined list. If the model version is older or specifically restricted, it will reject the `developer` label.
+3. **Supported Roles**: Valid roles for these models are limited to specific values. Depending on the API version and model type, recognized roles include:
+   * `SYSTEM` 
+   * `USER` 
+   * `ASSISTANT` 
+   * `FUNCTION` 
+   * `TOOL` 
+   * `CHATBOT` 
+   * `MODEL`
 
 ## Solution
-To resolve the unsupported role error, you must align your message configuration with the requirements of the **o1** series models. Follow these steps:
-1. **Adopt the Developer Role**: For models like `o1-2024-12-17` and later, replace the `system` role with the `developer` role in your API request.
-   - Example: `{"role": "developer", "content": "You are a helpful assistant."}`
-2. **Fallback to User Role**: If you are using the earlier `o1-preview` or `o1-mini` versions that do not yet support the `developer` role, move your system instructions into the first `user` message.
-3. **Use a Different Model**: If your application architecture strictly requires the `system` role and cannot be easily refactored, switch to a model that fully supports it, such as `gpt-4o` or `gpt-4-turbo`.
-4. **Verify Model Documentation**: Check the latest OpenAI documentation for reasoning models to confirm supported roles, as capabilities (like streaming and role support) are updated frequently for the **o1** series.
-5. **Check API Parameters**: Ensure you are also using `max_completion_tokens` instead of `max_tokens`, as reasoning models often require this specific parameter in conjunction with role changes.
+To resolve the `BadRequestError` and fix the unsupported role issue, adjust your message configuration using the following steps:
+1. **Replace the Developer Role**: Change the 'developer' role to a role that the model explicitly supports. For most standard and reasoning models, you should use the `SYSTEM` role for high-level instructions.
+2. **Use Valid Role Identifiers**: Ensure your message array uses one of the following supported roles:
+   * `SYSTEM` 
+   * `USER` 
+   * `ASSISTANT` 
+   * `FUNCTION` 
+   * `TOOL` 
+   * `CHATBOT` 
+   * `MODEL`
+3. **Update Client Libraries**: Ensure your OpenAI SDK (Python, Node.js, etc.) is updated to the latest version. Support for newer roles like `developer` often requires recent library updates (`pip install --upgrade openai`).
+4. **Check Model-Specific Requirements**: If you are using the `o1` series, consult the documentation to see if your specific model version (e.g., `o1-preview-2024-09-12`) requires instructions to be passed via the `user` role or if it has been updated to accept `developer` instructions.
 
 ## Suggested Links
 - [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
-- [https://community.openai.com/t/o1-models-do-not-support-system-role-in-chat-completion/953880](https://community.openai.com/t/o1-models-do-not-support-system-role-in-chat-completion/953880)
-- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
 - [https://github.com/run-llama/llama_index/issues/17395](https://github.com/run-llama/llama_index/issues/17395)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://community.openai.com/t/o1-models-do-not-support-system-role-in-chat-completion/953880](https://community.openai.com/t/o1-models-do-not-support-system-role-in-chat-completion/953880)
 - [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
-- [https://community.openai.com/t/request-failed-with-status-code-400/39242](https://community.openai.com/t/request-failed-with-status-code-400/39242)
-- [https://platform.openai.com/docs/guides/reasoning](https://platform.openai.com/docs/guides/reasoning)
+- [https://community.openai.com/t/i-am-receiving-an-error-status-code-400/351121](https://community.openai.com/t/i-am-receiving-an-error-status-code-400/351121)
+- [https://community.make.com/t/receiving-unsupported-parameter-logit-bias-error-with-openai-o1-model/64208](https://community.make.com/t/receiving-unsupported-parameter-logit-bias-error-with-openai-o1-model/64208)
+- [https://platform.openai.com/docs/guides/reasoning/specifying-instructions-with-the-developer-role](https://platform.openai.com/docs/guides/reasoning/specifying-instructions-with-the-developer-role)
+- [https://platform.openai.com/docs/api-reference/chat/create](https://platform.openai.com/docs/api-reference/chat/create)

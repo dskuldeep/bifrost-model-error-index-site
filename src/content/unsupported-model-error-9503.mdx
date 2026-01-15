@@ -1,0 +1,32 @@
+---
+title: "invalid request: model \"embed-english-v2.0\" is not supported by the generate API"
+provider: "cohere"
+provider_icon: "/logos/cohere.svg"
+solved: true
+slug: "unsupported-model-error-9503"
+---
+
+## Reason
+
+This error occurs when an embedding-family model is used with a text-generation API endpoint. The error message `invalid request: model "embed-english-v2.0" is not supported by the generate API` indicates that you are attempting to use the `generate` endpoint (which is designed for text completion) with a model specifically built for creating vector embeddings.
+
+Key reasons for this failure include:
+1. **Endpoint Mismatch**: You are calling the `/v1/generate` (legacy) or `/v1/chat` endpoint with an `embed` model identifier.
+2. **Model Purpose**: The `embed-english-v2.0` model is designed to transform text into numerical vectors for tasks like semantic search and clustering; it does not possess the parameters required to produce generative text responses.
+3. **Request Logic Error**: The underlying API logic requires a generative model (like those in the `command` family) to process text completion requests.
+
+## Solution
+To resolve this 400 status error, you must align the model family with the correct API endpoint. Follow these remediation steps:
+1. **Select the Appropriate API Endpoint**: 
+   - If you need to generate text, use the `/v1/chat` (recommended) or `/v1/generate` endpoint.
+   - If you need to create vector representations for search or classification, use the `/v1/embed` endpoint.
+2. **Use a Supported Generative Model**: If your intent is to generate text, replace `embed-english-v2.0` with a compatible generative model such as `command`, `command-light`, or `command-r`.
+3. **Use a Supported Embedding Model**: If your intent is to generate embeddings, ensure your code is calling the `embed` method. While `embed-english-v2.0` is supported on that endpoint, consider upgrading to latest versions like `embed-english-v3.0` or `embed-multilingual-v3.0` for better performance.
+4. **Verify Input Parameters**: When using newer embedding models (v3 and above), ensure you include the required `input_type` parameter (e.g., `search_query`, `search_document`, `classification`, or `clustering`).
+5. **Check Documentation**: Consult the Cohere Models documentation to verify the exact string identifiers for current models and their associated endpoints.
+
+## Suggested Links
+- [https://docs.cohere.com/docs/models](https://docs.cohere.com/docs/models)
+- [https://docs.cohere.com/reference/embed](https://docs.cohere.com/reference/embed)
+- [https://docs.cohere.com/reference/chat](https://docs.cohere.com/reference/chat)
+- [https://docs.cohere.com/docs/errors](https://docs.cohere.com/docs/errors)

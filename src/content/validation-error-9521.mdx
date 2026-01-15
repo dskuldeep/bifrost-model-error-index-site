@@ -1,46 +1,34 @@
 ---
-title: "'type' is a required property - 'tools.0'"
-provider: "openai"
-provider_icon: "/logos/openai.png"
+title: "\"parameters\" is a required property - \"functions.0\""
+provider: "azure-openai"
+provider_icon: "/file.svg"
 solved: true
 slug: "validation-error-9521"
 ---
 
 ## Reason
 
-The `400 Bad Request` error with the message `'type' is a required property - 'tools.0'` occurs when an OpenAI API request fails schema validation. This error specifically targets the `tools` parameter in the request body.
+The error message `"parameters" is a required property - "functions.0"` indicates a schema validation failure within the Azure OpenAI API request. This specifically occurs when using the legacy **Function Calling** feature. 
 
 Key reasons for this error include:
-1.  **Missing Required Property**: The API request includes a `tools` array, but the first object in that array (index 0) is missing the mandatory `type` property. According to the OpenAI schema, every tool must explicitly declare its type.
-2.  **Invalid Request Structure**: The tool definition does not conform to the expected JSON structure. Even if the function details are provided, the API cannot process the tool without the top-level `type` identifier.
-3.  **API Documentation Non-Compliance**: The request fails to adhere to the Chat Completions API specification, which requires each tool to be an object containing both a `type` (currently only `"function"` is supported) and the corresponding tool definition (e.g., the `function` object).
+
+*   **Missing Parameters in Function Definition**: The `functions` array expects each function object to contain a `parameters` property. This error triggers when the first item in the array (index 0) lacks this property, even if the function requires no arguments.
+*   **Invalid Request Payload**: The payload may be incorrectly formatted or contain invalid JSON that does not match the expected API schema.
+*   **Incorrect API Keys or Authentication**: Using an incorrect, expired, or invalid API key, or targeting the wrong API endpoint, can result in a 400 error.
+*   **Rate Limiting**: Exceeding the Tokens Per Minute (TPM) or Requests Per Minute (RPM) limits set for the Azure OpenAI resource.
+*   **Parameter Compatibility**: Using parameters that are unsupported by the specific model version, such as using `max_completion_tokens` instead of `max_tokens` where necessary.
+*   **Incorrect HTTP Headers**: Missing or incorrectly configured headers, such as `Content-Type` or the `api-key` header.
 
 ## Solution
-To resolve the `'type' is a required property - 'tools.0'` error, you must ensure your request payload aligns with the OpenAI tool-calling schema. Follow these remediation steps:
-1.  **Add the Type Property**: Explicitly include the `"type": "function"` key-value pair for every tool defined in your `tools` array.
-2.  **Correct the Tool Object Format**: Ensure each item in the `tools` list follows this structure:
-
-```json
-{
-  "type": "function",
-  "function": {
-    "name": "your_function_name",
-    "parameters": { ... }
-  }
-}
-```
-3.  **Verify Mandatory Fields**: Check that all required fields within the `function` object, such as `name`, are present and correctly named.
-4.  **Audit the Tools Array**: The error suffix `tools.0` identifies the first element as the source of the failure. Inspect the first element specifically, but ensure all subsequent tools in the array also contain the `type` property.
-5.  **Review Payload for Typos**: Double-check for casing issues (e.g., using `Type` instead of `type`) or misplaced braces that might cause the `type` property to be nested incorrectly.
-6.  **Consult Official Documentation**: Reference the OpenAI API documentation to ensure you are using the correct schema for the model version you are targeting.
+To resolve the "parameters is a required property" error and other 400 Bad Request issues, follow these steps:
+1.  **Define the Parameters Property**: Ensure every object inside the `functions` array includes the `parameters` key. If the function requires no arguments, you must still provide a valid JSON schema object, for example: `"parameters": {"type": "object", "properties": {}}`.
+2.  **Verify Request Payload**: Use a JSON validator to ensure the entire request body is correctly formatted and complies with the expected structure for the Azure OpenAI Chat Completion API.
+3.  **Validate API Keys and Authentication**: Confirm that the `api-key` header is correctly set and that the resource endpoint matches the region of your deployment.
+4.  **Comply with Rate Limits**: Monitor your usage in the Azure Portal to ensure you are not exceeding the assigned quotas.
+5.  **Use Compatible Parameters**: Check the documentation for your specific model version to ensure you are using supported parameters (e.g., verify compatibility for `max_tokens` vs `max_completion_tokens`).
+6.  **Correct HTTP Headers**: Ensure the `Content-Type` header is set to `application/json` and the `api-key` or `Authorization` headers are properly configured.
+7.  **Consider Migrating to Tools**: For modern implementations, Azure OpenAI recommends moving from the legacy `functions` parameter to the `tools` parameter.
 
 ## Suggested Links
-- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
-- [https://github.com/Nutlope/aicommits/issues/137](https://github.com/Nutlope/aicommits/issues/137)
-- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
-- [https://community.openai.com/t/content-is-required-property-error-400/486260](https://community.openai.com/t/content-is-required-property-error-400/486260)
-- [https://community.openai.com/t/request-failed-with-status-code-400/39242](https://community.openai.com/t/request-failed-with-status-code-400/39242)
-- [https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807](https://community.openai.com/t/intermittent-error-an-unexpected-error-occurred-error-code-400-error-message-this-model-does-not-support-specifying-dimensions-type-invalid-request-error-param-none-code-none/955807)
-- [https://openai.com/index/introducing-structured-outputs-in-the-api/](https://openai.com/index/introducing-structured-outputs-in-the-api/)
-- [https://platform.openai.com/docs/guides/structured-outputs](https://platform.openai.com/docs/guides/structured-outputs)
-- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-tools](https://platform.openai.com/docs/api-reference/chat/create#chat-create-tools)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)

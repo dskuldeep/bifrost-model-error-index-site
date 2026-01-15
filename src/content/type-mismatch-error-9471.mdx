@@ -1,42 +1,40 @@
 ---
-title: "The input for 'tools' or 'functions' is expected to be an array, but a different data type was provided. Please ensure the input adheres to the required schema."
-provider: "azure-openai"
-provider_icon: "/file.svg"
+title: "'name' is not of type 'object' - 'functions.2'"
+provider: "openai"
+provider_icon: "/logos/openai.svg"
 solved: true
 slug: "type-mismatch-error-9471"
 ---
 
-## Raw Error Text
-
-```text
-{'name': 'information_extraction', 'description': 'Extracts the relevant information from the passage.', 'parameters': {'type': 'object', 'properties': {'properties': {'Tech Sector Concerns': {'type': 'integer', 'enum': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'description': "Describes how much the message is related to the following topic: 'Tech Sector Concerns' - There appears to be some anxiety about the current state of the tech and gaming sectors with references to job cuts, financial downturn and a potential anticipation for government intervention. The higher the number the more related"}, 'Bot Development Work': {'type': 'integer', 'enum': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'description': "Describes how much the message is related to the following topic: 'Bot Development Work' - The team is actively working on a bot, requiring improvements and internal testing. There's mention of considerable changes that will impact bug reporting, feedback/suggestions and Hasura implementations. The higher the number the more related"}, 'Expense Question': {'type': 'integer', 'enum': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'description': "Describes how much the message is related to the following topic: 'Expense Question' - There's a humorous exchange around the proposal of expensing a purchase, implying some light-hearted camaraderie within the team. The higher the number the more related"}, 'API Configuration Progress': {'type': 'integer', 'enum': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'description': "Describes how much the message is related to the following topic: 'API Configuration Progress' - One of the team members managed to create Linear App ID/secret, Titan ID/secret and got OAuth2 user approval. Difficulties were encountered, but it's seen as overall good progress. The higher the number the more related"}}, 'required': ['Tech Sector Concerns', 'Bot Development Work', 'Expense Question', 'API Configuration Progress']}}} is not of type 'array' - 'tools'
-```
-
 ## Reason
 
-The 400 Bad Request error in Azure OpenAI indicates that the request sent to the API is malformed or violates the expected schema. Based on the error log, the primary causes are:
-1. **Incorrect Parameter Type for 'tools'**: The error message `is not of type 'array' - 'tools'` explicitly identifies that the `tools` parameter was provided as an object (dictionary) instead of a JSON array (list). Azure OpenAI expects the `tools` field to be a collection of tool objects, even if only one tool is defined.
-2. **Parameter Mismatches**: Using arguments that are unrecognized by specific model versions or API versions can trigger 400 errors. For instance, using newer parameters like `max_completion_tokens` on older model versions that only support `max_tokens` will cause a failure.
-3. **Configuration and Authentication Issues**: Malformed resource IDs or incorrect configuration of managed identities (such as missing RBAC roles like 'Cognitive Services OpenAI User') can result in bad requests.
-4. **Content Filtering Policies**: If the request content or tool descriptions trigger Azure's automated safety filters, the API may reject the request with a 400 error to comply with content management policies.
+The `400 Bad Request` error with the message `'name' is not of type 'object' - 'functions.2'` indicates that the OpenAI API's JSON validator encountered a structural mismatch in your request payload. Specifically, the error identifies an issue with the third item (index 2) within the `functions` array.
+
+Key reasons for this error include:
+1. **Invalid Schema Structure**: This error often occurs when the API expects a JSON Schema object but receives a different type, such as a string or a primitive value. If you are defining function parameters, the `parameters` field must be an object representing a valid JSON Schema.
+2. **Mismatched Data Types**: Values passed into the request—often via environment variables or dynamic code—might be of the incorrect type. For instance, if a field requires an object but receives a string, the validator will reject the request.
+3. **Incorrect Function Definition**: In OpenAI's legacy function calling (or the `tools` API), each function must be an object. If the structure is nested incorrectly or missing required keys, the validator may report type mismatches on unexpected fields.
+4. **Hidden or Invalid Characters**: Hidden characters, such as non-breaking spaces or trailing commas, can cause the JSON parser to misinterpret the structure of the request body.
+5. **API Configuration Issues**: General configuration errors, including malformed headers or incorrect base URLs, can prevent the API from correctly parsing the intended JSON payload.
 
 ## Solution
-To resolve the 400 status error, address the following configuration and structural issues:
-1. **Fix 'tools' Array Structure**: Ensure the `tools` parameter is wrapped in square brackets `[]`. Even if you are defining a single function, it must be an item within an array.
-   - **Incorrect**: `"tools": { "type": "function", ... }`
-   - **Correct**: `"tools": [{ "type": "function", ... }]`
-2. **Verify Request Argument Types**: Check that all request arguments match the expected data types (e.g., integers vs. floats) and names required by your specific API version (e.g., `2023-12-01-preview` or later for tool calling).
-3. **Validate Authentication and Roles**: Confirm that your API key is valid. If using Managed Identity, verify that the resource ID is correct and that the identity has the necessary permissions assigned within the Azure Portal.
-4. **Comply with Content Policies**: Review and modify your prompts or function descriptions to ensure they do not violate Azure OpenAI's safety guidelines, which can trigger policy-related blocks.
-5. **Check Model Compatibility**: Ensure the model deployment you are calling supports the specific features you are using, such as function calling or specific token limit parameters.
+To resolve the `400` status error and ensure your API calls are formatted correctly, follow these remediation steps:
+1. **Verify API Keys and Organization ID**: Confirm that your API key and Organization ID are correct, active, and included in the request headers.
+2. **Validate JSON Payload Structure**: Ensure the request body is valid JSON. Specifically, inspect the `functions` (or `tools`) array at index
+2. Verify that the `parameters` field is a properly formatted JSON Schema object and not a string.
+3. **Inspect Request Parameters**: Compare your payload against the official OpenAI API reference. Ensure all field names are spelled correctly and that values strictly match the expected types (e.g., ensuring `name` is a string and `parameters` is an object).
+4. **Check for Hidden or Invalid Characters**: Sanitize your request payload and environment files to remove any hidden characters, unexpected whitespace, or invalid symbols that could break JSON parsing.
+5. **Correct Headers and Base URL**: Verify that the `Content-Type` header is set to `application/json` and that the `Authorization` header uses the correct `Bearer` token format.
+6. **Test with Debugging Tools**: Use a tool like Postman, Hoppscotch, or `curl` to send a raw JSON request. This helps isolate whether the error is caused by your application's serialization logic or the underlying data.
 
 ## Suggested Links
-- [https://learn.microsoft.com/en-us/answers/questions/1680345/issue-with-authenticating-api-management-with-azur](https://learn.microsoft.com/en-us/answers/questions/1680345/issue-with-authenticating-api-management-with-azur)
-- [https://luke.geek.nz/azure/troubleshooting-scenarios-azure-open-ai/](https://luke.geek.nz/azure/troubleshooting-scenarios-azure-open-ai/)
-- [https://github.com/explodinggradients/ragas/issues/649](https://github.com/explodinggradients/ragas/issues/649)
-- [https://community.openai.com/t/azure-open-ai-client-not-working-with-threads/520374](https://community.openai.com/t/azure-open-ai-client-not-working-with-threads/520374)
 - [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
-- [https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md](https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md)
-- [https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue](https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue)
-- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)
-- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)
+- [https://github.com/Nutlope/aicommits/issues/137](https://github.com/Nutlope/aicommits/issues/137)
+- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
+- [https://forum.bubble.io/t/openai-api-error-http-400/263917](https://forum.bubble.io/t/openai-api-error-http-400/263917)
+- [https://community.openai.com/t/request-failed-with-status-code-400/39242](https://community.openai.com/t/request-failed-with-status-code-400/39242)
+- [https://platform.openai.com/docs/guides/error-codes](https://platform.openai.com/docs/guides/error-codes)
+- [https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096](https://community.openai.com/t/troubleshooting-api-integration-with-openais-language-model/627096)
+- [https://forum.bubble.io/t/openai-we-could-not-phase-the-json-body-of-your-request/244061](https://forum.bubble.io/t/openai-we-could-not-phase-the-json-body-of-your-request/244061)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-functions](https://platform.openai.com/docs/api-reference/chat/create#chat-create-functions)
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)

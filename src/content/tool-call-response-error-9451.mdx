@@ -1,0 +1,32 @@
+---
+title: "An assistant message with \"tool_calls\" must be followed by tool messages responding to each \"tool_call_id\". The following tool_call_ids did not have response messages: call_IyKJFAGQaCSMPvNOowZSkIFT"
+provider: "openai"
+provider_icon: "/logos/openai.svg"
+solved: true
+slug: "tool-call-response-error-9451"
+---
+
+## Reason
+
+The 400 Bad Request error occurs because the OpenAI API enforces a strict sequence of messages when using the **Tools** (formerly Functions) feature. 
+
+Key structural requirements include:
+1. **Mandatory Pairing**: Any assistant message containing a `tool_calls` array must be immediately followed by messages with the `role: "tool"` for every call requested.
+2. **ID Matching**: Each tool response message must include a `tool_call_id` that matches the unique `id` provided in the assistant's original tool call.
+3. **Sequential Integrity**: The API expects all tool responses to appear in the message history before any subsequent user or assistant messages. Missing a single response or placing it out of order violates the request schema.
+
+In this specific case, the assistant initiated a call with the ID `call_IyKJFAGQaCSMPvNOowZSkIFT`, but the message history sent to the API did not contain a matching tool response for that identifier.
+
+## Solution
+To resolve the 400 status error, ensure your application correctly closes the loop for every tool requested by the model. Follow these steps:
+1. **Iterate and Respond**: When the model returns a message with `tool_calls`, iterate through the entire array. For every tool call found, you must append a new message to your `messages` array with the following fields:
+   * `role`: "tool"
+   * `tool_call_id`: The exact ID from the assistant message (e.g., `call_IyKJFAGQaCSMPvNOowZSkIFT`).
+   * `content`: The output or result of your function (must be a string).
+2. **Check for Parallel Tool Calls**: If the model requested multiple tools simultaneously (Parallel Function Calling), ensure you provide a tool response message for **every** item in the `tool_calls` list before making the next API request.
+3. **Maintain Message History Consistency**: Verify that the message history includes the assistant's `tool_calls` message followed immediately by the corresponding `tool` messages. Do not insert user messages or system instructions between a tool call and its response.
+4. **Handle Errors as Tool Content**: If a tool or function fails to execute, do not skip the response. Instead, send a tool message with a descriptive error string as the `content` so the model understands the failure.
+
+## Suggested Links
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages](https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages)

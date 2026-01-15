@@ -1,5 +1,5 @@
 ---
-title: "rayllm.backend.llm.error_handling.ValidationError: top_p must be 1 when using greedy sampling. (Request ID: 82f41f76-a592-4d89-a6c5-e36ab8ce9d7b)"
+title: "rayllm.backend.llm.error_handling.ValidationError: n>1 is not supported yet in aviary (Request ID: 57be219c-3db9-4434-a613-d2cb6dc1ff80)"
 provider: "anyscale"
 provider_icon: "/file.svg"
 solved: true
@@ -8,22 +8,20 @@ slug: "validation-error-9515"
 
 ## Reason
 
-The error `rayllm.backend.llm.error_handling.ValidationError: top_p must be 1 when using greedy sampling` occurs when an API request contains conflicting sampling parameters. This is categorized as a 400 Bad Request client error.
-
-In the Anyscale API (and the underlying RayLLM backend), **greedy sampling** is typically activated when the `temperature` parameter is set to `0`. Greedy sampling works by selecting only the single most probable token at each step. Because this method does not sample from a distribution of tokens, the `top_p` parameter (nucleus sampling), which defines a cumulative probability threshold, must be set to `1` (representing the full distribution). Providing any other value for `top_p` while in greedy mode creates a logical mismatch in the sampling configuration, leading to this validation failure.
+This error is a `400 Bad Request` triggered by a `ValidationError` within Anyscale's **rayllm** (formerly Aviary) backend. It occurs when a request violates specific schema constraints defined by the model-serving infrastructure. Key reasons include:
+1. **Unsupported Parameter Value**: The error message `n>1 is not supported yet in aviary` explicitly indicates that the `n` parameter (which requests multiple completion choices for a single prompt) is set to a value greater than
+1. The current implementation of the serving backend for these models only supports a single completion per request.
+2. **Invalid Request Body**: The request may be malformed or contain query parameters that do not align with the API's expected schema. This includes using extra fields that are not permitted or providing invalid values for supported parameters.
+3. **Request Exceeding Limits**: The API enforces strict validation limits. While this specific error focuses on the `n` parameter, similar validation errors can occur if the request exceeds other implementation-specific bounds, such as maximum input length or unsupported sampling configurations.
 
 ## Solution
-To resolve this validation error and successfully make the API call, you must ensure your request configuration follows these rules:
-1. **Set top_p to 1 for Greedy Sampling**: If your request uses greedy sampling (typically by setting `temperature` to `0`), you must explicitly set the `top_p` parameter to `1` or omit it if the default is `1`.
-2. **Enable Sampling for custom top_p values**: If you intend to use a specific `top_p` value (e.g., `0.9`), ensure that the `temperature` is set to a value greater than `0` to enable non-greedy sampling.
-3. **Audit API Parameters**: Review the entire request payload to ensure all parameters are correctly configured according to the Anyscale API requirements. Double-check that there are no extra, unsupported, or redundant fields that might conflict with the sampling logic.
-4. **Verify Request ID**: If the error persists, use the `Request ID` provided in the error message (e.g., `82f41f76-a592-4d89-a6c5-e36ab8ce9d7b`) when contacting support to help identify specific backend validation failures.
+To resolve the 400 validation error, you must modify your request to align with Anyscale's supported parameters and constraints. Follow these steps:
+1. **Modify the 'n' Parameter**: Locate the `n` parameter in your API request body and set it to `1`. If you do not explicitly require multiple choices, you can remove the parameter entirely, as it defaults to `1`.
+2. **Implement Client-Side Looping**: If your application requires multiple variations of a response for the same prompt, you should send multiple separate API requests rather than attempting to use the `n` parameter in a single call.
+3. **Audit Request Data**: Review the request body and query parameters to ensure they are correctly formatted and do not contain any extra or unsupported fields that might trigger a validation failure.
+4. **Verify Parameter Ranges**: Ensure that other values provided (such as `temperature`, `top_p`, or `max_tokens`) adhere to the supported limits and constraints defined for the specific model you are using.
+5. **Consult Documentation**: Refer to the Anyscale API documentation for the most current guidelines on supported parameters and their valid ranges, as backend capabilities may change with newer versions of RayLLM.
 
 ## Suggested Links
-- [https://github.com/ray-project/ray/issues/31370](https://github.com/ray-project/ray/issues/31370)
-- [https://community.openai.com/t/400-model-error-call-to-llm-failed/276375](https://community.openai.com/t/400-model-error-call-to-llm-failed/276375)
-- [https://docs.apigee.com/api-platform/troubleshoot/runtime/400-decompressionfailureatrequest](https://docs.apigee.com/api-platform/troubleshoot/runtime/400-decompressionfailureatrequest)
-- [https://docs.equinix.com/en-us/Content/KnowledgeCenter/LOA/ErrorHandling/400.htm](https://docs.equinix.com/en-us/Content/KnowledgeCenter/LOA/ErrorHandling/400.htm)
-- [https://forum.bubble.io/t/how-to-catch-a-400-error-from-api-connector/27682](https://forum.bubble.io/t/how-to-catch-a-400-error-from-api-connector/27682)
-- [https://forum.bubble.io/t/why-do-api-connector-requests-sometimes-return-a-400-error/321731](https://forum.bubble.io/t/why-do-api-connector-requests-sometimes-return-a-400-error/321731)
 - [https://docs.anyscale.com/endpoints/model-serving/parameters](https://docs.anyscale.com/endpoints/model-serving/parameters)
+- [https://github.com/ray-project/ray-llm](https://github.com/ray-project/ray-llm)

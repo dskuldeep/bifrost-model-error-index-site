@@ -1,5 +1,5 @@
 ---
-title: "Invalid model: mistralai/Mixtral-8x7B-Instruct-v0.1"
+title: "Invalid model name"
 provider: "mistral-ai"
 provider_icon: "/file.svg"
 solved: true
@@ -8,31 +8,59 @@ slug: "model-selection-error-9357"
 
 ## Reason
 
-The "Invalid model" error (specifically for `mistralai/Mixtral-8x7B-Instruct-v0.1`) in the Mistral AI API typically indicates a mismatch between the requested identifier and the recognized model slugs on the server. The primary reasons include:
-1. **Incorrect Model Naming Convention**: The identifier `mistralai/Mixtral-8x7B-Instruct-v0.1` is a common format used on the Hugging Face hub or by other providers like Together AI. However, the official Mistral AI API (La Plateforme) requires specific internal slugs, such as `open-mixtral-8x7b`.
-2. **Model Availability**: The requested model may not be loaded or available on the server at the time of the request due to maintenance, updates, or a transition to a newer version (e.g., `mistral-large-latest`).
-3. **Model Permissions**: Access to certain high-performance or newer models may be restricted based on your account's subscription tier or organization-specific authorization settings.
-4. **Configuration or Syntax Issues**: The API request may contain malformed syntax, incorrect headers, or parameters that do not align with the expected request format for the specified endpoint.
-5. **Rate Limiting or Throttling**: While less common for this specific error message, extreme rate limiting or quota exhaustion can occasionally cause the API to reject model requests, though this usually returns a 429 status code.
+The "Invalid model name" error (typically accompanied by an HTTP 400 Bad Request status) occurs when the Mistral AI API or similar providers cannot recognize the model identifier provided in the request payload. 
+
+**Incorrect Model Name**
+The model name specified does not match the provider's permitted or available models. This is frequently caused by typos, using outdated model names that have been deprecated, or requesting a model that is not supported by the specific endpoint being called (e.g., calling a chat completion endpoint with a non-chat model).
+
+**Invalid Configuration**
+The request may contain malformed syntax or missing required properties. Common issues include missing `Content-Type: application/json` headers, incorrectly formatted `Authorization` bearer tokens, or providing parameters in the wrong data type.
+
+**Rate Limiting or Throttling**
+While rate limits usually return a 429 status code, certain middleware configurations or API gateways may manifest throttling issues as a 400 error if the request is rejected before reaching the core model processing logic.
+
+**Environmental or Variable Issues**
+The error can arise if environment variables used to store the model name are incorrectly defined. For example, the variable might include accidental whitespace, hidden characters, or extra quotation marks that invalidate the string when passed to the API client.
+
+**Network or Middleware Issues**
+General network problems or misconfigured middleware (such as Axios, LangChain, or proxy wrappers) can lead to malformed requests where the model name is stripped or altered before it reaches the API server.
 
 ## Solution
-To resolve the "Invalid model" error and successfully call the Mistral AI API, follow these remediation steps:
-1. **Verify Official Model Slugs**: Ensure you are using the correct identifier as defined in the Mistral AI documentation. For the Mixtral-8x7B model, replace `mistralai/Mixtral-8x7B-Instruct-v0.1` with the official slug `open-mixtral-8x7b`.
-2. **Check Model Availability and Status**: Visit the official Mistral AI Status Page to confirm if the model or API service is undergoing maintenance or experiencing downtime.
-3. **Review Account Permissions and Billing**: Log into the Mistral AI Console to ensure your API key has the necessary permissions for the model you are trying to use. Verify that your account has an active billing plan and sufficient credits.
-4. **Inspect Request Syntax**: Double-check your API call configuration. Ensure that the model parameter is correctly nested in the JSON payload and that all headers (such as the Authorization Bearer token) are properly formatted.
-5. **Monitor Rate Limits**: Review your usage dashboard to ensure you are operating within the allowed rate limits for your current tier.
-6. **Contact Support**: If the model name is correct and permissions are verified but the issue persists, reach out to Mistral AI support for further technical assistance.
+To resolve the "Invalid model name" error, follow these structured remediation steps:
+
+**1. Verify the Model Name**
+Cross-reference the model string in your code with the official Mistral AI documentation. Ensure you are using the correct identifier for the desired model, such as:
+
+*   `open-mistral-7b`
+*   `open-mixtral-8x7b`
+*   `mistral-small-latest`
+*   `mistral-medium-latest`
+*   `mistral-large-latest`
+
+**2. Check API Keys and Headers**
+Confirm that your API keys are active and that your headers are correctly configured. The `Authorization` header must follow the `Bearer <API_KEY>` format, and the `Content-Type` must be set to `application/json`.
+
+**3. Review Request Syntax**
+Inspect the JSON payload for syntax errors. Ensure that the `model` field is a valid string and that all other mandatory fields (e.g., the `messages` array) are properly structured according to the API specification.
+
+**4. Inspect Network Traffic**
+Use network inspection tools or logging to view the raw HTTP request being sent. This will help identify if the model name or other parameters are being modified by a library or proxy before transmission.
+
+**5. Check Environment Variables**
+If you are loading the model name from an environment variable, log the variable's value immediately before the API call to ensure it contains only the intended string without leading/trailing spaces or incorrect casing.
+
+**6. Monitor Rate Limits**
+Check your provider dashboard to ensure you have not exceeded your usage limits or tier quotas. If you are being throttled, reduce the frequency of your requests or upgrade your plan.
 
 ## Suggested Links
 - [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
 - [https://community.make.com/t/400-invalid-model-llama-3-8b-instruct-how-is-that-possible-if-it-is-actually-permitted/53562](https://community.make.com/t/400-invalid-model-llama-3-8b-instruct-how-is-that-possible-if-it-is-actually-permitted/53562)
+- [https://community.openai.com/t/request-failed-with-status-code-400/39242](https://community.openai.com/t/request-failed-with-status-code-400/39242)
+- [https://community.openai.com/t/content-is-required-property-error-400/486260](https://community.openai.com/t/content-is-required-property-error-400/486260)
+- [https://discuss.huggingface.co/t/400-client-error-in-inference-api-for-sentence-similarity-task/34784](https://discuss.huggingface.co/t/400-client-error-in-inference-api-for-sentence-similarity-task/34784)
 - [https://learn.microsoft.com/en-us/answers/questions/2117664/my-mistral-large-2407-serverless-deployment-api-is](https://learn.microsoft.com/en-us/answers/questions/2117664/my-mistral-large-2407-serverless-deployment-api-is)
-- [https://discuss.huggingface.co/t/tried-to-download-mistral-7b-but-got-an-error-message/57196](https://discuss.huggingface.co/t/tried-to-download-mistral-7b-but-got-an-error-message/57196)
+- [https://community.crewai.com/t/crewai-on-mistral-api-error/1559](https://community.crewai.com/t/crewai-on-mistral-api-error/1559)
 - [https://github.com/langchain-ai/langchain/issues/16869](https://github.com/langchain-ai/langchain/issues/16869)
-- [https://www.datacamp.com/tutorial/codestral-api-tutorial](https://www.datacamp.com/tutorial/codestral-api-tutorial)
-- [https://community.make.com/t/400-invalid-model/59048](https://community.make.com/t/400-invalid-model/59048)
-- [https://forum.cloudron.io/topic/11826/using-mistral-api-seems-broken-on-cloudron](https://forum.cloudron.io/topic/11826/using-mistral-api-seems-broken-on-cloudron)
-- [https://www.merge.dev/blog/mistral-ai-api-key](https://www.merge.dev/blog/mistral-ai-api-key)
-- [https://docs.mistral.ai/platform/endpoints/](https://docs.mistral.ai/platform/endpoints/)
-- [https://status.mistral.ai/](https://status.mistral.ai/)
+- [https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/discussions/98](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/discussions/98)
+- [https://docs.mistral.ai/getting-started/models/](https://docs.mistral.ai/getting-started/models/)
+- [https://docs.mistral.ai/api/](https://docs.mistral.ai/api/)

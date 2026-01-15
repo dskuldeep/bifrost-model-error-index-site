@@ -1,41 +1,37 @@
 ---
-title: "1 validation error for Request body -> metadata -> data str type expected (type=type_error.str)"
+title: "-3555 is less than the minimum of 1 - \"max_tokens\""
 provider: "openai"
-provider_icon: "/logos/openai.png"
+provider_icon: "/logos/openai.svg"
 solved: true
 slug: "validation-error-9525"
 ---
 
 ## Reason
 
-This 400 Bad Request error occurs because the OpenAI API expects all values within the `metadata` object to be strings, but the value assigned to the `data` field was a different type (such as an integer, boolean, or object).
+The OpenAI API returns a **400 Bad Request** error when the `max_tokens` parameter is set to an invalid value. The specific message "is less than the minimum of 1" indicates that the value provided was zero or a negative number (in this case, -3555).
 
-Key reasons include:
-1. **Invalid Data Type**: The API validator specifically flagged `metadata -> data` with `type=type_error.str`, indicating that while a string was required, a non-string value was provided.
-2. **Strict Schema Enforcement**: OpenAI enforces a strict schema for the `metadata` parameter. It does not automatically cast numbers or booleans into strings; these must be converted before the request is sent.
-3. **Incorrect JSON Payload**: Discrepancies in the JSON structure, such as attempting to nest another object within the `metadata` field, will trigger validation failures as the API expects a flat key-value map.
+Key reasons for this error include:
+1. **Invalid Parameter Value**: The `max_tokens` parameter must be a positive integer because it specifies the upper limit of tokens the model is allowed to generate.
+2. **Schema Violation**: Setting this to a negative number violates the API's validation schema, which requires a minimum value of
+1.
+3. **Calculation Errors**: This often occurs in applications that dynamically calculate `max_tokens` (e.g., subtracting the prompt length from the model's total context limit). If the prompt is longer than expected, the result can become negative.
 
 ## Solution
-To resolve the validation error, ensure the request payload conforms to OpenAI's specific metadata requirements:
-1. **Ensure Correct Data Types**: Convert the value for the `data` key (and all other metadata values) into a string. For example, use `str(value)` in Python or `.toString()` in JavaScript.
-2. **Comply with Metadata Constraints**:
-   * **Quantity**: A maximum of 16 key-value pairs are allowed per object.
-   * **Key Length**: Keys must not exceed 64 characters.
-   * **Value Length**: Values must not exceed 512 characters.
-3. **Flatten the Metadata**: Ensure the `metadata` object contains only a single level of key-value pairs. Nested objects or arrays are not supported within metadata.
-4. **Verify JSON Format and Headers**: Confirm the JSON payload is correctly formatted and that the `Content-Type: application/json` header is included. Also, verify that your `Authorization` header contains a valid API key.
-5. **Review API Documentation**: Consult the OpenAI API reference for the specific endpoint you are calling (e.g., Assistants, Runs, or Files) to ensure metadata is supported for that object type.
+To resolve the invalid `max_tokens` error, follow these steps to ensure the parameter meets the OpenAI API requirements:
+
+**Ensure the max_tokens Value is Positive**
+1. Set `max_tokens` to a positive integer value of at least
+1.
+2. Implement a safety check in your code to prevent negative outputs. For example, use a function like `Math.max(1, calculated_value)` to ensure the value never drops below the minimum threshold.
+
+**Validate Parameter Logic**
+1. Verify that no negative values, non-integer values (floats), or null values are being assigned to the `max_tokens` field.
+2. Review any logic responsible for calculating token budgets to ensure it accounts for the overhead of the prompt and system messages.
+
+**Observe Model-Specific Limits**
+1. Confirm that the `max_tokens` value, when added to the tokens in your prompt, does not exceed the total context window of the model you are using (e.g., 128k for GPT-4o).
+2. While exceeding the total limit usually triggers a different error, ensuring the value is within the supported range of the specific model version is a best practice.
 
 ## Suggested Links
-- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
-- [https://community.openai.com/t/im-encountering-an-issue-while-uploading-both-training-and-validation-files-can-you-assist/372496](https://community.openai.com/t/im-encountering-an-issue-while-uploading-both-training-and-validation-files-can-you-assist/372496)
-- [https://forum.bubble.io/t/openai-api-error-http-400/263917](https://forum.bubble.io/t/openai-api-error-http-400/263917)
-- [https://community.openai.com/t/getting-400-response-with-already-working-code/509212](https://community.openai.com/t/getting-400-response-with-already-working-code/509212)
-- [https://learn.microsoft.com/en-us/answers/questions/2043454/i-cannot-register-metadata-info-in-azure-openai-ba](https://learn.microsoft.com/en-us/answers/questions/2043454/i-cannot-register-metadata-info-in-azure-openai-ba)
-- [https://community.openai.com/t/whats-the-format-of-the-metadata-field-in-assistant-api/624266](https://community.openai.com/t/whats-the-format-of-the-metadata-field-in-assistant-api/624266)
-- [https://swagger.io/docs/specification/v3_0/describing-request-body/describing-request-body/](https://swagger.io/docs/specification/v3_0/describing-request-body/describing-request-body/)
-- [https://github.com/Nutlope/aicommits/issues/137](https://github.com/Nutlope/aicommits/issues/137)
-- [https://community.openai.com/t/when-are-400-errors-thrown-by-the-answers-endpoint/1237](https://community.openai.com/t/when-are-400-errors-thrown-by-the-answers-endpoint/1237)
-- [https://community.openai.com/t/solved-whats-wrong-with-the-api-request-syntax/36611](https://community.openai.com/t/solved-whats-wrong-with-the-api-request-syntax/36611)
-- [https://platform.openai.com/docs/api-reference](https://platform.openai.com/docs/api-reference)
-- [https://community.openai.com/t/whats-the-format-of-the-metadata-field-in-assistant-api/621535](https://community.openai.com/t/whats-the-format-of-the-metadata-field-in-assistant-api/621535)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-max_tokens](https://platform.openai.com/docs/api-reference/chat/create#chat-create-max_tokens)
+- [https://platform.openai.com/docs/models](https://platform.openai.com/docs/models)

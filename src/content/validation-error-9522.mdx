@@ -1,5 +1,5 @@
 ---
-title: "\"parameters\" is a required property - \"functions.0\""
+title: "'parameters' is a required property - 'functions.0'"
 provider: "azure-openai"
 provider_icon: "/file.svg"
 solved: true
@@ -8,27 +8,50 @@ slug: "validation-error-9522"
 
 ## Reason
 
-The error message `"parameters" is a required property - "functions.0"` indicates a schema validation failure within the Azure OpenAI API request. This specifically occurs when using the legacy **Function Calling** feature. 
+The HTTP 400 Bad Request error `'parameters' is a required property - 'functions.0'` occurs when the Azure OpenAI API receives a request containing a function definition that lacks the mandatory JSON Schema `parameters` field. 
 
-Key reasons for this error include:
-
-*   **Missing Parameters in Function Definition**: The `functions` array expects each function object to contain a `parameters` property. This error triggers when the first item in the array (index 0) lacks this property, even if the function requires no arguments.
-*   **Invalid Request Payload**: The payload may be incorrectly formatted or contain invalid JSON that does not match the expected API schema.
-*   **Incorrect API Keys or Authentication**: Using an incorrect, expired, or invalid API key, or targeting the wrong API endpoint, can result in a 400 error.
-*   **Rate Limiting**: Exceeding the Tokens Per Minute (TPM) or Requests Per Minute (RPM) limits set for the Azure OpenAI resource.
-*   **Parameter Compatibility**: Using parameters that are unsupported by the specific model version, such as using `max_completion_tokens` instead of `max_tokens` where necessary.
-*   **Incorrect HTTP Headers**: Missing or incorrectly configured headers, such as `Content-Type` or the `api-key` header.
+Key causes include:
+1. **Missing Mandatory Property**: In the `functions` array of your request payload, the first function object (index 0) is missing the `parameters` key. The API requires this field even if the function accepts no arguments.
+2. **Incorrect Schema Structure**: The request payload may be malformed or fail to follow the strict JSON Schema requirements expected by the Azure OpenAI API for function calling.
+3. **API Version Compatibility**: Using an API version that supports function calling (such as `2023-07-01-preview` or later) without adhering to the specific schema requirements for that version. Older versions may not recognize the function calling parameters correctly, or newer versions may have stricter validation rules.
+4. **Invalid JSON Payload**: Syntax errors or incorrectly named fields in the JSON body can prevent the server from correctly parsing the `parameters` property, leading to a validation failure.
 
 ## Solution
-To resolve the "parameters is a required property" error and other 400 Bad Request issues, follow these steps:
-1.  **Define the Parameters Property**: Ensure every object inside the `functions` array includes the `parameters` key. If the function requires no arguments, you must still provide a valid JSON schema object, for example: `"parameters": {"type": "object", "properties": {}}`.
-2.  **Verify Request Payload**: Use a JSON validator to ensure the entire request body is correctly formatted and complies with the expected structure for the Azure OpenAI Chat Completion API.
-3.  **Validate API Keys and Authentication**: Confirm that the `api-key` header is correctly set and that the resource endpoint matches the region of your deployment.
-4.  **Comply with Rate Limits**: Monitor your usage in the Azure Portal to ensure you are not exceeding the assigned quotas.
-5.  **Use Compatible Parameters**: Check the documentation for your specific model version to ensure you are using supported parameters (e.g., verify compatibility for `max_tokens` vs `max_completion_tokens`).
-6.  **Correct HTTP Headers**: Ensure the `Content-Type` header is set to `application/json` and the `api-key` or `Authorization` headers are properly configured.
-7.  **Consider Migrating to Tools**: For modern implementations, Azure OpenAI recommends moving from the legacy `functions` parameter to the `tools` parameter.
+To resolve the `'parameters' is a required property` error, ensure that every function definition in your `functions` array includes a valid `parameters` object. Follow these steps:
+1. **Verify the Function Schema**: Check the first item in your `functions` array (`functions[0]`). Ensure it contains a `parameters` key. If your function does not require any input arguments, the `parameters` property should still be present and defined as an empty JSON Schema object:
+
+```json
+"parameters": {
+  "type": "object",
+  "properties": {}
+}
+```
+2. **Check JSON Payload Integrity**: Validate that your entire request body is a correctly formatted JSON string. Ensure there are no trailing commas or missing brackets that could cause the `parameters` field to be ignored by the parser.
+3. **Align with API Version**: Confirm you are using a supported Azure OpenAI API version (e.g., `2023-07-01-preview`, `2023-12-01-preview`, or `2024-02-15-preview`). Ensure your implementation matches the specific requirements of that version.
+4. **Example of a Correct Function Definition**: Ensure your structure matches this pattern:
+
+```json
+{
+  "name": "get_weather",
+  "description": "Get the current weather",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "location": {"type": "string"}
+    },
+    "required": ["location"]
+  }
+}
+```
+5. **Transition to Tools (Optional)**: If you are using newer models (like GPT-4 Turbo), consider migrating from the deprecated `functions` parameter to the `tools` parameter, which uses a similar but updated structure.
 
 ## Suggested Links
+- [https://github.com/FlowiseAI/Flowise/issues/195](https://github.com/FlowiseAI/Flowise/issues/195)
+- [https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400](https://cheatsheet.md/chatgpt-cheatsheet/openai-api-error-axioserror-request-failed-status-code-400)
+- [https://forum.bubble.io/t/openai-api-error-http-400/263917](https://forum.bubble.io/t/openai-api-error-http-400/263917)
+- [https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue](https://learn.microsoft.com/en-us/answers/questions/1479386/azure-openai-api-calling-issue)
+- [https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md](https://github.com/Azure/azure-sdk-for-java/blob/main/sdk/openai/azure-ai-openai/TROUBLESHOOTING.md)
+- [https://learn.microsoft.com/en-us/answers/questions/2139738/openai-badrequesterror-error-code-400-((error-((me](https://learn.microsoft.com/en-us/answers/questions/2139738/openai-badrequesterror-error-code-400-((error-((me)
+- [https://community.openai.com/t/azure-open-ai-assistant-api-connection-error/662198](https://community.openai.com/t/azure-open-ai-assistant-api-connection-error/662198)
 - [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)
-- [https://learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)
+- [https://platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling)

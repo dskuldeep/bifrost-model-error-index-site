@@ -1,33 +1,58 @@
 ---
-title: "rayllm.backend.llm.error_handling.ValidationError: n>1 is not supported yet in aviary (Request ID: 57be219c-3db9-4434-a613-d2cb6dc1ff80)"
-provider: "anyscale"
-provider_icon: "/file.svg"
+title: "1 validation error for Request body -> response_format extra fields not permitted (type=value_error.extra)"
+provider: "openai"
+provider_icon: "/logos/openai.svg"
 solved: true
 slug: "validation-error-9517"
 ---
 
 ## Reason
 
-This error is a `400 Bad Request` triggered by a `ValidationError` within Anyscale's **rayllm** (formerly Aviary) backend. It occurs when a request violates specific schema constraints defined by the model-serving infrastructure. Key reasons include:
-1. **Unsupported Parameter Value**: The error message `n>1 is not supported yet in aviary` explicitly indicates that the `n` parameter (which requests multiple completion choices for a single prompt) is set to a value greater than
-1. The current implementation of the serving backend for these models only supports a single completion per request.
-2. **Invalid Request Body**: The request may be malformed or contain query parameters that do not align with the API's expected schema. This includes using extra fields that are not permitted or providing invalid values for supported parameters.
-3. **Request Exceeding Limits**: The API enforces strict validation limits. While this specific error focuses on the `n` parameter, similar validation errors can occur if the request exceeds other implementation-specific bounds, such as maximum input length or unsupported sampling configurations.
+The error message `1 validation error for Request body -> response_format extra fields not permitted (type=value_error.extra)` indicates that the API request contains unauthorized or unrecognized fields within the `response_format` object.
+
+This typically happens for the following reasons:
+1. **Schema Mismatch**: The `response_format` parameter includes keys that are not part of the OpenAI API specification. For example, trying to pass a schema directly under `response_format` rather than nesting it within a `json_schema` property.
+2. **Incorrect Structure**: The API expects a specific structure for the request body. If using "JSON Mode," it expects `{"type": "json_object"}`. If using "Structured Outputs," it expects `{"type": "json_schema", "json_schema": {...}}`. Adding any other fields at the top level of this object triggers a validation failure.
+3. **SDK Limitations**: You may be using an outdated version of the OpenAI SDK that does not recognize newer fields (like `json_schema`), causing the local validator to flag them as "extra" fields before the request is even sent.
 
 ## Solution
-To resolve the 400 validation error, you must modify your request to align with Anyscale's supported parameters and constraints. Follow these steps:
-1. **Modify the 'n' Parameter**: Locate the `n` parameter in your API request body and set it to `1`. If you do not explicitly require multiple choices, you can remove the parameter entirely, as it defaults to `1`.
-2. **Implement Client-Side Looping**: If your application requires multiple variations of a response for the same prompt, you should send multiple separate API requests rather than attempting to use the `n` parameter in a single call.
-3. **Audit Request Data**: Review the request body and query parameters to ensure they are correctly formatted and do not contain any extra or unsupported fields that might trigger a validation failure.
-4. **Verify Parameter Ranges**: Ensure that other values provided (such as `temperature`, `top_p`, or `max_tokens`) adhere to the supported limits and constraints defined for the specific model you are using.
-5. **Consult Documentation**: Refer to the Anyscale API documentation for the most current guidelines on supported parameters and their valid ranges, as backend capabilities may change with newer versions of RayLLM.
+To resolve the "400 status error" and the validation failure, you must ensure the request body strictly adheres to the OpenAI API's expected structure. Follow these steps:
+
+**1. Verify API Key and Headers**
+Ensure your API key is valid and the `Authorization` header is correctly formatted as `Bearer YOUR_API_KEY`.
+
+**2. Validate the response_format Object**
+Review your code to ensure the `response_format` matches one of the two supported formats:
+
+- **For JSON Mode**: 
+  ```json
+  "response_format": { "type": "json_object" }
+  ```
+- **For Structured Outputs**: 
+  ```json
+  "response_format": {
+    "type": "json_schema",
+    "json_schema": {
+      "name": "example_schema",
+      "schema": { ... },
+      "strict": true
+    }
+  }
+  ```
+
+**3. Remove Extra Fields**
+Scan the `response_format` block and remove any non-permitted fields. Common mistakes include adding metadata, custom keys, or placing the `strict` flag outside of the `json_schema` wrapper.
+
+**4. Check for Supported Models and Media Types**
+Ensure that the model you are calling supports the requested `response_format`. For example, older models may not support `json_schema`. Additionally, ensure that media types in the `content` object match supported OpenAI formats.
+
+**5. Update the OpenAI Library**
+Run `pip install --upgrade openai` (Python) or `npm install openai@latest` (Node.js) to ensure your client library recognizes the latest API parameters.
+
+**6. Review Official API Documentation**
+Always cross-reference your request structure with the official OpenAI API Reference to ensure all nested fields are valid and correctly placed.
 
 ## Suggested Links
-- [https://github.com/ray-project/ray/issues/31370](https://github.com/ray-project/ray/issues/31370)
-- [https://community.llamaindex.ai/hi-all-WJ1Y1QcRV8v7](https://community.llamaindex.ai/hi-all-WJ1Y1QcRV8v7)
-- [https://community.openai.com/t/400-model-error-call-to-llm-failed/276375](https://community.openai.com/t/400-model-error-call-to-llm-failed/276375)
-- [https://docs.apigee.com/api-platform/troubleshoot/runtime/400-decompressionfailureatrequest](https://docs.apigee.com/api-platform/troubleshoot/runtime/400-decompressionfailureatrequest)
-- [https://discuss.ray.io/t/error-scaling-ray-serve-to-2-replicas/3181](https://discuss.ray.io/t/error-scaling-ray-serve-to-2-replicas/3181)
-- [https://discuss.ray.io/t/llm-ray-serve-problem/11862](https://discuss.ray.io/t/llm-ray-serve-problem/11862)
-- [https://docs.anyscale.com/endpoints/model-serving/parameters](https://docs.anyscale.com/endpoints/model-serving/parameters)
-- [https://github.com/ray-project/ray-llm](https://github.com/ray-project/ray-llm)
+- [https://platform.openai.com/docs/api-reference/chat/create#chat-create-response_format](https://platform.openai.com/docs/api-reference/chat/create#chat-create-response_format)
+- [https://platform.openai.com/docs/guides/structured-outputs](https://platform.openai.com/docs/guides/structured-outputs)
+- [https://platform.openai.com/docs/guides/text-generation/json-mode](https://platform.openai.com/docs/guides/text-generation/json-mode)

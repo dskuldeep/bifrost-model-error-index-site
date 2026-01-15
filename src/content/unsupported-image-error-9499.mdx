@@ -1,0 +1,31 @@
+---
+title: "You uploaded an unsupported image. Please make sure your image is below 20 MB in size and is of one the following formats: [\"png\", \"gif\", \"webp\", \"jpeg\"]."
+provider: "azure-openai"
+provider_icon: "/file.svg"
+solved: true
+slug: "unsupported-image-error-9499"
+---
+
+## Reason
+
+The 400 Status Error (Bad Request) occurs when the Azure OpenAI API—specifically vision-capable models like GPT-4o or GPT-4 Turbo with Vision—encounters an image payload that violates its ingestion constraints. 
+
+Key reasons for this failure include:
+1. **Unsupported Image Format**: The service strictly supports only PNG (.png), JPEG (.jpeg, .jpg), WEBP (.webp), and non-animated GIF (.gif) files. Providing other formats like BMP, TIFF, or animated GIFs will trigger this error.
+2. **Exceeding Size Limits**: The individual image size must be below the **20 MB** limit (precisely 20,971,520 bytes).
+3. **Base64 Encoding Overhead**: If you are providing images via Base64 strings, the encoding process increases the data size by approximately 33%. A file that is 16 MB on disk may exceed the 20 MB threshold once converted to a Base64 string.
+4. **Batch Limit Violations**: Standard API requests are limited to a maximum of 10 images per chat request. Including more than this limit can lead to request rejection.
+5. **Corrupted Data**: If the image file is corrupted or the Base64 string is improperly formatted, the API will fail to parse the content.
+
+## Solution
+To resolve the 400 status error and successfully upload images to Azure OpenAI, follow these remediation steps:
+1. **Validate Image Format**: Ensure your image is in a supported format: PNG, JPEG, WEBP, or a non-animated GIF. If the image is in another format, use an image processing library to convert it before sending.
+2. **Verify File Size**: Check that the image is under the 20 MB limit. If the file is too large, resize the dimensions or use compression (e.g., JPEG quality reduction) to bring it within the allowed threshold.
+3. **Calculate Base64 Payload**: If using Base64, calculate the size of the final string. If it exceeds 20 MB, you must compress the original image further or host the image at a publicly accessible URL instead.
+4. **Check Image Count**: Ensure you are not sending more than 10 images in a single API call.
+5. **Use Valid URLs**: If passing images via URL, ensure the link is direct, publicly accessible, or accessible to the Azure OpenAI resource, and that it points to a supported file type.
+6. **Inspect Request Configuration**: Confirm that your API request body follows the expected structure for vision inputs, with the content type correctly set to `image_url` or `base64` as required by the SDK.
+
+## Suggested Links
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/gpt-with-vision](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/gpt-with-vision)
+- [https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models#gpt-4o-and-gpt-4-turbo-with-vision-limits](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models#gpt-4o-and-gpt-4-turbo-with-vision-limits)

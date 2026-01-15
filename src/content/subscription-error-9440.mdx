@@ -1,0 +1,70 @@
+---
+title: "Inactive subscription or usage limit reached"
+provider: "mistral-ai"
+provider_icon: "/file.svg"
+solved: true
+slug: "subscription-error-9440"
+---
+
+## Reason
+
+The 403 Forbidden error in Mistral AI, specifically indicating an inactive subscription or usage limit reached, typically occurs due to the following factors:
+
+**Inactive Subscription or Billing Issues**
+
+Your account on Mistral AI's La Plateforme may not have an active billing profile. This occurs if a subscription has expired, credit card payments have failed, or the free trial credits provided upon registration have been fully exhausted. In such cases, the API key remains valid, but the underlying subscription status prevents request processing.
+
+**Usage Tiers and Limits**
+
+Mistral AI employs a tier-based system (Tier 0 to Tier 4). If you reach the usage limit for your specific tier—measured in Requests Per Minute (RPM), Requests Per Day (RPD), or Tokens Per Minute (TPM)—the API may return a 403 or 429 error. Requests are blocked until the limit resets or the account is upgraded to a higher tier.
+
+**Insufficient Permissions**
+
+The API key used may lack the necessary scopes or roles required to access specific models or endpoints. If you are part of a workspace, the workspace owner may have restricted your access level.
+
+**Security and IP Policies**
+
+Mistral AI or your internal API gateway may enforce security policies such as IP whitelisting. If the request originates from an unauthorized IP address, the server will deny access with a 403 Forbidden response.
+
+**Gateway and Configuration Errors**
+
+Misconfigurations in intermediate layers, such as an API Gateway or proxy server, can lead to incorrect routing or failed authentication checks, resulting in the server rejecting the request.
+
+## Solution
+To resolve the 403 Forbidden error and restore API access, follow these steps:
+
+**Verify Subscription and Billing**
+1. Log in to the [Mistral AI Console (La Plateforme)](https://console.mistral.ai/).
+2. Navigate to the 'Billing' or 'Subscription' section.
+3. Ensure a valid payment method is linked and that there are no outstanding invoices.
+4. If you are using a prepaid plan, check that your credit balance is above zero.
+
+**Check Usage Tier Limits**
+1. Review the 'Usage' tab in your console to see how much of your quota has been consumed.
+2. Compare your current usage against the limits defined for your Tier.
+3. If you consistently hit limits, consider upgrading to a higher tier by increasing your lifetime spend or contacting Mistral support.
+
+**Manage API Keys and Permissions**
+1. Ensure the API key being used is active and correctly associated with the intended workspace.
+2. Create a new API key if you suspect the current one has been corrupted or has insufficient permissions.
+
+**Network and Security Adjustments**
+1. If your organization uses a firewall or IP whitelisting, ensure that Mistral AI’s endpoints are accessible.
+2. Update any IP allow-lists in your API gateway configuration to include your application's current egress IP address.
+
+**Review API Gateway Settings**
+1. If you are using a proxy or gateway like Bifrost or Kong, verify that the access control rules are not erroneously blocking the traffic.
+2. Correct any misconfigured headers or routing rules at the gateway level.
+
+## Suggested Links
+- [https://apipark.com/blog/3451](https://apipark.com/blog/3451)
+- [https://mistral.ai/terms/](https://mistral.ai/terms/)
+- [https://community.constantcontact.com/t5/API-Developer-Support/Getting-ERR-403-DEVELOPER-INACTIVE-error-when-I-post-using/td-p/221904](https://community.constantcontact.com/t5/API-Developer-Support/Getting-ERR-403-DEVELOPER-INACTIVE-error-when-I-post-using/td-p/221904)
+- [https://huggingface.co/mistralai/Mistral-Nemo-Instruct-2407/discussions/15](https://huggingface.co/mistralai/Mistral-Nemo-Instruct-2407/discussions/15)
+- [https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/discussions/108](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/discussions/108)
+- [https://apipark.com/techblog/en/understanding-the-causes-of-pinpoint-post-403-forbidden-errors/](https://apipark.com/techblog/en/understanding-the-causes-of-pinpoint-post-403-forbidden-errors/)
+- [https://www.restack.io/p/mistral-inference-answer-rate-limits-cat-ai](https://www.restack.io/p/mistral-inference-answer-rate-limits-cat-ai)
+- [https://www.hostinger.com/tutorials/what-is-403-forbidden-error-and-how-to-fix-it](https://www.hostinger.com/tutorials/what-is-403-forbidden-error-and-how-to-fix-it)
+- [https://docs.mistral.ai/deployment/laplateforme/tier/](https://docs.mistral.ai/deployment/laplateforme/tier/)
+- [https://console.mistral.ai/billing/](https://console.mistral.ai/billing/)
+- [https://docs.mistral.ai/platform/usage-tiers/](https://docs.mistral.ai/platform/usage-tiers/)
