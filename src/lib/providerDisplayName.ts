@@ -18,7 +18,7 @@ export const PROVIDER_NAME_MAP: Record<string, string> = {
   
   // Cloud & Infrastructure
   azure: "Azure",
-  "azure-openai": "Azure OpenAI",
+  "azure-openai": "Azure",
   aws: "AWS",
   bedrock: "AWS Bedrock",
   vertex: "Vertex AI",

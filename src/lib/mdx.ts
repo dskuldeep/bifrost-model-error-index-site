@@ -29,10 +29,16 @@ export function getErrorBySlug(slug: string): Error {
     const fullPath = path.join(contentDirectory, `${realSlug}.mdx`);
     const fileContents = fs.readFileSync(fullPath, 'utf8');
     const { data, content } = matter(fileContents);
+    const frontmatter = data as ErrorFrontmatter;
+
+    if (frontmatter.provider) {
+        // Always derive the provider icon from the canonical mapping.
+        frontmatter.provider_icon = getProviderLogoPath(frontmatter.provider);
+    }
 
     return { 
         slug: realSlug, 
-        frontmatter: data as ErrorFrontmatter, 
+        frontmatter, 
         content 
     };
 }
